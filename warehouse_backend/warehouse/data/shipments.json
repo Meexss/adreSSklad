@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "shipment_number": "SH123",
+        "shipment_date": "2023-10-01",
+        "counterparty": "Company A",
+        "warehouse": "Warehouse 1",
+        "stocks": [
+            {
+                "product": {
+                    "article": "ART001",
+                    "name": "Product 1",
+                    "quantity": 10,
+                    "cell": "A1",
+                    "sector": "S1",
+                    "status": "In Stock",
+                    "zone": "Z1"
+                },
+                "quantity": 5
+            }
+        ]
+    }
+]

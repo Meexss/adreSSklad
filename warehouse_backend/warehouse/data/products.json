@@ -1,0 +1,11 @@
+[
+    {
+        "article": "ART001",
+        "name": "Product 1",
+        "quantity": 10,
+        "cell": "A1",
+        "sector": "S1",
+        "status": "In Stock",
+        "zone": "Z1"
+    }
+]

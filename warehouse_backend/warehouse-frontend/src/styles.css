@@ -1,0 +1,80 @@
+/* src/styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #71bf44;
+    width: 100%;
+}
+
+header {
+    color: white;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgb(85, 84, 84);
+}
+
+nav a:hover {
+    text-decoration: underline;
+    background-color: #45a049;
+}
+
+
+footer {
+    color: white;
+    text-align: center;
+    width: 100%;
+    /* padding: 10px; */
+    position: absolute;
+    bottom: 0;
+}
+
+button {
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    background-color: rgb(85, 84, 84)
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Стиль для содержимого children */
+main > * {
+    margin: 20px; /* Отступы между детьми */
+    padding: 20px; /* Внутренние отступы */
+    background-color: rgb(240, 240, 240); /* Белый фон для детей */
+    border-radius: 8px; /* Закругленные углы у детей */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    min-height: 600px;
+}
+
+/* Для маленьких экранов можно уменьшить размеры контейнера */
+@media (max-width: 768px) {
+    main {
+        padding: 10px; /* Меньше отступов на маленьких экранах */
+    }
+}
