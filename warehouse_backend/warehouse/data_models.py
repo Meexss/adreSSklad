@@ -49,13 +49,14 @@ class AddProduct:
         write_json('addproduct.json', data)
 
 class Product:
-    def __init__(self, article, name, quantity, cell, sector, zone):
+    def __init__(self, unique_id, article, name, quantity, place, goods_status, barcode):
+        self.unique_id = unique_id
         self.article = article
         self.name = name
         self.quantity = quantity
-        self.cell = cell
-        self.sector = sector
-        self.zone = zone
+        self.place = place
+        self.goods_status = goods_status
+        self.barcode = barcode
 
     @staticmethod
     def get_all():

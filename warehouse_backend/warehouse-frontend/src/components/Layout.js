@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
                         <li><Link to="/operations">Расходные операции</Link></li>
                         <li><Link to="/products">Список товаров</Link></li>
                         <li><Link to="/add-product-list">Список приходов</Link></li>
-                        <li><Link to="/add-product">Оприходование</Link></li>
+                        <li><Link to="/add-product">Оприходование ТСД</Link></li>
                         <li><Link to="/search">Поиск</Link></li>
                     </ul>
                 </nav>

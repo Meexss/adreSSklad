@@ -21,6 +21,14 @@ const ShipmentDetails = () => {
                 <p><strong>Контрагент:</strong> {shipment.counterparty}</p>
                 <p><strong>Склад:</strong> {shipment.warehouse}</p>
                 <p><strong>Статус:</strong> {shipment.progress}</p>
+                
+                <button>Зарезервировать товар</button>
+                <br></br>
+                <br></br>
+                <button>Печать отборочника</button>
+                <br></br>
+                <br></br>
+                <button>Закрыть отгрузку</button>
                 <h3>Список товаров:</h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
                     <thead>

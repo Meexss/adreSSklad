@@ -22,9 +22,10 @@ class AddProductSerializer(serializers.Serializer):
     stocks = StockSerializer(many=True)
 
 class ProductSerializer(serializers.Serializer):
+    unique_id = serializers.CharField()
     article = serializers.CharField()
     name = serializers.CharField()
     quantity = serializers.IntegerField()
-    cell = serializers.CharField()
-    sector = serializers.CharField()
-    zone = serializers.CharField()
+    place = serializers.CharField()
+    goods_status = serializers.CharField()
+    barcode = serializers.CharField()

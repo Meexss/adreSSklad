@@ -16,7 +16,7 @@ const Operations = () => {
     return (
         <Layout>
             <div>
-                <h1>Операции</h1>
+                <h1>Расходные операции</h1>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
                     <thead>
                         <tr style={{ backgroundColor: '#f0f0f0' }}>

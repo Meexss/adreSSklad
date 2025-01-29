@@ -21,9 +21,9 @@ const ProductList = () => {
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Артикул</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Наименование</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Количество</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Сектор товара</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ячейка товара</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Зона</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Место хранения</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Статус товара</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Штрихкод</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,9 +43,9 @@ const ProductList = () => {
                                 <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.article}</td>
                                 <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'left' }}>{product.name}</td>
                                 <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.quantity}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.sector}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.cell}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.zone}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.place}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.goods_status}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.barcode}</td>
                             </tr>
                         ))}
                     </tbody>

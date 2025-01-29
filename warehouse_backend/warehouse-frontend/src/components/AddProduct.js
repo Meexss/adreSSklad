@@ -27,7 +27,7 @@ const AddProduct = () => {
     return (
         <Layout>
         <div>
-            <h1>Оприходование</h1>
+            <h1>Оприходование ТСД</h1>
             <form onSubmit={handleSubmit}>
                 <input type="text" name="article" placeholder="Артикул" onChange={handleChange} />
                 <input type="text" name="name" placeholder="Наименование" onChange={handleChange} />
