@@ -4,27 +4,27 @@ import Layout from './Layout';
 import { Link } from 'react-router-dom';
 
 
-const Operations = () => {
-    const [shipments, setShipments] = useState([]);
+const AddProductList = () => {
+    const [addproducts, setAddproducts] = useState([]);
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/shipments/')
-            .then(response => setShipments(response.data))
+        axios.get('http://127.0.0.1:8000/api/addproducts/')
+            .then(response => setAddproducts(response.data))
             .catch(error => console.error(error));
     }, []);
 
     return (
         <Layout>
             <div>
-                <h1>Операции</h1>
+                <h1>Список приходов с 1С (перемещение/ приход товара)</h1>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
                     <thead>
                         <tr style={{ backgroundColor: '#f0f0f0' }}>
                         <th style={{ border: '1px solid #ddd', padding: '8px' }}></th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Тип операции</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Номер отгрузки</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Номер прихода 1С</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Дата</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Контрагент</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Поставшик</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Склад</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во позиций</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во едениц товара</th>
@@ -32,9 +32,9 @@ const Operations = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {shipments.map(shipment => (
+                        {addproducts.map(addproducts => (
                             <tr
-                                key={shipment.shipment_number}
+                                key={addproducts.add_number}
                                 style={{
                                     border: '1px solid #ddd',
                                     backgroundColor: '#fff',
@@ -46,26 +46,26 @@ const Operations = () => {
                                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
                             >
                                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                    <Link
+                                    {/* <Link
                                         to={`/shipment/${shipment.id}`}
                                         state={{ shipment }}
                                         style={{ textDecoration: 'none', color: '#000' }}
                                     >
                                         Подробнее
-                                    </Link>
+                                    </Link> */}
                                     </td>
                                 <td style={{ border: '1px solid #ddd',padding: '8px' }}>Добавить в API</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{shipment.shipment_number}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{shipment.shipment_date}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{shipment.counterparty}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{shipment.warehouse}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{addproducts.add_number}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{addproducts.add_date}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{addproducts.counterparty}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{addproducts.warehouse}</td>
                                     {/* Кол-во позиций: длина массива stocks */}
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{shipment.stocks.length}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{addproducts.stocks.length}</td>
                                 {/* Кол-во единиц товара: сумма quantity из stocks */}
                                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                    {shipment.stocks.reduce((total, stock) => total + stock.quantity, 0)}
+                                    {addproducts.stocks.reduce((total, stock) => total + stock.quantity, 0)}
                                 </td>
-                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{shipment.progress}</td>
+                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{addproducts.progress}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -75,4 +75,4 @@ const Operations = () => {
     );
 };
 
-export default Operations;
+export default AddProductList;

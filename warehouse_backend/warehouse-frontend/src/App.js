@@ -5,6 +5,8 @@ import ProductList from './components/ProductList';
 import AddProduct from './components/AddProduct';
 import Search from './components/Search';
 import Home from './components/Home'; // Импортируем главную страницу
+import ShipmentDetails from './components/ShipmentDetails';
+import AddProductList from './components/AddProductList';
 
 const App = () => {
     return (
@@ -14,7 +16,9 @@ const App = () => {
                 <Route path="/operations" element={<Operations />} />
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/add-product" element={<AddProduct />} />
+                <Route path="/add-product-list" element={<AddProductList />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/shipment/:id" element={<ShipmentDetails />} />
             </Routes>
         </Router>
     );

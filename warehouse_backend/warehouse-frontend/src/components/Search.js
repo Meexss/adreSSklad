@@ -20,13 +20,41 @@ const Search = () => {
             <button onClick={handleSearch}>Найти</button>
             {product && (
                 <div>
-                    <p>Артикул: {product.article}</p>
-                    <p>Наименование: {product.name}</p>
-                    <p>Количество: {product.quantity}</p>
-                    <p>Ячейка: {product.cell}</p>
-                    <p>Сектор: {product.sector}</p>
-                    <p>Статус: {product.status}</p>
-                    <p>Зона: {product.zone}</p>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+                    <thead>
+                        <tr style={{ backgroundColor: '#f0f0f0' }}>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Артикул</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Наименование</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Количество</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ячейка товара</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Сектор товара</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Статус</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Зона</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr
+                                style={{
+                                    border: '1px solid #ddd',
+                                    backgroundColor: '#fff',
+                                    transition: 'background-color 0.2s ease',
+                                    textAlign: 'center',
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#45a049'}
+                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
+                            >
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{product.article}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{product.name}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{product.quantity}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{product.cell}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{product.sector}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{product.status}</td>
+                                <td style={{ border: '1px solid #ddd',padding: '8px' }}>{product.zone}</td>
+                            </tr>
+                            </tbody>
+                </table>
+
                 </div>
             )}
         </div>

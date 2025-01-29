@@ -10,8 +10,9 @@ const Layout = ({ children }) => {
                 <nav>
                     <ul>
                         <li><Link to="/">Главная</Link></li>
-                        <li><Link to="/operations">Операции</Link></li>
+                        <li><Link to="/operations">Расходные операции</Link></li>
                         <li><Link to="/products">Список товаров</Link></li>
+                        <li><Link to="/add-product-list">Список приходов</Link></li>
                         <li><Link to="/add-product">Оприходование</Link></li>
                         <li><Link to="/search">Поиск</Link></li>
                     </ul>

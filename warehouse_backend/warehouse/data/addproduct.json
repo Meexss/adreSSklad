@@ -1,7 +1,7 @@
 [
     {
-        "shipment_number": "SH123",
-        "shipment_date": "2023-10-01",
+        "add_number": "SH1243",
+        "add_date": "2023-10-01",
         "counterparty": "Company A",
         "warehouse": "Warehouse 1",
         "progress": "Новый",
