@@ -68,3 +68,31 @@ class Product:
         data = read_json('products.json')
         data.append(product_data)
         write_json('products.json', data)
+
+class Reserv:
+    def __init__(self, shipment_number, reserve_data, unique_id, article, name, quantity, place, goods_status, barcode):
+        self.shipment_number = shipment_number
+        self.reserve_data = reserve_data
+        self.unique_id = counterparty
+        self.article = article
+        self.name = name
+        self.quantity = quantity
+        self.place = place
+        self.goods_status = goods_status
+        self.barcode = barcode
+
+    @staticmethod
+    def get_all():
+        # Читаем данные из addproduct.json
+        data = read_json('reserv.json')
+        return [AddProduct(**item) for item in data]
+
+    @staticmethod
+    def add(addproduct_data):
+        # Читаем текущие данные из addproduct.json
+        data = read_json('reserv.json')
+        # Добавляем новые данные
+        data.append(addproduct_data)
+        # Записываем обратно в файл
+        write_json('reserv.json', data)
+

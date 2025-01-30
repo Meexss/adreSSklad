@@ -46,13 +46,13 @@ const AddProductList = () => {
                                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
                             >
                                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                    {/* <Link
-                                        to={`/shipment/${shipment.id}`}
-                                        state={{ shipment }}
+                                    <Link
+                                        to={`/add-product/${addproducts.add_number}`}
+                                        state={{ addproducts }}
                                         style={{ textDecoration: 'none', color: '#000' }}
                                     >
                                         Подробнее
-                                    </Link> */}
+                                    </Link>
                                     </td>
                                 <td style={{ border: '1px solid #ddd',padding: '8px' }}>Добавить в API</td>
                                 <td style={{ border: '1px solid #ddd',padding: '8px' }}>{addproducts.add_number}</td>

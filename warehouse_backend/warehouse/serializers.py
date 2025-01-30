@@ -29,3 +29,14 @@ class ProductSerializer(serializers.Serializer):
     place = serializers.CharField()
     goods_status = serializers.CharField()
     barcode = serializers.CharField()
+
+class ReservSerializer(serializers.Serializer):
+    shipment_number = serializers.CharField()
+    reserve_data = serializers.CharField()
+    unique_id = serializers.CharField()
+    article = serializers.CharField()
+    name = serializers.CharField()
+    quantity = serializers.IntegerField()
+    place = serializers.CharField()
+    goods_status = serializers.CharField()
+    barcode = serializers.CharField()

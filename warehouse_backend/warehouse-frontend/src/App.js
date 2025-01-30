@@ -7,6 +7,7 @@ import Search from './components/Search';
 import Home from './components/Home'; // Импортируем главную страницу
 import ShipmentDetails from './components/ShipmentDetails';
 import AddProductList from './components/AddProductList';
+import AddProductDetails from './components/AddProductDetails';
 
 const App = () => {
     return (
@@ -19,6 +20,7 @@ const App = () => {
                 <Route path="/add-product-list" element={<AddProductList />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/shipment/:id" element={<ShipmentDetails />} />
+                <Route path="/add-product/:id" element={<AddProductDetails />} />
             </Routes>
         </Router>
     );
