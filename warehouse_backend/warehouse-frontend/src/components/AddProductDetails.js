@@ -20,23 +20,13 @@ const AddProductDetails = () => {
                 <p><strong>Контрагент:</strong> {addproducts.counterparty}</p>
                 <p><strong>Склад:</strong> {addproducts.warehouse}</p>
                 <p><strong>Статус:</strong> {addproducts.progress}</p>
-                
-                <button>Зарезервировать товар</button>
-                <br></br>
-                <br></br>
-                <button>Печать отборочника</button>
-                <br></br>
-                <br></br>
-                <button>Закрыть отгрузку</button>
-                <h3>Список товаров:</h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
                     <thead>
                         <tr style={{ backgroundColor: '#f0f0f0' }}>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Артикул</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Наименование</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Количество</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Сектор товара</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ячейка товара</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Место товара</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Зона</th>
                         </tr>
                     </thead>

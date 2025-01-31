@@ -73,7 +73,7 @@ class Reserv:
     def __init__(self, shipment_number, reserve_data, unique_id, article, name, quantity, place, goods_status, barcode):
         self.shipment_number = shipment_number
         self.reserve_data = reserve_data
-        self.unique_id = counterparty
+        self.unique_id = unique_id
         self.article = article
         self.name = name
         self.quantity = quantity

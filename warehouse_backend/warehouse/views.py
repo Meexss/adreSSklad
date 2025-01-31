@@ -3,15 +3,11 @@ from rest_framework.views import APIView
 from rest_framework import status
 from .data_models import Shipment, AddProduct, Product
 from .serializers import ShipmentSerializer, AddProductSerializer, ProductSerializer, ReservSerializer
-import logging
-import os
-import json
 import uuid
-from django.conf import settings
 from .utils import read_json, write_json
 from datetime import datetime
+from datetime import datetime
 
-logger = logging.getLogger(__name__)
 
 # Обработчик для получения всех отгрузок
 class ShipmentListView(APIView):
@@ -21,18 +17,43 @@ class ShipmentListView(APIView):
             serializer = ShipmentSerializer(shipments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error(f"Ошибка при получении отгрузок: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
         try:
-            shipment_data = request.data
-            Shipment.add(shipment_data)  # Добавляем данные в shipment.json
-            return Response({"status": "success"}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.error(f"Ошибка при добавлении отгрузки: {e}")
-            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # Получаем данные из запроса
+            shipment_number = request.data.get('shipment_number')
+            progress = request.data.get('progress')
 
+            if not shipment_number or not progress:
+                return Response(
+                    {"error": "Параметры shipment_number и progress обязательны"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Читаем текущие данные из shipment.json
+            shipments = read_json('shipments.json')
+
+            # Ищем нужную запись по shipment_number
+            shipment_found = False
+            for shipment in shipments:
+                if shipment.get('shipment_number') == shipment_number:
+                    shipment['progress'] = progress  # Обновляем поле progress
+                    shipment_found = True
+                    break
+
+            if not shipment_found:
+                return Response(
+                    {"error": f"Отгрузка с shipment_number={shipment_number} не найдена"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Сохраняем обновленные данные обратно в shipment.json
+            write_json('shipments.json', shipments)
+
+            return Response({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Ошибка на сервере: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 # Обработчик для получения всех добавленных продуктов
 class AddProductListView(APIView):
     def get(self, request):
@@ -41,7 +62,6 @@ class AddProductListView(APIView):
             serializer = AddProductSerializer(addproducts, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error(f"Ошибка при получении добавленных продуктов: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
@@ -50,7 +70,6 @@ class AddProductListView(APIView):
             AddProduct.add(addproduct_data)  # Добавляем данные в addproduct.json
             return Response({"status": "success"}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            logger.error(f"Ошибка при добавлении добавленных продуктов: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Обработчик для работы с продуктами
@@ -70,20 +89,9 @@ class ProductListView(APIView):
             Product.add(product_data)
             return Response({"status": "success"}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            logger.error(f"Ошибка при добавлении продукта: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-import logging
-import uuid
-from datetime import datetime
-from .utils import read_json, write_json
-from .serializers import ReservSerializer
-
-logger = logging.getLogger(__name__)
-
+# Обработчик для работы с резервом на отгрузку
 class ReserveAllView(APIView):
     def post(self, request):
         stocks = request.data.get('stocks', [])
@@ -110,35 +118,37 @@ class ReserveAllView(APIView):
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
-            logger.error(f"Ошибка в ReserveAllView: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request):
         try:
-            # Получаем shipment_number из параметров запроса
             shipment_number = request.query_params.get('shipment_number')
 
+            # Проверка наличия shipment_number в запросе
             if not shipment_number:
                 return Response(
                     {"error": "Параметр shipment_number обязателен"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Чтение данных из reserv.json
             reserv = read_json('reserv.json')
-
-            # Фильтруем записи по shipment_number
             filtered_reserv = [item for item in reserv if item['shipment_number'] == shipment_number]
 
-            # Сериализация данных
-            serializer = ReservSerializer(filtered_reserv, many=True)
+            # Проверка наличия данных по shipment_number
+            if not filtered_reserv:
+                return Response(
+                    {"error": f"Отгрузка с shipment_number={shipment_number} не найдена"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
+            serializer = ReservSerializer(filtered_reserv, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            logger.error(f"Ошибка в get-запросе ReserveAllView: {e}")
-            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response(
+                {"error": "Ошибка на сервере"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     def reserve_product(self, article, quantity, shipment_number):
         try:
             # Чтение данных из products.json и reserv.json
@@ -175,7 +185,6 @@ class ReserveAllView(APIView):
                         if serializer.is_valid():
                             reserv.append(serializer.validated_data)
                         else:
-                            logger.error(f"Ошибка валидации данных: {serializer.errors}")
                             continue
 
                         # Обновляем текущий товар
@@ -206,7 +215,6 @@ class ReserveAllView(APIView):
                         if serializer.is_valid():
                             reserv.append(serializer.validated_data)
                         else:
-                            logger.error(f"Ошибка валидации данных: {serializer.errors}")
                             continue
 
                         # Обнуляем количество и обновляем статус
@@ -223,6 +231,55 @@ class ReserveAllView(APIView):
             return reserved_quantity, reserved_places
 
         except Exception as e:
-            logger.error(f"Ошибка в reserve_product: {e}")
             raise
 
+class CancelReservation(APIView):
+    def post(self, request):
+        try:
+            reserve_ids = request.data.get('reserve_ids', [])
+            
+            # Читаем данные из файлов
+            reserv = read_json('reserv.json')
+            products = read_json('products.json')
+
+            # Находим записи для отмены
+            canceled_items = [item for item in reserv if item['unique_id'] in reserve_ids]
+            
+            # Если не найдено ни одной записи
+            if not canceled_items:
+                return Response(
+                    {"error": "Не найдено резервирований с указанными ID"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            # Переносим товары обратно в products.json
+            for item in canceled_items:
+                # Создаем копию с обновленным статусом
+                product_entry = {
+                    "unique_id": item['unique_id'],  # Сохраняем оригинальный ID
+                    "article": item['article'],
+                    "name": item['name'],
+                    "quantity": item['quantity'],
+                    "place": item['place'],
+                    "goods_status": "Хранение",  # Обновляем статус
+                    "barcode": item['barcode']
+                }
+                products.append(product_entry)
+
+            # Удаляем отмененные записи из reserv.json
+            new_reserv = [item for item in reserv if item['unique_id'] not in reserve_ids]
+
+            # Сохраняем изменения
+            write_json('reserv.json', new_reserv)
+            write_json('products.json', products)
+
+            return Response(
+                {"status": "success", "canceled_count": len(canceled_items)},
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": "Ошибка на сервере"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

@@ -7,11 +7,14 @@ import { Link } from 'react-router-dom';
 const Operations = () => {
     const [shipments, setShipments] = useState([]);
 
+
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/shipments/')
             .then(response => setShipments(response.data))
             .catch(error => console.error(error));
     }, []);
+
+    
 
     return (
         <Layout>
@@ -29,6 +32,7 @@ const Operations = () => {
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во позиций</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во едениц товара</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Статус</th>
+                           
                         </tr>
                     </thead>
                     <tbody>
@@ -66,8 +70,11 @@ const Operations = () => {
                                     {shipment.stocks.reduce((total, stock) => total + stock.quantity, 0)}
                                 </td>
                                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>{shipment.progress}</td>
+        
                             </tr>
-                        ))}
+                            
+                        )
+                        )}
                     </tbody>
                 </table>
             </div>

@@ -4,20 +4,18 @@
         "shipment_date": "2023-10-01",
         "counterparty": "Company A",
         "warehouse": "Warehouse 1",
-        "progress": "Новый",
+        "progress": "Черновик",
         "stocks": [
             {
-                    "article": "ART001",
-                    "name": "Product 1",
-                    "quantity": 10
-                    
-            }, 
+                "article": "ART001",
+                "name": "Product 1",
+                "quantity": 10
+            },
             {
-                    "article": "ART002",
-                    "name": "Product 2",
-                    "quantity": 30
-                
-        }
+                "article": "ART002",
+                "name": "Product 2",
+                "quantity": 30
+            }
         ]
     },
     {
@@ -25,20 +23,18 @@
         "shipment_date": "2023-10-01",
         "counterparty": "Company B",
         "warehouse": "Warehouse 1",
-        "progress": "В работе",
+        "progress": "Черновик",
         "stocks": [
             {
-                    "article": "ART001",
-                    "name": "Product 1",
-                    "quantity": 5
-                    
-            }, 
+                "article": "ART001",
+                "name": "Product 1",
+                "quantity": 5
+            },
             {
-                    "article": "ART002",
-                    "name": "Product 2",
-                    "quantity": 4
-                
-        }
+                "article": "ART002",
+                "name": "Product 2",
+                "quantity": 4
+            }
         ]
     }
 ]
