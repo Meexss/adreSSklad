@@ -1,20 +1,22 @@
 [
     {
-        "shipment_number": "SH123",
-        "shipment_date": "2023-10-01",
-        "counterparty": "Company A",
-        "warehouse": "Warehouse 1",
+        "shipment_number": "номер",
+        "shipment_date": "дата",
+        "counterparty": "название компании",
+        "warehouse": "Склад",
         "progress": "Черновик",
         "stocks": [
             {
-                "article": "ART001",
-                "name": "Product 1",
-                "quantity": 10
+                "article": "Артикул товара",
+                "name": "Наименование товара",
+                "quantity": 10,
+                "barcode": "Штрихкод"
             },
             {
-                "article": "ART002",
-                "name": "Product 2",
-                "quantity": 30
+                "article": "Артикул товара",
+                "name": "Наименование товара",
+                "quantity": 10,
+                "barcode": "Штрихкод"
             }
         ]
     },
@@ -23,17 +25,19 @@
         "shipment_date": "2023-10-01",
         "counterparty": "Company B",
         "warehouse": "Warehouse 1",
-        "progress": "Черновик",
+        "progress": "В работе",
         "stocks": [
             {
                 "article": "ART001",
                 "name": "Product 1",
-                "quantity": 5
+                "quantity": 5,
+                "barcode": "-"
             },
             {
                 "article": "ART002",
                 "name": "Product 2",
-                "quantity": 4
+                "quantity": 4,
+                "barcode": "-"
             }
         ]
     }

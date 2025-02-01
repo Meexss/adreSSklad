@@ -2,11 +2,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from .data_models import Shipment, AddProduct, Product
-from .serializers import ShipmentSerializer, AddProductSerializer, ProductSerializer, ReservSerializer
+from .serializers import PlaceProductsSerializer, ShipmentSerializer, AddProductSerializer, ProductSerializer, ReservSerializer
 import uuid
 from .utils import read_json, write_json
 from datetime import datetime
 from datetime import datetime
+import logging
 
 
 # Обработчик для получения всех отгрузок
@@ -58,44 +59,98 @@ class ShipmentListView(APIView):
 class AddProductListView(APIView):
     def get(self, request):
         try:
-            addproducts = AddProduct.get_all()  # Читаем данные из addproduct.json
-            serializer = AddProductSerializer(addproducts, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            add_number = request.query_params.get("add_number")
+            print(f"Поиск товара article={add_number}")  # Логирование
+
+            # Читаем данные из JSON
+            all_products = read_json("addproduct.json")
+
+            # Фильтрация по add_number
+            if add_number:
+                filtered_products = [p for p in all_products if str(p.get("add_number")) == str(add_number)]
+                print(f"Поиск товара article={filtered_products}")  # Логирование
+                return Response(filtered_products, status=status.HTTP_200_OK)
+
+            return Response(all_products, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
         try:
             addproduct_data = request.data
-            AddProduct.add(addproduct_data)  # Добавляем данные в addproduct.json
-            return Response({"status": "success"}, status=status.HTTP_201_CREATED)
+            add_number = addproduct_data.get('add_number')
+            position_data = addproduct_data.get('positionData')
+            new_progress = addproduct_data.get('progress')
+
+            # Читаем данные из addproduct.json
+            all_products = read_json("addproduct.json")
+
+            # Находим продукт с нужным add_number
+            product = next((p for p in all_products if str(p.get("add_number")) == str(add_number)), None)
+
+            if product:
+                print("Position data:", position_data)
+                # Обновляем данные для найденных позиций
+                for new_position in position_data:
+                    article = new_position.get("article")
+                    for position in product.get("positionData", []):
+                        if position.get("article") == article:
+                            # Обновляем error_barcode, newbarcode и final_quantity
+                            position["error_barcode"] = new_position.get("error_barcode", position["error_barcode"])
+                            position["newbarcode"] = new_position.get("newbarcode", position["newbarcode"])
+                            position["final_quantity"] = new_position.get("final_quantity", 0)
+                            
+                if new_progress:
+                    product["progress"] = new_progress            
+
+                # Сохраняем обновленные данные в JSON
+                write_json("addproduct.json", all_products)
+                return Response({"status": "success"}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"error": "Product with this add_number not found"}, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as e:
-            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Обработчик для работы с продуктами
 class ProductListView(APIView):
+    def post(self, request):
+        try:
+            serializer = ProductSerializer(data=request.data)
+            if serializer.is_valid():
+                Product.add(serializer.validated_data)
+                return Response({"status": "success"}, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     def get(self, request):
         try:
             products = Product.get_all()
+            
+            # Фильтрация
+            if article := request.query_params.get('article'):
+                products = [p for p in products if p.article == article]
+            
+            if barcode := request.query_params.get('barcode'):
+                products = [p for p in products if p.barcode == barcode]
+            
+            # Сортировка
+            sort_by = request.query_params.get('sort', 'article')
+            reverse = request.query_params.get('order', 'asc') == 'desc'
+            products.sort(key=lambda x: getattr(x, sort_by, ''), reverse=reverse)
+            
             serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
         except Exception as e:
-            print(f"Ошибка: {e}")  # Логируем исключение
-            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    def post(self, request):
-        try:
-            product_data = request.data
-            Product.add(product_data)
-            return Response({"status": "success"}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=500)
 
 # Обработчик для работы с резервом на отгрузку
 class ReserveAllView(APIView):
     def post(self, request):
         stocks = request.data.get('stocks', [])
         shipment_number = request.data.get('shipment_number', 'RESERVED')  # Получаем номер отгрузки
+        print(f"Поиск по отгрузке с номером: {shipment_number}")
+        print(f"Поиск по отгрузке с номером: {stocks}")
         total_reserved = 0
         reserved_items = []
 
@@ -118,6 +173,7 @@ class ReserveAllView(APIView):
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
+            print(f"Ошибка в reserve_product: {str(e)}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request):
@@ -151,15 +207,23 @@ class ReserveAllView(APIView):
         )
     def reserve_product(self, article, quantity, shipment_number):
         try:
-            # Чтение данных из products.json и reserv.json
             products = read_json('products.json')
             reserv = read_json('reserv.json')
+
+            print(f"Поиск товара article={article}, shipment={shipment_number}")  # Логирование
 
             reserved_quantity = 0
             reserved_places = []
 
             for product in products:
-                if product['article'] == article and product['goods_status'] in ["Хранение", "Приемка"]:
+                # Приводим статус к нижнему регистру и удаляем пробелы
+                goods_status = product.get('goods_status', '').strip().lower()
+                print(f"Товар: {product['article']}, статус: {goods_status}")  # Логирование статуса
+                
+                # Проверяем, что статус товара подходит для резервирования
+                if product['article'] == article and goods_status in ["хранение", "приемка"]:
+                    print(f"Товар подходит для резерва: {product}")  # Логирование подходящего товара
+                    # Логика резервирования
                     available_quantity = product['quantity']
                     remaining_needed = quantity - reserved_quantity
 
@@ -231,55 +295,124 @@ class ReserveAllView(APIView):
             return reserved_quantity, reserved_places
 
         except Exception as e:
+            print(f"Ошибка в reserve_product: {str(e)}")
             raise
 
 class CancelReservation(APIView):
     def post(self, request):
         try:
             reserve_ids = request.data.get('reserve_ids', [])
-            
-            # Читаем данные из файлов
+            cancel_quantities = request.data.get('cancel_quantities', {})  # Словарь {unique_id: количество для отмены}
+            new_goods_status = request.data.get('goods_status', 'Хранение')
+
+
+            # Чтение данных из файлов
             reserv = read_json('reserv.json')
             products = read_json('products.json')
 
-            # Находим записи для отмены
-            canceled_items = [item for item in reserv if item['unique_id'] in reserve_ids]
-            
-            # Если не найдено ни одной записи
-            if not canceled_items:
-                return Response(
-                    {"error": "Не найдено резервирований с указанными ID"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
+            canceled_items = []  # Список отмененных товаров
+            updated_reserv = []  # Обновленные записи резервирования
 
-            # Переносим товары обратно в products.json
-            for item in canceled_items:
-                # Создаем копию с обновленным статусом
-                product_entry = {
-                    "unique_id": item['unique_id'],  # Сохраняем оригинальный ID
-                    "article": item['article'],
-                    "name": item['name'],
-                    "quantity": item['quantity'],
-                    "place": item['place'],
-                    "goods_status": "Хранение",  # Обновляем статус
-                    "barcode": item['barcode']
-                }
-                products.append(product_entry)
+            for item in reserv:
+                if item['unique_id'] in reserve_ids:
+                    # Определяем, сколько нужно отменить
+                    cancel_quantity = cancel_quantities.get(item['unique_id'], item['quantity'])
 
-            # Удаляем отмененные записи из reserv.json
-            new_reserv = [item for item in reserv if item['unique_id'] not in reserve_ids]
+                    # Если отменяем часть товара
+                    if cancel_quantity < item['quantity']:
+                        # Создаем запись для отмененной части товара с новым уникальным ID
+                        canceled_item = {
+                            "unique_id": str(uuid.uuid4()),  # Новый уникальный ID для отмененной части
+                            "article": item['article'],
+                            "name": item['name'],
+                            "quantity": cancel_quantity,
+                            "place": item['place'],
+                            "goods_status": new_goods_status,  # Статус для возвращаемого товара
+                            "barcode": item['barcode']
+                        }
+                        products.append(canceled_item)
 
-            # Сохраняем изменения
-            write_json('reserv.json', new_reserv)
+                        # Оставшаяся часть товара сохраняет старый unique_id
+                        updated_reserv.append({
+                            **item,
+                            "quantity": item['quantity'] - cancel_quantity,  # Обновляем количество в резерве
+                            "goods_status": "Хранение",  # Статус оставшегося товара
+                        })
+                    else:
+                        # Если отменяем весь товар
+                        canceled_items.append(item)
+                        # Добавляем весь товар обратно в products.json
+                        product_entry = {
+                            "unique_id": item['unique_id'],
+                            "article": item['article'],
+                            "name": item['name'],
+                            "quantity": item['quantity'],
+                            "place": item['place'],
+                            "goods_status": new_goods_status,  # Статус "Хранение" для возвращаемого товара
+                            "barcode": item['barcode']
+                        }
+                        products.append(product_entry)
+                else:
+                    updated_reserv.append(item)
+
+            # Сохраняем обновленные данные в файлы
+            write_json('reserv.json', updated_reserv)
             write_json('products.json', products)
 
             return Response(
-                {"status": "success", "canceled_count": len(canceled_items)},
+                {"status": "success", "canceled_count": len(canceled_items), "canceled_items": canceled_items},
                 status=status.HTTP_200_OK,
             )
 
         except Exception as e:
+            print(f"Ошибка: {str(e)}")  # Добавьте вывод ошибки для отладки
             return Response(
                 {"error": "Ошибка на сервере"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class PlaceProducts(APIView):
+    def get(self, request):
+        try:
+            add_number = request.query_params.get("add_number")
+            all_products = read_json("placeProducts.json")
+            
+            if add_number:
+                filtered_products = [p for p in all_products if str(p.get("add_number")) == str(add_number)]
+                return Response(filtered_products, status=status.HTTP_200_OK)
+            
+            return Response(all_products, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request):
+        try:
+            new_products = request.data
+            print("Полученные данные:", new_products)  # Лог запроса
+            if not isinstance(new_products, list):
+                return Response({"error": "Ожидается список объектов"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            all_products = read_json("placeProducts.json")
+            product_records = read_json("products.json")
+            
+            for product in new_products:
+                unique_id = str(uuid.uuid4())
+                product["unique_id"] = unique_id
+                all_products.append(product)
+                
+                product_records.append({
+                    "unique_id": unique_id,
+                    "article": product.get("article"),
+                    "name": product.get("name"),
+                    "quantity": product.get("quantity"),
+                    "goods_status": product.get("goods_status"),
+                    "barcode": product.get("barcode")
+                })
+            
+            write_json("placeProducts.json", all_products)
+            write_json("products.json", product_records)
+            
+            return Response({"message": "Данные успешно добавлены"}, status=status.HTTP_201_CREATED)
+        except Exception:
+            print("Ошибка:", e)  # Лог ошибок
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

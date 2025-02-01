@@ -1,23 +1,56 @@
 [
     {
+        "add_number": "Номер прихода",
+        "add_date": "Дата прихода",
+        "counterparty": "Компания поставщик",
+        "warehouse": "Склад",
+        "progress": "В работе",
+        "positionData": [
+            {
+                "article": "артикул",
+                "name": "Наименование",
+                "quantity": 10,
+                "barcode": "Штрихкод",
+                "error_barcode": false,
+                "newbarcode": "Новый Штрихкод",
+                "final_quantity": 6
+            },
+            {
+                "article": "артикул",
+                "name": "Наименование",
+                "quantity": 10,
+                "barcode": "Штрихкод",
+                "error_barcode": false,
+                "newbarcode": "Новый Штрихкод",
+                "final_quantity": 6
+            }
+        ]
+    },
+    {
         "add_number": "59438",
         "add_date": "2023-10-01",
         "counterparty": "Company A",
         "warehouse": "Warehouse 1",
-        "progress": "Новый",
-        "stocks": [
+        "progress": "В работе",
+        "positionData": [
             {
-                    "article": "ART001",
-                    "name": "Product 1",
-                    "quantity": 10
-                    
-            }, 
+                "article": "ART001",
+                "name": "Product 1",
+                "quantity": 10,
+                "barcode": "150499116844",
+                "error_barcode": false,
+                "newbarcode": "-",
+                "final_quantity": 9
+            },
             {
                 "article": "ART002",
                 "name": "Product 2",
-                "quantity": 30
-                
-        }
+                "quantity": 30,
+                "barcode": "150499116843",
+                "error_barcode": false,
+                "newbarcode": "150499116842",
+                "final_quantity": 27
+            }
         ]
     }
 ]

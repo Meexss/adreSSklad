@@ -26,8 +26,10 @@ const AddProductList = () => {
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Дата</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Поставшик</th>
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Склад</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во позиций</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во едениц товара</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во позиций по 1С</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во едениц товара по 1С</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во принятого товара</th>
+
                             <th style={{ border: '1px solid #ddd', padding: '8px' }}>Статус</th>
                         </tr>
                     </thead>
@@ -60,10 +62,14 @@ const AddProductList = () => {
                                 <td style={{ border: '1px solid #ddd',padding: '8px' }}>{addproducts.counterparty}</td>
                                 <td style={{ border: '1px solid #ddd',padding: '8px' }}>{addproducts.warehouse}</td>
                                     {/* Кол-во позиций: длина массива stocks */}
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{addproducts.stocks.length}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{addproducts.positionData.length}</td>
                                 {/* Кол-во единиц товара: сумма quantity из stocks */}
                                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                    {addproducts.stocks.reduce((total, stock) => total + stock.quantity, 0)}
+                                    {addproducts.positionData.reduce((total, stock) => total + stock.quantity, 0)}
+                                </td>
+
+                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                    {addproducts.positionData.reduce((total, stock) => total + stock.final_quantity, 0)}
                                 </td>
                                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>{addproducts.progress}</td>
                             </tr>

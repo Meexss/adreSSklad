@@ -1,0 +1,52 @@
+[
+    {
+        "add_number": "Номер прихода",
+        "article": "артикул",
+        "name": "Наименование",
+        "barcode": "Штрихкод",
+        "quantity": 5,
+        "unique_id": "уникальный ID",
+        "place": "место хранения на складе",
+        "goods_status": "статус хранения"
+    },
+    {
+        "add_number": "59438",
+        "article": "ART002",
+        "name": "Product 2",
+        "barcode": "150499116843",
+        "quantity": 10,
+        "unique_id": "a9f6d925-74a1-4761-a666-16e2648bd437",
+        "place": "A-2-2-1",
+        "goods_status": "Хранение"
+    },
+    {
+        "add_number": "59438",
+        "article": "ART001",
+        "name": "Product 1",
+        "barcode": "150499116844",
+        "quantity": 5,
+        "unique_id": "d02ad2be-ac96-49c3-960f-2c39d982ac06",
+        "place": "A-2-3-1",
+        "goods_status": "Хранение"
+    },
+    {
+        "add_number": "59438",
+        "article": "ART001",
+        "name": "Product 1",
+        "barcode": "150499116844",
+        "quantity": 2,
+        "unique_id": "8b2d0b48-028b-4b87-8d96-9ac28a086984",
+        "place": "A-5-4-2",
+        "goods_status": "Хранение"
+    },
+    {
+        "add_number": "59438",
+        "article": "ART002",
+        "name": "Product 2",
+        "barcode": "150499116843",
+        "quantity": 5,
+        "unique_id": "984036e2-85d7-4d94-b700-57b58c8c72a8",
+        "place": "A-3-5-1",
+        "goods_status": "Хранение"
+    }
+]
