@@ -9,15 +9,6 @@
         "barcode": "Штрихкод"
     },
     {
-        "unique_id": "f7219169-e9ff-4471-a21f-36636416d6bb",
-        "article": "ART002",
-        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
-        "quantity": 2,
-        "place": "A-1-1-2",
-        "goods_status": "Хранение",
-        "barcode": "56268998198"
-    },
-    {
         "unique_id": "3648e57f-334e-4820-92ca-0a28114da046",
         "article": "ART001",
         "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
@@ -25,15 +16,6 @@
         "place": "A-1-1-3",
         "goods_status": "Брак",
         "barcode": "5626899819"
-    },
-    {
-        "unique_id": "25819118-6580-4bd0-8dbf-a94357e373d0",
-        "article": "ART002",
-        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
-        "quantity": 4,
-        "place": "A-1-1-3",
-        "goods_status": "Хранение",
-        "barcode": "56268998198"
     },
     {
         "unique_id": "3648e57f-334e-4820-92ca-0a28114da046",
@@ -45,28 +27,74 @@
         "barcode": "5626899819"
     },
     {
-        "unique_id": "1a5aeed6-3da8-40e2-a66c-34e36d67e52d",
-        "article": "ART001",
-        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
-        "quantity": 3,
-        "place": "A-1-1-3",
-        "goods_status": "Хранение",
-        "barcode": "5626899819"
-    },
-    {
-        "unique_id": "28dd85dc-c0e6-44f8-807e-247f2c0f39e1",
+        "unique_id": "50e2792d-98c6-4b7a-90ca-75050f33ae62",
         "article": "ART002",
         "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
-        "quantity": 4,
+        "quantity": 1,
         "place": "A-1-1-2",
         "goods_status": "Хранение",
         "barcode": "56268998198"
     },
     {
-        "unique_id": "a9f6d925-74a1-4761-a666-16e2648bd437",
+        "unique_id": "f7219169-e9ff-4471-a21f-36636416d6bb",
+        "article": "ART002",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 2,
+        "place": "A-1-1-2",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "f8180d84-072b-46d0-97d3-791f8abf751e",
+        "article": "ART002",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 2,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "25819118-6580-4bd0-8dbf-a94357e373d0",
+        "article": "ART002",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 2,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "df4c6de6-4341-4b97-9c16-bf4dbbfc470b",
+        "article": "ART002",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 2,
+        "place": "A-1-1-2",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "28dd85dc-c0e6-44f8-807e-247f2c0f39e1",
+        "article": "ART002",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 2,
+        "place": "A-1-1-2",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "b0a5c854-a196-4a4d-a59f-87c81a201c3d",
         "article": "ART002",
         "name": "Product 2",
-        "quantity": 10,
+        "quantity": 2,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "150499116843"
+    },
+    {
+        "unique_id": "faae3629-3b4a-4767-a77d-ec102f2f1136",
+        "article": "ART002",
+        "name": "Product 2",
+        "quantity": 4,
+        "place": "A-1-1-3",
         "goods_status": "Хранение",
         "barcode": "150499116843"
     },
@@ -74,23 +102,80 @@
         "unique_id": "d02ad2be-ac96-49c3-960f-2c39d982ac06",
         "article": "ART001",
         "name": "Product 1",
-        "quantity": 5,
+        "quantity": 3,
+        "place": "A-1-1-3",
         "goods_status": "Хранение",
         "barcode": "150499116844"
     },
     {
-        "unique_id": "8b2d0b48-028b-4b87-8d96-9ac28a086984",
+        "unique_id": "8f4876e2-64bc-4db9-b881-48179b2bc0c9",
         "article": "ART001",
         "name": "Product 1",
         "quantity": 2,
+        "place": "A-1-1-3",
         "goods_status": "Хранение",
         "barcode": "150499116844"
     },
     {
-        "unique_id": "984036e2-85d7-4d94-b700-57b58c8c72a8",
+        "unique_id": "82a68d57-bba8-4f62-892e-ba7bf8b2a1b5",
         "article": "ART002",
         "name": "Product 2",
-        "quantity": 5,
+        "quantity": 4,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "150499116843"
+    },
+    {
+        "unique_id": "eb12c70f-8b95-48fc-9a1c-845f363c3e57",
+        "article": "ART001",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 1,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "95e18bcc-ad84-4f03-ac25-301ff2f77803",
+        "article": "ART001",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 1,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "28d00343-e6ac-406b-b6e0-5c86e0903f0b",
+        "article": "ART001",
+        "name": "тест 1",
+        "quantity": 1,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "6dba90d2-332f-4824-a539-6d7cec5d5baf",
+        "article": "ART001",
+        "name": "тест 1",
+        "quantity": 1,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "75a03a48-4342-4d8c-8006-479e25d5ea97",
+        "article": "ART001",
+        "name": "Культиватор бензиновый FERMER FM-812MB Black edition, Культиватор бензиновый FERMER FM-812MB Black edition",
+        "quantity": 1,
+        "place": "A-1-1-3",
+        "goods_status": "Хранение",
+        "barcode": "56268998198"
+    },
+    {
+        "unique_id": "b30e513d-dc6d-4fd3-b3c5-b2c7fea0e973",
+        "article": "ART002",
+        "name": "Product 2",
+        "quantity": 4,
+        "place": "A-1-1-3",
         "goods_status": "Хранение",
         "barcode": "150499116843"
     }

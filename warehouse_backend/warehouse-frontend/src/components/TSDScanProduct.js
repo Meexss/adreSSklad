@@ -1,5 +1,6 @@
 import React, {useState, useCallback } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 // Компонент для процесса приёмки товаров
 const TSDScanProduct = () => {
@@ -11,6 +12,23 @@ const TSDScanProduct = () => {
   const [error, setError] = useState(''); // Добавьте это состояние для ошибок
   const [apiData, setApiData] = useState([])
   const [numberAcceptance, setNumberAcceptance] = useState('')
+
+  const handleAcceptanceScan = async (e) => {
+    const value = e.target.value;
+    console.log("Вводится значение:", value);
+  
+    if (value.length === 5) {
+      setNumberAcceptance(value);
+  
+      try {
+        await loadAcceptance(); // Дожидаемся загрузки данных
+        setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
+      } catch (error) {
+        console.error("Ошибка загрузки приемки:", error);
+        setError("Ошибка загрузки приемки");
+      }
+    }
+  };
 
 
   // Загрузка данных приёмки
@@ -30,7 +48,7 @@ const TSDScanProduct = () => {
 
   // Обработка сканирования баркода
   const handleBarcodeScan = (e) => {
-    const code = e.target.value;
+    const code = e;
     setBarcode(code);
     console.log("Сканированный баркод:", code);
 
@@ -113,28 +131,26 @@ const TSDScanProduct = () => {
   
 
   return (
-    <div className="receive-container">
+    <div className="app-container">
+      <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
       {curretStep === 1  && (
         <div className="scan-section">
           <h2>Сканируйте номер приемки</h2>
-          <input
-            onChange={e => {
-              console.log("Вводится значение:", e.target.value);
-              if (e.target.value.length === 5) {setNumberAcceptance(e.target.value); setCurrentStep(2); loadAcceptance()};
-            }}
-            autoFocus
-          />
+          <input className="scan-input" onChange={handleAcceptanceScan} autoFocus />
         </div>
       )}
       
       {curretStep === 2 && (
-        <div className="barcode-section">
+        <div className="scan-section">
           <h2>Сканируйте баркод товара</h2>
           <input
+            className="scan-input"
             value={barcode}
-            onChange={handleBarcodeScan}
+            onChange ={(e) =>{handleBarcodeScan(e.target.value)}}
             autoFocus
+            
           /> 
+           {error && <p style={{ color: "red" }}>{error}</p>}
           </div>)}
 
           {curretStep === 3 && (

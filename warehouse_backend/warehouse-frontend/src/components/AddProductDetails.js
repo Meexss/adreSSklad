@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Layout from './Layout';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const AddProductDetails = () => {
     const location = useLocation();
@@ -39,50 +41,71 @@ const AddProductDetails = () => {
 
     return (
         <Layout>
-            <div style={{ padding: '20px' }}>
-                <h1>Детали прихода</h1>
-                <p><strong>Номер прихода:</strong> {addproducts.add_number}</p>
-                <p><strong>Дата:</strong> {addproducts.add_date}</p>
-                <p><strong>Контрагент:</strong> {addproducts.counterparty}</p>
-                <p><strong>Склад:</strong> {addproducts.warehouse}</p>
-                <p><strong>Статус:</strong> {addproducts.progress}</p>
+            <div >
+            <Link to="/operations" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                            <FontAwesomeIcon
+                                icon={faArrowLeft}
+                                style={{
+                                    cursor: 'pointer',
+                                    fontSize: '15px',
+                                    padding: '10px',
+                                    borderRadius: '50%',
+                                }}
+                            />
+                            <span style={{ fontSize: '12px' }}>Назад</span>
+                        </Link>
+                <h2>Детали прихода</h2>
+                <div class="data_wraper">
+                    <div class="data_info"><p><strong>Номер прихода:</strong> {addproducts.add_number}</p></div>
+                    <div class="data_info"><p><strong>Дата:</strong> {addproducts.add_date}</p></div>
+                    <div class="data_info"><p><strong>Контрагент:</strong> {addproducts.counterparty}</p></div>
+                    <div class="data_info"><p><strong>Склад:</strong> {addproducts.warehouse}</p></div>
+                    <div class="data_info"><p><strong>Статус:</strong> {addproducts.progress}</p></div>
+                </div>   
 
                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+                <table>
                     <thead>
-                        <tr style={{ backgroundColor: '#f0f0f0' }}>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Артикул</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Наименование</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Количество по 1С</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Фактически принято</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Места товара</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Зона</th>
+                        <tr>
+                            <th >Артикул</th>
+                            <th >Наименование</th>
+                            <th >Количество по 1С</th>
+                            <th >Фактически принято</th>
+                            <th >Места товара</th>
+                            <th >Количество на месте</th>
+                            <th >Статус товара</th>
                         </tr>
                     </thead>
                     <tbody>
                         {addproducts.positionData?.map((stock, index) => (
                             <tr key={index}>
-                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.article}</td>
-                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.name}</td>
-                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.quantity}</td>
+                                <td >{stock.article}</td>
+                                <td style={{ textAlign: 'left'}}>{stock.name}</td>
+                                <td >{stock.quantity}</td>
 
-                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                <td >
                                     {dataProducts?.positionData?.find(item => item.article === stock.article)?.final_quantity || '—'}
                                 </td>
-
-                                {/* Собираем все места для артикула */}
-                                    {placeProducts
-                                        ?.filter(item => item.article === stock.article)
-                                        .map((item, index) => (
-                                            <tr key={index}>  {/* Создаём новую строку для каждого item */}
-                                                <td style={{ border: '1px solid #ddd', padding: '8px' }}> место {item.place} кол-во {item.quantity}</td>
-                                                <td style={{ border: '1px solid #ddd', padding: '8px' }}></td> {/* Можно добавить количество или другие данные */}
-                                            </tr>
-                                        )) || '—'}
-                                
-
-                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.zone}</td>
+                                {placeProducts !== null && placeProducts.find(item => item.article === stock.article) ? (
+                                    (() => {
+                                        const product = placeProducts.find(item => item.article === stock.article);
+                                        return (
+                                        <>
+                                        {/* исправить */}
+                                            <td >{product.place || '—'}</td>        
+                                            <td >{product.quantity || '—'}</td>        
+                                            <td >{product.goods_status || '—'}</td>
+                                        </>
+                                        );
+                                    })()
+                                    ) : (
+                                    <>
+                                        <td >—</td>
+                                        <td >—</td>
+                                        <td >—</td>
+                                    </>
+                                    )}
                             </tr>
                         ))}
                     </tbody>

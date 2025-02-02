@@ -4,16 +4,16 @@ import { Link } from 'react-router-dom';
 
 const Layout = ({ children }) => {
     return (
-        <div>
+        <div class='mainWraper'>
             <header>
                 <h1>Акватехнологии.Склад</h1>
                 <nav>
                     <ul>
-                        <li><Link to="/">Главная</Link></li>
+                        {/* <li><Link to="/">Главная</Link></li> */}
                         <li><Link to="/operations">Расходные операции</Link></li>
                         <li><Link to="/products">Список товаров</Link></li>
                         <li><Link to="/add-product-list">Список приходов</Link></li>
-                        <li><Link to="/add-product">Оприходование ТСД</Link></li>
+                        <li><Link to="/TSDmenu">Меню ТСД</Link></li>
                         <li><Link to="/search">Поиск</Link></li>
                     </ul>
                 </nav>
@@ -21,9 +21,9 @@ const Layout = ({ children }) => {
             <main>
                 {children}
             </main>
-            <footer>
+            {/* <footer>
                 <p>© 2025 by Pavlov</p>
-            </footer>
+            </footer> */}
         </div>
     );
 };

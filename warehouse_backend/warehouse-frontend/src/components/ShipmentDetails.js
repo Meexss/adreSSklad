@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import Layout from './Layout';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const ShipmentDetails = () => {
     const location = useLocation();
@@ -12,7 +14,7 @@ const ShipmentDetails = () => {
     const [message, setMessage] = useState("");
     const [reservedData, setReservedData] = useState([]);
     const [showReservedData, setShowReservedData] = useState(false);
-    const [cancelItem, setCancelItem] = useState(null);
+    const [summarizedData, setSummarizedData] = useState([]);
 
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedQuantity, setSelectedQuantity] = useState(0);
@@ -25,17 +27,12 @@ const ShipmentDetails = () => {
         setSelectedQuantity(item.quantity);  // Можно установить начальное количество товара
         setShowModal(true);
     };
+    console.log(reservedData)
 
     const handleCloseModal = () => {
         setShowModal(false);
     };
     
-    const handleSubmit = () => {
-        // Здесь можно отправить данные на сервер или обновить состояние
-        console.log("Данные для отправки:", selectedItem, selectedQuantity, selectedStatus);
-        setShowModal(false);
-    };
-
     // Опции для статуса
     const statusOptions = ["Хранение", "Брак", "Недостача"];
 
@@ -173,32 +170,54 @@ const ShipmentDetails = () => {
         fetchReservationData();
     }, [shipment, storageKey, api]);
 
+    useEffect(() => {
+        if (reservedData.length > 0) {
+            const groupedData = reservedData.reduce((acc, item) => {
+                if (acc[item.article]) {
+                    acc[item.article] += item.quantity;
+                } else {
+                    acc[item.article] = item.quantity;
+                }
+                return acc;
+            }, {});
+    
+            // Преобразуем объект в массив
+            const result = Object.entries(groupedData).map(([article, quantity]) => ({
+                article,
+                quantity,
+            }));
+    
+            setSummarizedData(result);
+        }
+    }, [reservedData]);
+
+
     if (!shipment) {
         return <Layout><h2>Данные об отгрузке отсутствуют</h2></Layout>;
     }
 
-    const tableData = showReservedData ? reservedData : shipment.stocks;
 
     return (
         <Layout>
             <div style={{ padding: '20px' }}>
+            <Link to="/operations" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                <FontAwesomeIcon
+                    icon={faArrowLeft}
+                    style={{
+                        cursor: 'pointer',
+                        fontSize: '15px',
+                        padding: '10px',
+                        borderRadius: '50%',
+                    }}
+                />
+                <span style={{ fontSize: '12px' }}>Назад</span>
+            </Link>
                 <h1>Детали отгрузки</h1>
-                <p><strong>Номер отгрузки:</strong> {shipment.shipment_number}</p>
-                <p><strong>Дата отгрузки:</strong> {shipment.shipment_date}</p>
-                <p><strong>Контрагент:</strong> {shipment.counterparty}</p>
-                <p><strong>Склад:</strong> {shipment.warehouse}</p>
-                <p><strong>Статус:</strong> {shipment.progress}</p>
                 {!showReservedData && (
                     <button
                         onClick={handleReserveAll}
                         style={{
-                            marginTop: '20px',
-                            backgroundColor: '#4CAF50',
-                            color: 'white',
-                            padding: '10px 20px',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
+                            backgroundColor: 'green',
                         }}
                     >
                         Зарезервировать все товары
@@ -207,13 +226,7 @@ const ShipmentDetails = () => {
                 {showReservedData && (
                     <Link to="/operations"><button
                         style={{
-                            marginTop: '20px',
-                            backgroundColor: 'yellow',
-                            color: 'black',
-                            padding: '10px 20px',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
+                            backgroundColor: 'grey',
                         }}
                     >
                         Завершить отгрузку
@@ -223,33 +236,36 @@ const ShipmentDetails = () => {
                     <Link to="/operations"><button
                         onClick={handleMassCancelReservation}
                         style={{
-                            marginTop: '20px',
-                            backgroundColor: 'blue',
-                            color: 'white',
-                            padding: '10px 20px',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
+                            backgroundColor: 'red',
                         }}
                     >
                         Отменить резервирование
                     </button></Link>
                 )}
+                <div class="data_wraper">
+                    <div class="data_info"><p><strong>Номер отгрузки:</strong> {shipment.shipment_number}</p></div>
+                    <div class="data_info"><p><strong>Дата отгрузки:</strong> {shipment.shipment_date}</p></div>
+                    <div class="data_info"><p><strong>Контрагент:</strong> {shipment.counterparty}</p></div>
+                    <div class="data_info"><p><strong>Склад:</strong> {shipment.warehouse}</p></div>
+                    <div class="data_info"><p><strong>Статус:</strong> {shipment.progress}</p></div>
+                </div>
+
 
                 {message && <p style={{ marginTop: '10px', color: message.includes("Ошибка") ? 'red' : 'green' }}>{message}</p>}
                 <h3>{showReservedData ? "Зарезервированные товары:" : "Товары для отгрузки:"}</h3>
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+                <table >
                     <thead>
-                        <tr style={{ backgroundColor: '#f0f0f0' }}>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Артикул</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Наименование</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Количество общее</th>
+                        <tr >
+                            <th >Артикул</th>
+                            <th >Наименование</th>
+                            <th >Количество общее</th>
                             {showReservedData && (
                                 <>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Место</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Кол-во к отбору</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Сумма отбора</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Статус</th>
+                                    <th >Сумма резерва</th>
+                                    <th >Место Хранение</th>
+                                    <th >Кол-во к отбору</th>
+                                    <th >Статус</th>
+                                    <th ></th>
                                 </>
                             )}
                         </tr>
@@ -266,38 +282,38 @@ const ShipmentDetails = () => {
                                         {/* Первые 3 колонки из shipment.stocks (только для первой строки с этим артикулом) */}
                                         {subIndex === 0 && (
                                             <>
-                                                <td rowSpan={reservedItems.length} style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.article}</td>
-                                                <td rowSpan={reservedItems.length} style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.name}</td>
-                                                <td rowSpan={reservedItems.length} style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.quantity}</td>
+                                                <td rowSpan={reservedItems.length} >{stock.article}</td>
+                                                <td rowSpan={reservedItems.length} style={{ textAlign: 'left'}}>{stock.name}</td>
+                                                <td rowSpan={reservedItems.length} >{stock.quantity}</td>
+                                                <td rowSpan={reservedItems.length} >
+                                                    {summarizedData.find(item => item.article === reservedItem.article)?.quantity ?? 0}
+                                                </td>
                                             </>
                                         )}
-                                        {/* Оставшиеся данные из reservedData */}
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{reservedItem.place}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{reservedItem.quantity}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{reservedItem.goods_status}</td>
-                                        <button
+                                        <td >{reservedItem.place}</td>
+                                        <td >{reservedItem.quantity}</td>
+                                        <td >{reservedItem.goods_status}</td>
+                                        <FontAwesomeIcon
+                                            icon={faEdit}
                                             onClick={() => handleOpenModal(reservedItem)}
                                             style={{
-                                                backgroundColor: 'orange',
-                                                color: 'white',
-                                                padding: '10px 20px',
-                                                border: 'none',
-                                                borderRadius: '5px',
                                                 cursor: 'pointer',
+                                                fontSize: '18px',
+                                                padding: '5px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#fff',
                                             }}
-                                        >
-                                            Изменить статус
-                                        </button>
+                                        />
                                     </tr>
                                 ))
                             ) : (
                                 // Если зарезервированных данных нет, создаем одну строку
                                 <tr key={index}>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.article}</td>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.name}</td>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{stock.quantity}</td>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>—</td>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>—</td>
+                                    <td >{stock.article}</td>
+                                    <td >{stock.name}</td>
+                                    <td >{stock.quantity}</td>
+                                    <td >—</td>
+                                    <td >—</td>
                                 </tr>
                             );
                         })}
@@ -306,7 +322,7 @@ const ShipmentDetails = () => {
                 {showModal && selectedItem && (
                     <div style={{
                         position: 'fixed', top: '0', left: '0', right: '0', bottom: '0',
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center'
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: '2'
                     }}>
                         <div style={{
                             backgroundColor: 'white', padding: '20px', borderRadius: '8px', width: '400px',

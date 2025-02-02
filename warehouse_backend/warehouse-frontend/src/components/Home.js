@@ -15,9 +15,6 @@ const Home = () => {
                     <Link to="/operations">
                         <button style={{ margin: '10px', padding: '10px 20px' }}>Операции</button>
                     </Link>
-                    <Link to="/add-product">
-                        <button style={{ margin: '10px', padding: '10px 20px' }}>Оприходование</button>
-                    </Link>
                     <Link to="/search">
                         <button style={{ margin: '10px', padding: '10px 20px' }}>Поиск товара</button>
                     </Link>

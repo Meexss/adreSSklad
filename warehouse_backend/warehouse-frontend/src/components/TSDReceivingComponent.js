@@ -1,23 +1,16 @@
 import React, {useState} from 'react';
-import TSDScanProduct from './TSDScanProduct';
-import TSDPlaceProduct from './TSDPlaceProduct';
+import { Link } from 'react-router-dom';
 
 
 const TSDReceivingApp = () => {
-  const [activeComponent, setActiveComponent] = useState(null);
 
   return (
     <div className="app-container">
+       <Link to="/TSDmenu"><button class='buttonBack'>Назад</button></Link>
       <h2>Выберите действие</h2>
-      <div>
-        <button onClick={() => setActiveComponent('place')}>Расстановка товара</button>
-        <button onClick={() => setActiveComponent('scan')}>Приемка товара</button>
-      </div>
-
-      <div className="content">
-        {activeComponent === 'place' && <TSDPlaceProduct />}
-        {activeComponent === 'scan' && <TSDScanProduct />}
-      </div>
+      
+        <Link to="/add-product/scan"><button class='buttonMenu'>Приемка товара ТСД</button></Link>
+        <Link to="/add-product/place"><button class='buttonMenu'>Расстановка товара ТСД</button></Link>
     </div>
   );
 };

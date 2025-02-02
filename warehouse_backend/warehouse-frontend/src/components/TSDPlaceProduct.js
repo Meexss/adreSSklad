@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 // Компонент для процесса приёмки товаров
 const TSDPlaceProduct = () => {
@@ -11,6 +12,7 @@ const TSDPlaceProduct = () => {
     const [place, setPlace] = useState("");
     const [quantity, setQuantity] = useState("");
     const [error, setError] = useState("");
+    
 
     // Функция загрузки товаров по номеру приемки
     const loadAcceptance = async () => {
@@ -104,15 +106,18 @@ const TSDPlaceProduct = () => {
     };
 
     return (
-        <div className="receive-container">
+        <div className="app-container">
+            <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
             {curretStep === 1 && (
                 <div className="scan-section">
                     <h2>Сканируйте номер приемки</h2>
                     <input
+                    className="scan-input"
                         onChange={(e) => {
                             if (e.target.value.length === 5) {
                                 setCurrentStep(2);
                                 setAcceptanceNumber(e.target.value);
+                                loadAcceptance();
                             }
                         }}
                         autoFocus
@@ -121,11 +126,13 @@ const TSDPlaceProduct = () => {
             )}
 
             {curretStep === 2 && (
-                <div className="barcode-section">
+                <div className="scan-section">
                     <h2>Сканируйте баркод товара</h2>
                     <input 
+                    className="scan-input"
                         onChange ={(e) =>{
-                            if (e.target.value.length >= 5) {{handleBarcodeScan(e); loadAcceptance();}}}} autoFocus />
+                            if (e.target.value.length >= 5) {{handleBarcodeScan(e); }}}} 
+                            autoFocus />
                     {error && <p style={{ color: "red" }}>{error}</p>}
                 </div>
             )}

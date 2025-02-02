@@ -14,42 +14,33 @@ const ProductList = () => {
     return (
         <Layout>
         <div>
-            <h1>Список товаров</h1>
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-                    <thead>
-                        <tr style={{ backgroundColor: '#f0f0f0' }}>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Артикул</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Наименование</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Количество</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Место хранения</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Статус товара</th>
-                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Штрихкод</th>
+            <h2>Список товаров</h2>
+            <div>
+            <table >
+                    <thead >
+                        <tr >
+                            <th >Артикул</th>
+                            <th >Наименование</th>
+                            <th >Количество</th>
+                            <th >Место хранения</th>
+                            <th >Статус товара</th>
+                            <th >Штрихкод</th>
                         </tr>
                     </thead>
                     <tbody>
                 {products.map(product => (
-                    <tr
-                                key={product.article}
-                                style={{
-                                    border: '1px solid #ddd',
-                                    backgroundColor: '#fff',
-                                    transition: 'background-color 0.2s ease',
-                                    
-                                }}
-                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#45a049'}
-                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
-                            >
-                    
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.article}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'left' }}>{product.name}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.quantity}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.place}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.goods_status}</td>
-                                <td style={{ border: '1px solid #ddd',padding: '8px', textAlign: 'center' }}>{product.barcode}</td>
+                    <tr key={product.article}>
+                                <td >{product.article}</td>
+                                <td style={{ textAlign: 'left'}} >{product.name}</td>
+                                <td >{product.quantity}</td>
+                                <td >{product.place}</td>
+                                <td >{product.goods_status}</td>
+                                <td >{product.barcode}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                </div>
         </div>
         </Layout>
     );
