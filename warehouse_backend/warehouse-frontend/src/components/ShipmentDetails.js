@@ -21,6 +21,7 @@ const ShipmentDetails = () => {
     const [selectedStatus, setSelectedStatus] = useState("Хранение");
     const [showModal, setShowModal] = useState(false);
 
+    console.log(shipment) 
     const handleOpenModal = (item) => {
         console.log(item)
         setSelectedItem(item);
@@ -91,7 +92,7 @@ const ShipmentDetails = () => {
         console.log("Конец handleReserveAll");
     }, [api, shipment, storageKey]);
 
-
+    // частичное резервирование
     const handleSubmitPartialCancel = async () => {
         try {
             console.log("Данные для отправки:", selectedItem, selectedQuantity, selectedStatus);
@@ -116,7 +117,7 @@ const ShipmentDetails = () => {
             console.error("Ошибка отмены:", error);
         }
     };
-
+    // массовое резервирование
     const handleMassCancelReservation = useCallback(async () => {
         console.log("Начало массовой отмены резервирования");
         try {
@@ -153,8 +154,8 @@ const ShipmentDetails = () => {
         const fetchReservationData = async () => {
             try {
                 const shipmentNumber = shipment.shipment_number;
-                const response = await api.get(`/api/reserve/?shipment_number=${shipmentNumber}`);
-
+                const response = await api.get(`/api/reserve/?shipment_number=${shipmentNumber}`); 
+                console.log(response)
                 if (response.status === 200 && response.data.length > 0) {
                     setReservedData(response.data);
                     setShowReservedData(true);

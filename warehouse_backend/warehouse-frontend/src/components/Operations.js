@@ -10,9 +10,13 @@ const Operations = () => {
 
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/shipments/')
-            .then(response => setShipments(response.data))
+            .then(response => setShipments(response.data) )
             .catch(error => console.error(error));
+            
     }, []);
+
+    console.log(shipments)
+
 
     return (
         <Layout>
@@ -33,22 +37,26 @@ const Operations = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {shipments.map(shipment => (
-                            <tr
-                                key={shipment.shipment_number}
-                                onClick={() => navigate(`/shipment/${shipment.shipment_number}`, { state: { shipment } })}
-                                style={{ cursor: 'pointer' }} 
-                            >
-                                <td >Добавить в API</td>
-                                <td >{shipment.shipment_number}</td>
-                                <td >{shipment.shipment_date}</td>
-                                <td >{shipment.counterparty}</td>
-                                <td >{shipment.warehouse}</td>
-                                <td >{shipment.stocks.length}</td>
-                                <td >{shipment.stocks.reduce((total, stock) => total + stock.quantity, 0)}</td>
-                                <td >{shipment.progress}</td>
-                            </tr>
-                        ))}
+                    {shipments.map(shipment  => (
+                                <tr
+                                    key={shipment .shipment_number}
+                                    onClick={() => navigate(`/shipment/${shipment .shipment_number}`, { state: { shipment  } })}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <td>Добавить в API</td>
+                                    <td>{shipment .shipment_number}</td>
+                                    <td>{shipment .shipment_date}</td>
+                                    <td>{shipment .counterparty}</td>
+                                    <td>{shipment .warehouse}</td>
+                                    {/* <td>{Array.isArray(item) ? item.length : 0}</td>
+                                    <td>
+                                        {Array.isArray(item.stocks)
+                                            ? item.stocks.reduce((total, stock) => total + (stock.quantity || 0), 0)
+                                            : 0}
+                                    </td> */}
+                                    <td>{shipment .progress}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
                 </div>
