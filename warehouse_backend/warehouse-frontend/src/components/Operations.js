@@ -9,7 +9,7 @@ const Operations = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/shipments/')
+        axios.get('adressklad.onrender.com/api/shipments/')
             .then(response => setShipments(response.data))
             .catch(error => console.error(error));
     }, []);
