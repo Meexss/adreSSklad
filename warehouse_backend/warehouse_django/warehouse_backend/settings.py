@@ -132,7 +132,8 @@ REST_FRAMEWORK = {
     ],
 }
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # Адрес вашего фронтенда
+    'http://localhost:3000',
+    "https://meexss.github.io",  # Адрес вашего фронтенда
 ]
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
