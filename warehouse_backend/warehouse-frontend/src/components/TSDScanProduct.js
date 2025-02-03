@@ -34,7 +34,7 @@ const TSDScanProduct = () => {
   // Загрузка данных приёмки
   const loadAcceptance = () => {
     console.log("Запрос на сервер с номером: ", numberAcceptance);
-    axios.get(`http://127.0.0.1:8000/api/addproducts/?add_number=${numberAcceptance}`)
+    axios.get(`https://adressklad.onrender.com/api/addproducts/?add_number=${numberAcceptance}`)
       .then(res => {
         if (res.data.length === 0) throw new Error('Приёмка не найдена');
         setPositions(res.data);

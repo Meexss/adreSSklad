@@ -9,7 +9,7 @@ const AddProductList = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/addproducts/')
+        axios.get('https://adressklad.onrender.com/api/addproducts/')
             .then(response => setAddproducts(response.data))
             .catch(error => console.error(error));
     }, []);
@@ -22,7 +22,7 @@ const AddProductList = () => {
                     <thead>
                         <tr >
                         <th ></th>
-                            <th >Тип операции</th>
+                            {/* <th >Тип операции</th> */}
                             <th >Номер прихода 1С</th>
                             <th >Дата</th>
                             <th >Поставшик</th>

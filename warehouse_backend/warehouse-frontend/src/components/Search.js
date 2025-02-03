@@ -10,7 +10,7 @@ const Search = () => {
 
     const handleSearch = () => {
         axios
-            .get(`http://127.0.0.1:8000/api/products/`)
+            .get(`https://adressklad.onrender.com/api/products/`)
             .then((response) => {
                 setProducts(response.data);
 

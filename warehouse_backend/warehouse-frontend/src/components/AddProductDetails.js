@@ -17,7 +17,7 @@ const AddProductDetails = () => {
 
         const fetchAddData = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:8000/api/addproducts/?add_number=${addproducts.add_number}`);
+                const response = await axios.get(`https://adressklad.onrender.com/api/addproducts/?add_number=${addproducts.add_number}`);
                 setDataProducts(response.data.length ? response.data[0] : null);
             } catch (error) {
                 console.error("Ошибка запроса:", error);
@@ -27,7 +27,7 @@ const AddProductDetails = () => {
 
         const fetchPlacedData = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:8000/api/placeship/?add_number=${addproducts.add_number}`);
+                const response = await axios.get(`https://adressklad.onrender.com/api/placeship/?add_number=${addproducts.add_number}`);
                 setPlaceProducts(response.data);
             } catch (error) {
                 console.error("Ошибка запроса:", error);
@@ -55,7 +55,7 @@ const AddProductDetails = () => {
                             <span style={{ fontSize: '12px' }}>Назад</span>
                         </Link>
                 <h2>Детали прихода</h2>
-                <div class="data_wraper">
+                <div className="data_wraper">
                     <div className="data_info"><p><strong>Номер прихода:</strong> {addproducts.add_number}</p></div>
                     <div className="data_info"><p><strong>Дата:</strong> {addproducts.add_date}</p></div>
                     <div className="data_info"><p><strong>Контрагент:</strong> {addproducts.counterparty}</p></div>

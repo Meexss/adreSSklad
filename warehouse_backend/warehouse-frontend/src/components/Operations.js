@@ -9,12 +9,12 @@ const Operations = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('adressklad.onrender.com/api/shipments/')
+        axios.get('https://adressklad.onrender.com/api/shipments/')
             .then(response => setShipments(response.data))
             .catch(error => console.error(error));
     }, []);
-
     console.log("я молодец")
+    console.log(shipments)
     return (
         <Layout>
             <div>

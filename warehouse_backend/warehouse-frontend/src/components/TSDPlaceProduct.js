@@ -18,7 +18,7 @@ const TSDPlaceProduct = () => {
     const loadAcceptance = async () => {
         try {
             const response = await axios.get(
-                `http://127.0.0.1:8000/api/addproducts/?add_number=${acceptanceNumber}`
+                `https://adressklad.onrender.com/api/addproducts/?add_number=${acceptanceNumber}`
             );
             setProducts(response.data);
             setCurrentStep(2);
@@ -94,7 +94,7 @@ const TSDPlaceProduct = () => {
 
         console.log(requestData)
         try {
-            await axios.post("http://127.0.0.1:8000/api/placeship/", requestData);
+            await axios.post("https://adressklad.onrender.com/api/placeship/", requestData);
             alert("Данные успешно отправлены!");
             setCurrentStep(2); // Возвращаемся к сканированию нового номера приемки
             setBarcode("");
