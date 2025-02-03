@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Operations from './components/Operations';
 import ProductList from './components/ProductList';
 import TSDReceivingComponent from './components/TSDReceivingComponent';
@@ -14,7 +14,6 @@ import TSDMenu from './components/TSDMenu';
 
 const App = () => {
     return (
-        <Router>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/operations" element={<Operations />} />
@@ -28,7 +27,6 @@ const App = () => {
                 <Route path="/add-product/:id" element={<AddProductDetails />} />
                 <Route path="/TSDmenu" element={<TSDMenu />} />
             </Routes>
-        </Router>
     );
 };
 
