@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/adreSSklad/static/css/main.fc232f1a.css",
+    "main.js": "/adreSSklad/static/js/main.58319727.js",
+    "index.html": "/adreSSklad/index.html",
+    "main.fc232f1a.css.map": "/adreSSklad/static/css/main.fc232f1a.css.map",
+    "main.58319727.js.map": "/adreSSklad/static/js/main.58319727.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fc232f1a.css",
+    "static/js/main.58319727.js"
+  ]
+}
