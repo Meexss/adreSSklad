@@ -21,6 +21,7 @@ const TSDPlaceProduct = () => {
                 `http://127.0.0.1:8000/api/addproducts/?add_number=${acceptanceNumber}`
             );
             setProducts(response.data);
+            setCurrentStep(2);
         } catch (error) {
             console.error("Ошибка загрузки приемки:", error);
         }
@@ -115,7 +116,7 @@ const TSDPlaceProduct = () => {
                     className="scan-input"
                         onChange={(e) => {
                             if (e.target.value.length === 5) {
-                                setCurrentStep(2);
+                                
                                 setAcceptanceNumber(e.target.value);
                                 loadAcceptance();
                             }

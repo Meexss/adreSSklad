@@ -14,6 +14,7 @@ const Operations = () => {
             .catch(error => console.error(error));
     }, []);
 
+    console.log("я молодец")
     return (
         <Layout>
             <div>

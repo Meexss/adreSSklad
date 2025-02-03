@@ -6,11 +6,11 @@ const TSDReceivingApp = () => {
 
   return (
     <div className="app-container">
-       <Link to="/TSDmenu"><button class='buttonBack'>Назад</button></Link>
+       <Link to="/TSDmenu"><button className='buttonBack'>Назад</button></Link>
       <h2>Выберите действие</h2>
       
-        <Link to="/add-product/scan"><button class='buttonMenu'>Приемка товара ТСД</button></Link>
-        <Link to="/add-product/place"><button class='buttonMenu'>Расстановка товара ТСД</button></Link>
+        <Link to="/add-product/scan"><button className='buttonMenu'>Приемка товара ТСД</button></Link>
+        <Link to="/add-product/place"><button claclassNamess='buttonMenu'>Расстановка товара ТСД</button></Link>
     </div>
   );
 };

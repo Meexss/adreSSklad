@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Layout = ({ children }) => {
     return (
-        <div class='mainWraper'>
+        <div className='mainWraper'>
             <header>
                 <h1>Акватехнологии.Склад</h1>
                 <nav>

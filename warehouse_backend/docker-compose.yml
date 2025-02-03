@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: warehouse_django/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./warehouse_django:/app
+      - ./warehouse_django/warehouse/data:/app/data  # Монтируем папку с JSON-файлами
+    environment:
+      - DEBUG=1
+
+  frontend:
+    build:
+      context: .
+      dockerfile: warehouse-frontend/Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./warehouse-frontend:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend

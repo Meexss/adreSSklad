@@ -242,12 +242,12 @@ const ShipmentDetails = () => {
                         Отменить резервирование
                     </button></Link>
                 )}
-                <div class="data_wraper">
-                    <div class="data_info"><p><strong>Номер отгрузки:</strong> {shipment.shipment_number}</p></div>
-                    <div class="data_info"><p><strong>Дата отгрузки:</strong> {shipment.shipment_date}</p></div>
-                    <div class="data_info"><p><strong>Контрагент:</strong> {shipment.counterparty}</p></div>
-                    <div class="data_info"><p><strong>Склад:</strong> {shipment.warehouse}</p></div>
-                    <div class="data_info"><p><strong>Статус:</strong> {shipment.progress}</p></div>
+                <div className="data_wraper">
+                    <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.shipment_number}</p></div>
+                    <div className="data_info"><p><strong>Дата отгрузки:</strong> {shipment.shipment_date}</p></div>
+                    <div className="data_info"><p><strong>Контрагент:</strong> {shipment.counterparty}</p></div>
+                    <div className="data_info"><p><strong>Склад:</strong> {shipment.warehouse}</p></div>
+                    <div className="data_info"><p><strong>Статус:</strong> {shipment.progress}</p></div>
                 </div>
 
 

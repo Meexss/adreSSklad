@@ -414,5 +414,4 @@ class PlaceProducts(APIView):
             
             return Response({"message": "Данные успешно добавлены"}, status=status.HTTP_201_CREATED)
         except Exception:
-            print("Ошибка:", e)  # Лог ошибок
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

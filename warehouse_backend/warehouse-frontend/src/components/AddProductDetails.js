@@ -56,11 +56,11 @@ const AddProductDetails = () => {
                         </Link>
                 <h2>Детали прихода</h2>
                 <div class="data_wraper">
-                    <div class="data_info"><p><strong>Номер прихода:</strong> {addproducts.add_number}</p></div>
-                    <div class="data_info"><p><strong>Дата:</strong> {addproducts.add_date}</p></div>
-                    <div class="data_info"><p><strong>Контрагент:</strong> {addproducts.counterparty}</p></div>
-                    <div class="data_info"><p><strong>Склад:</strong> {addproducts.warehouse}</p></div>
-                    <div class="data_info"><p><strong>Статус:</strong> {addproducts.progress}</p></div>
+                    <div className="data_info"><p><strong>Номер прихода:</strong> {addproducts.add_number}</p></div>
+                    <div className="data_info"><p><strong>Дата:</strong> {addproducts.add_date}</p></div>
+                    <div className="data_info"><p><strong>Контрагент:</strong> {addproducts.counterparty}</p></div>
+                    <div className="data_info"><p><strong>Склад:</strong> {addproducts.warehouse}</p></div>
+                    <div className="data_info"><p><strong>Статус:</strong> {addproducts.progress}</p></div>
                 </div>   
 
                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
