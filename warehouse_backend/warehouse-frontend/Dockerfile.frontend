@@ -5,13 +5,15 @@ FROM node:14
 WORKDIR /app
 
 # Копируем package.json и package-lock.json
-COPY warehouse-frontend/package*.json ./
+# COPY warehouse-frontend/package*.json ./
+COPY package*.json ./
 
 # Устанавливаем зависимости
 RUN npm install
 
 # Копируем весь проект в контейнер
-COPY warehouse-frontend/ .
+# COPY warehouse-frontend/ .
+COPY . .
 
 # Собираем проект
 RUN npm run build
