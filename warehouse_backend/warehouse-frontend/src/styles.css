@@ -18,8 +18,7 @@
   h2, h3 {
     color: black; /* Белый текст для контраста */
     text-align: left;
-    margin-bottom: 20px;
-    margin-top: 5px;
+    margin-bottom: 10px;
   }
   h1 {
     margin-top: 0px;
@@ -165,19 +164,19 @@ nav ul {
     
 }
 
-nav a {
+/* nav a {
     color: white;
     text-decoration: none;
     font-size: 18px;
     padding: 10px;
     border-radius: 5px;
     background-color: #7dc25e;
-}
+} */
 
-nav a:hover {
+/* nav a:hover {
     text-decoration: underline;
     background-color: #45a049;
-}
+} */
 
 
 /* footer {
@@ -191,13 +190,17 @@ nav a:hover {
 
 
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   background-image: linear-gradient(to right bottom, #7dc25e, #7eb763, #7fad68, #7fa26c, #7e9870);
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
+  font-size: 15px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .mainWraper {
@@ -211,7 +214,7 @@ main > * {
     margin-left: 2vh; 
     margin-top: 2vh;
     margin-bottom: 2vh;
-    padding: 20px; 
+    padding: 0 15px 10px 15px; 
     background-color: #f5fbf1; /* Белый фон для детей */
     border-radius: 10px; /* Закругленные углы у детей */
     box-shadow: 0px 5px 10px 1px rgba(34, 60, 80, 0.36) inset;
@@ -246,7 +249,7 @@ th {
 th, td {
   padding: 10px;
   text-align: center;
-  border: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   position: relative;
 }
 
@@ -430,4 +433,8 @@ input:focus {
   border-color: #0056b3;
   box-shadow: 0px 0px 5px rgba(0, 91, 187, 0.5);
 }
+
+
+
+
 

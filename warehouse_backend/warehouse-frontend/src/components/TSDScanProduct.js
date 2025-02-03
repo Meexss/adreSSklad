@@ -114,7 +114,7 @@ const TSDScanProduct = () => {
     console.log(scanRequest);
   
     // Отправка запроса
-    const scanResponse = await axios.post('http://127.0.0.1:8000/api/addproducts/', scanRequest);
+    const scanResponse = await axios.post('https://adressklad.onrender.com/api/addproducts/', scanRequest);
     console.log(scanResponse);
 
 
@@ -127,6 +127,7 @@ const TSDScanProduct = () => {
       setEnteredQuantity('');
       setCurrentStep(2);
     }
+    
   }, [foundPosition, enteredQuantity, apiData]); // Добавляем зависимости
   
 
