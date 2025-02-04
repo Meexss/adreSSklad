@@ -1,86 +1,85 @@
-import React, { useState, useMemo } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import TSDLayout from './TSDLayout';
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import TSDLayout from "./TSDLayout";
 
-// Компонент для поиска товара
 const TSDTest = () => {
-    const [curretStep, setCurrentStep] = useState(1);
-    const [barcode, setBarcode] = useState("");
-    const [products, setProducts] = useState([]); // Храним товары из API
-    const [error, setError] = useState("");
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [scannedBarcodes, setScannedBarcodes] = useState([]); // Список отсканированных штрихкодов
+    const [broadcastMessages, setBroadcastMessages] = useState([]); // Список Broadcast-сообщений
+    const inputRef = useRef(null); // Для автофокуса
 
+    // Функция добавления штрихкода в список
+    const addBarcode = (code) => {
+        if (code && code.length === 13) {
+            setScannedBarcodes((prev) => [...prev, code]);
+        }
+    };
 
-    // const api = useMemo(() => axios.create({
-    //     // baseURL: 'https://adressklad.onrender.com',
-    //     baseURL: 'http://127.0.0.1:8000',
-    // }), []);
+    // 1️⃣ ОБРАБОТКА ВВОДА В INPUT
+    const handleInput = (e) => {
+        const code = e.target.value.trim();
+        if (code.length === 13) {
+            addBarcode(code);
+            e.target.value = "";
+        }
+        else {
+            
+        }
+    };
 
+    // 2️⃣ ОБРАБОТКА BROADCAST-СООБЩЕНИЙ
+    useEffect(() => {
+        const handleBroadcast = (event) => {
+            const message = `Broadcast message: ${event.data}`;
+            setBroadcastMessages((prev) => [...prev, message]); // Добавляем сообщение на экран
+            addBarcode(event.data); // Добавляем штрихкод в список
+        };
 
-    const handleBarcodeScan = (e) => {
-        const code = e.target.value;
-        setBarcode(code);
-        console.log(code)
-        console.log(barcode)
-
-        // api.get(`/api/products/`)
-        //     .then((response) => {
-        //         setProducts(response.data);
-
-        // // Фильтруем нужные товары
-        // const foundProducts = response.data.filter((item) => item.barcode === code);
-        //     setFilteredProducts(foundProducts);
-        //     setCurrentStep(2)
-        // })
-        //     .catch((error) => setError(error));
-        //     console.log(error)
-        //     console.log(products)
-        //     console.log(filteredProducts)
-        //     console.log("Сканированный баркод:", code);
-};
-
+        window.addEventListener("message", handleBroadcast);
+        return () => window.removeEventListener("message", handleBroadcast);
+    }, []);
 
     return (
         <TSDLayout>
             <div className="containerr">
-                <Link to="/TSDmenu"><button class='buttonBack'>В меню</button></Link>
-               
-               {/* Шаг первый установка баркода товара  */}
-               {curretStep === 1 && (
-                    <div className="scan-section">
-                        <h2>Сканируйте баркод товара</h2>
-                        <input 
+                <Link to="/TSDmenu">
+                    <button className="buttonBack">В меню</button>
+                </Link>
+
+                <div className="scan-section">
+                    <h2>Сканируйте баркод товара</h2>
+                    <input
                         className="scan-input"
-                            onChange ={(e) =>{
-                                if (e.target.value.length >= 5) {{handleBarcodeScan(e); }}}} 
-                                autoFocus />
-                        {error && <p style={{ color: "red" }}>{error}</p>}
+                        // ref={inputRef}
+                        onInput={handleInput} // Ввод с клавиатуры
+                        autoFocus
+                        inputMode="none"
+                    />
+                </div>
+
+                {/* Отображение списка отсканированных штрихкодов */}
+                {scannedBarcodes.length > 0 && (
+                    <div>
+                        <h3>Отсканированные штрихкоды:</h3>
+                        <ul>
+                            {scannedBarcodes.map((code, index) => (
+                                <li key={index} className="scanned-code">{code}</li>
+                            ))}
+                        </ul>
                     </div>
                 )}
 
-                {/* Шаг второй отображение найденных позиций  */}
-                {filteredProducts.length > 0 && (
+                {/* Отображение Broadcast-сообщений */}
+                {broadcastMessages.length > 0 && (
                     <div>
-                        <h3>Сканированный баркод:</h3>
-                        <div className="serch-info">
-                            <p className='mainText'>{barcode}</p>
-                        </div>
-                        {/* {filteredProducts.map((item, index) => (
-                            <div key={index} className="serch-info-place">
-                                <div className='blockInfoSerch'>
-                                    <p className='supText'>Место: </p>
-                                    <p className='mainText'>{item.place}</p>
-                                </div>
-                                <div className='blockInfoSerch'>
-                                    <p className='supText'>Кол-во: </p>
-                                    <p className='mainText'>{item.quantity}</p>
-                                </div>
-                            </div>
-                        ))} */}
+                        <h3>Полученные Broadcast-сообщения:</h3>
+                        <ul>
+                            {broadcastMessages.map((msg, index) => (
+                                <li key={index}>{msg}</li>
+                            ))}
+                        </ul>
                     </div>
-                )}]
-            </div>    
+                )}
+            </div>
         </TSDLayout>
     );
 };

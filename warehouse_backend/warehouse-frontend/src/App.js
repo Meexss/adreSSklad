@@ -13,6 +13,8 @@ import TSDPlaceProduct from './components/TSDPlaceProduct';
 import TSDMenu from './components/TSDMenu';
 import TSDSerchProduct from './components/TSDSerchProduct';
 import TSDTest from './components/TSDTest';
+import TSDSerchPlace from './components/TSDSerchPlace';
+import TSDChangePlace from './components/TSDChangePlace';
 
 
 const App = () => {
@@ -33,8 +35,8 @@ const App = () => {
                     <Route path="/add-product" element={<TSDReceivingComponent />} /> {/* Оприходование  */}
                         <Route path="/add-product/scan" element={<TSDScanProduct />} /> {/* Сверка кол-ва  */}
                         <Route path="/add-product/place" element={<TSDPlaceProduct />} /> {/* Присваение места  */}
-                    <Route path="/change-place-tsd" element={<TSDMenu />} /> {/* перемещение товара (изменение ячейки)  */}
-                    <Route path="/info-place-tsd" element={<TSDMenu />} /> {/* информация о товаре в ячейке  */}
+                    <Route path="/change-place-tsd" element={<TSDChangePlace />} /> {/* перемещение товара (изменение ячейки)  */}
+                    <Route path="/info-place-tsd" element={<TSDSerchPlace />} /> {/* информация о товаре в ячейке  */}
                     <Route path="/info-product-tsd" element={<TSDSerchProduct />} /> {/* информация о товаре в ячейках  */}
                     <Route path="/ship-info-tsd" element={<TSDMenu />} /> {/* отгрузка товара  */}
                     <Route path="/invent-product-tsd" element={<TSDMenu />} /> {/* инвентаризация товара  */}

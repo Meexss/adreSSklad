@@ -1,67 +1,80 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
-import { Link, useNavigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 
 const AddProductList = () => {
     const [addproducts, setAddproducts] = useState([]);
-    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     const api = useMemo(() => axios.create({
-        // baseURL: 'https://adressklad.onrender.com',
         baseURL: 'http://127.0.0.1:8000',
     }), []);
 
     useEffect(() => {
         api.get('/api/addproducts/')
-            .then(response => setAddproducts(response.data))
-            .catch(error => console.error(error));
-    }, []);
+            .then(response => {
+                setAddproducts(response.data);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error("Ошибка запроса:", error);
+                setErrorMessage(`Ошибка: ${error.response?.data?.error || error.message}`);
+                setLoading(false);
+            });
+    }, [api]);
 
     return (
         <Layout>
             <div>
                 <h2>Список приходов с 1С (перемещение/ приход товара)</h2>
-                <table >
-                    <thead>
-                        <tr >
-                        <th ></th>
-                            {/* <th >Тип операции</th> */}
-                            <th >Номер прихода 1С</th>
-                            <th >Дата</th>
-                            <th >Поставшик</th>
-                            <th >Склад</th>
-                            <th >Кол-во позиций по 1С</th>
-                            <th >Кол-во едениц товара по 1С</th>
-                            <th >Кол-во принятого товара</th>
-                            <th >Статус</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {addproducts.map(addproducts => (
-                            <tr
-                                key={addproducts.add_number}
-                                onClick={() => navigate(`/add-product/${addproducts.add_number}`, { state: { addproducts } })}
-                                style={{ cursor: 'pointer' }} 
-                            >
-                                <td >Добавить в API</td>
-                                <td >{addproducts.add_number}</td>
-                                <td >{addproducts.add_date}</td>
-                                <td >{addproducts.counterparty}</td>
-                                <td >{addproducts.warehouse}</td>
-                                <td >{addproducts.positionData.length}</td>
-                                <td >
-                                    {addproducts.positionData.reduce((total, stock) => total + stock.quantity, 0)}
-                                </td>
-                                <td >
-                                    {addproducts.positionData.reduce((total, stock) => total + stock.final_quantity, 0)}
-                                </td>
-                                <td >{addproducts.progress}</td>
+                
+                {loading ? (
+                    <p>Загрузка...</p>
+                ) : errorMessage ? (
+                    <p style={{ color: 'red' }}>{errorMessage}</p>
+                ) : (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Номер прихода 1С</th>
+                                <th>Дата</th>
+                                <th>Поставщик</th>
+                                <th>Склад</th>
+                                <th>Кол-во позиций по 1С</th>
+                                <th>Кол-во единиц товара по 1С</th>
+                                <th>Кол-во принятого товара</th>
+                                <th>Статус</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {addproducts.map(addproduct => (
+                                <tr
+                                    key={addproduct.add_number}
+                                    onClick={() => navigate(`/add-product/${addproduct.add_number}`, { state: { addproducts: addproduct } })}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <td>Добавить в API</td>
+                                    <td>{addproduct.add_number}</td>
+                                    <td>{addproduct.add_date}</td>
+                                    <td>{addproduct.counterparty}</td>
+                                    <td>{addproduct.warehouse}</td>
+                                    <td>{addproduct.positionData.length}</td>
+                                    <td>
+                                        {addproduct.positionData.reduce((total, stock) => total + stock.quantity, 0)}
+                                    </td>
+                                    <td>
+                                        {addproduct.positionData.reduce((total, stock) => total + stock.final_quantity, 0)}
+                                    </td>
+                                    <td>{addproduct.progress}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </Layout>
     );

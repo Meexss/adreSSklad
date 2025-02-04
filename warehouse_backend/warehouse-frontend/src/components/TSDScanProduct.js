@@ -148,7 +148,7 @@ const TSDScanProduct = () => {
         {curretStep === 1  && (
           <div className="scan-section">
             <h2>Сканируйте номер приемки</h2>
-            <input className="scan-input" onChange={handleAcceptanceScan} autoFocus />
+            <input className="scan-input" onInput= {handleAcceptanceScan} autoFocus inputMode="none"/>
           </div>
           )}
 
@@ -159,9 +159,9 @@ const TSDScanProduct = () => {
             <input
               className="scan-input"
               value={barcode}
-              onChange ={(e) =>{handleBarcodeScan(e.target.value)}}
+              onInput= {handleBarcodeScan}
               autoFocus
-              
+              inputMode="none"
             /> 
             {error && <p style={{ color: "red" }}>{error}</p>}
             </div>
@@ -187,6 +187,7 @@ const TSDScanProduct = () => {
                     type="number"
                     onChange={handleFinalQuantityChange} // Сохраняем введенное количество
                     autoFocus
+                    inputMode="none"
                   />
                 </div>
                 <button className='buttonCompl' onClick={handleSubmit}>Подтвердить</button>

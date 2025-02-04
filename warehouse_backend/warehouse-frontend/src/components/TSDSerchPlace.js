@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 
 // Компонент для поиска товара
-const TSDSerchProduct = () => {
+const TSDSerchPlace = () => {
     const [curretStep, setCurrentStep] = useState(1);
-    const [barcode, setBarcode] = useState("");
+    const [place, setPlace] = useState("");
     const [products, setProducts] = useState([]); // Храним товары из API
     const [error, setError] = useState("");
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -18,26 +18,24 @@ const TSDSerchProduct = () => {
     }), []);
 
 
-    const handleBarcodeScan = (e) => {
-        const code = e.target.value;
-        setBarcode(code);
-        console.log(code)
-
+    const handlePlaceScan = (place) => {
+        setPlace(place);
+        console.log(place);
+    
         api.get(`/api/products/`)
             .then((response) => {
                 setProducts(response.data);
-
-        // Фильтруем нужные товары
-        const foundProducts = response.data.filter((item) => item.barcode === code);
-            setFilteredProducts(foundProducts);
-            setCurrentStep(2)
-        })
+    
+                // Фильтруем товары по ячейке
+                const foundProducts = response.data.filter((item) => item.place === place);
+                setFilteredProducts(foundProducts);
+                setCurrentStep(2);
+            })
             .catch((error) => setError(error));
-            console.log(error)
-            console.log(products)
-            console.log(filteredProducts)
-            console.log("Сканированный баркод:", code);
-};
+    
+        console.log("Сканированное место:", place);
+    };
+    
 
 
     return (
@@ -45,13 +43,13 @@ const TSDSerchProduct = () => {
             <div className="containerr">
                 <Link to="/TSDmenu"><button class='buttonBack'>В меню</button></Link>
                
-               {/* Шаг первый установка баркода товара  */}
+               {/* Шаг первый установка ячейки товара  */}
                {curretStep === 1 && (
                     <div className="scan-section">
-                        <h2>Сканируйте баркод товара</h2>
+                        <h2>Сканируйте ячейку товара</h2>
                         <input 
                         className="scan-input"
-                        onInput= {handleBarcodeScan} 
+                        onChange={(e) => handlePlaceScan(e.target.value)} // передаем только значение
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}
@@ -61,29 +59,31 @@ const TSDSerchProduct = () => {
                 {/* Шаг второй отображение найденных позиций  */}
                 {filteredProducts.length > 0 && (
                     <div>
-                        <h3>Список позиций соответствующих баркоду:</h3>
-                        <div className="serch-info">
-                            <p className='mainText'>{filteredProducts[0].name}</p>
+                        <h3>Список позиций соответствующих Ячейке:</h3>
+                        <div className="serch-info-place">
+                                <div className='blockInfoSerch'>
+                                    <p className='supText'>Место: </p>
+                                    <p className='mainText'>{place}</p>
+                                </div>
+                        </div>        
+                        
+                        {filteredProducts.map((item, index) => (
+                            <div className="serch-info">
+                            <p className='mainText'>{item.name}</p>
                             <div className='blockInfo'>
                                 <p className='supText'>Артикул: </p>
-                                <p className='mainText'>{filteredProducts[0].article}</p>
+                                <p className='mainText'>{item.article}</p>
                             </div>
                             <div className='blockInfo'>
                                 <p className='supText'>Баркод: </p>
-                                <p className='mainText'>{filteredProducts[0].barcode}</p>
+                                <p className='mainText'>{item.barcode}</p>
                             </div>
+                            <div className='blockInfo'>
+                                <p className='supText'>Количество: </p>
+                                <p className='mainText'>{item.quantity} шт.</p>
+                            </div>
+
                         </div>
-                        {filteredProducts.map((item, index) => (
-                            <div key={index} className="serch-info-place">
-                                <div className='blockInfoSerch'>
-                                    <p className='supText'>Место: </p>
-                                    <p className='mainText'>{item.place}</p>
-                                </div>
-                                <div className='blockInfoSerch'>
-                                    <p className='supText'>Кол-во: </p>
-                                    <p className='mainText'>{item.quantity}</p>
-                                </div>
-                            </div>
                         ))}
                     </div>
                 )}
@@ -92,4 +92,4 @@ const TSDSerchProduct = () => {
     );
 };
 
-export default TSDSerchProduct;
+export default TSDSerchPlace;

@@ -15,47 +15,42 @@ const ShipmentDetails = () => {
     const [reservedData, setReservedData] = useState([]);
     const [showReservedData, setShowReservedData] = useState(false);
     const [summarizedData, setSummarizedData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedQuantity, setSelectedQuantity] = useState(0);
     const [selectedStatus, setSelectedStatus] = useState("Хранение");
     const [showModal, setShowModal] = useState(false);
 
-
-
     const handleOpenModal = (item) => {
-        console.log(item)
         setSelectedItem(item);
-        setSelectedQuantity(item.quantity);  // Можно установить начальное количество товара
+        setSelectedQuantity(item.quantity);
         setShowModal(true);
     };
-    console.log(reservedData)
 
     const handleCloseModal = () => {
         setShowModal(false);
     };
-    
-    // Опции для статуса
-    const statusOptions = ["Хранение", "Брак", "Недостача"];
 
+    const statusOptions = ["Хранение", "Брак", "Недостача"];
     const storageKey = `reservedData_${shipment?.shipment_number}`;
 
     const api = useMemo(() => axios.create({
-        // baseURL: 'https://adressklad.onrender.com',
         baseURL: 'http://127.0.0.1:8000',
     }), []);
-
 
     const updateShipmentStatus = (newStatus) => {
         setShipment(prev => ({ ...prev, progress: newStatus }));
     };
-    
+
     const handleReserveAll = useCallback(async () => {
-        console.log("Начало handleReserveAll");
         try {
             if (!shipment) return;
-
-            setMessage(""); // Сбрасываем предыдущие сообщения
+            
+            setLoading(true);
+            setError(null);
+            setMessage("");
 
             const reserveRequest = {
                 shipment_number: shipment.shipment_number,
@@ -64,17 +59,14 @@ const ShipmentDetails = () => {
                     quantity: stock.quantity,
                 })),
             };
-            console.log(reserveRequest);
 
             const reserveResponse = await api.post('/api/reserve/', reserveRequest);
-            console.log(reserveResponse);
-
+            
             if (reserveResponse.status === 200) {
                 setMessage("Резервирование успешно завершено.");
-                
                 const shipmentNumber = shipment.shipment_number;
                 const getResponse = await api.get(`/api/reserve/?shipment_number=${shipmentNumber}`);
-
+                
                 await api.post('/api/shipments/', {
                     shipment_number: shipment.shipment_number,
                     progress: "В работе"
@@ -89,16 +81,17 @@ const ShipmentDetails = () => {
                 }
             }
         } catch (error) {
-            setMessage(`Ошибка: ${error.response?.data?.error || "Неизвестная ошибка"}`);
+            setError(error.response?.data?.error || "Ошибка при резервировании");
             console.error("Ошибка:", error);
+        } finally {
+            setLoading(false);
         }
-        console.log("Конец handleReserveAll");
     }, [api, shipment, storageKey]);
-
 
     const handleSubmitPartialCancel = async () => {
         try {
-            console.log("Данные для отправки:", selectedItem, selectedQuantity, selectedStatus);
+            setLoading(true);
+            setError(null);
             setShowModal(false);
 
             const cancelRequest = {
@@ -108,25 +101,28 @@ const ShipmentDetails = () => {
                     [selectedItem.unique_id]: selectedQuantity,
                 },
             };
-            console.log(cancelRequest)
-            const   cancelResponse = await api.post('/api/reserve/cancel/', cancelRequest);
+
+            const cancelResponse = await api.post('/api/reserve/cancel/', cancelRequest);
 
             if (cancelResponse.status === 200) {
                 setMessage("Частичная отмена выполнена успешно.");
                 await api.get(`/api/reserve/?shipment_number=${shipment.shipment_number}`);
             }
         } catch (error) {
-            setMessage(`Ошибка отмены: ${error.response?.data?.error || "Неизвестная ошибка"}`);
+            setError(error.response?.data?.error || "Ошибка при частичной отмене");
             console.error("Ошибка отмены:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleMassCancelReservation = useCallback(async () => {
-        console.log("Начало массовой отмены резервирования");
         try {
             if (!reservedData.length) return;
 
-            setMessage(""); // Сбрасываем сообщения
+            setLoading(true);
+            setError(null);
+            setMessage("");
 
             const cancelResponse = await api.post('/api/reserve/cancel/', {
                 reserve_ids: reservedData.map(item => item.unique_id),
@@ -146,16 +142,21 @@ const ShipmentDetails = () => {
                 updateShipmentStatus("Черновик");
             }
         } catch (error) {
-            setMessage(`Ошибка массовой отмены: ${error.response?.data?.error || "Неизвестная ошибка"}`);
+            setError(error.response?.data?.error || "Ошибка при массовой отмене");
             console.error("Ошибка массовой отмены:", error);
+        } finally {
+            setLoading(false);
         }
     }, [api, reservedData, storageKey, shipment?.shipment_number]);
 
     useEffect(() => {
-        if (!shipment) return;
-
         const fetchReservationData = async () => {
             try {
+                if (!shipment) return;
+                
+                setLoading(true);
+                setError(null);
+                
                 const shipmentNumber = shipment.shipment_number;
                 const response = await api.get(`/api/reserve/?shipment_number=${shipmentNumber}`);
 
@@ -166,8 +167,10 @@ const ShipmentDetails = () => {
                 }
             } catch (error) {
                 if (error.response?.status !== 404) {
-                    setMessage(`Ошибка: ${error.response?.data?.error || error.message}`);
+                    setError(error.response?.data?.error || "Ошибка загрузки данных");
                 }
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -177,33 +180,33 @@ const ShipmentDetails = () => {
     useEffect(() => {
         if (reservedData.length > 0) {
             const groupedData = reservedData.reduce((acc, item) => {
-                if (acc[item.article]) {
-                    acc[item.article] += item.quantity;
-                } else {
-                    acc[item.article] = item.quantity;
-                }
+                acc[item.article] = (acc[item.article] || 0) + item.quantity;
                 return acc;
             }, {});
-    
-            // Преобразуем объект в массив
+
             const result = Object.entries(groupedData).map(([article, quantity]) => ({
                 article,
                 quantity,
             }));
-    
+
             setSummarizedData(result);
         }
     }, [reservedData]);
-
 
     if (!shipment) {
         return <Layout><h2>Данные об отгрузке отсутствуют</h2></Layout>;
     }
 
+    if (loading) return <Layout><p>Загрузка...</p></Layout>;
+    if (error) return <Layout><div className="error-message">{error}</div></Layout>;
 
     return (
         <Layout>
             <div style={{ padding: '20px' }}>
+
+            {error && <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
+            {message && <div className="success-message" style={{ color: 'green', margin: '10px 0' }}>{message}</div>}
+
             <Link to="/operations" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
                 <FontAwesomeIcon
                     icon={faArrowLeft}

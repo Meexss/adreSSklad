@@ -20,7 +20,7 @@
 .app-container{
     background-color: #f5fbf1;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     overflow-x: hidden; /* Запрещаем горизонтальную прокрутку */
     overflow-y: auto;   /* Разрешаем вертикальную прокрутку */
     box-sizing: border-box;
@@ -40,7 +40,7 @@
 
   .buttonMenu{
     margin: 0 auto;
-    width: 45vw;
+    width: 43vw;
     height: 14vh;
     background-color: #7e9870;
     font-size: 20px;
@@ -78,7 +78,7 @@
     padding: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-    height: 75vh;
+    height: 62vh;
   }
   
   .scan-section h2 {

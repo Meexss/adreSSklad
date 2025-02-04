@@ -21,8 +21,9 @@ const TSDPlaceProduct = () => {
     
 
     // Функция загрузки товаров по номеру приемки
-    const loadAcceptance = async () => {
+    const loadAcceptance = async (e) => {
         try {
+            setAcceptanceNumber(e.target.value)    
             const response = await api.get(
                 `/api/addproducts/?add_number=${acceptanceNumber}`
             );
@@ -123,13 +124,9 @@ const TSDPlaceProduct = () => {
                         <h2>Сканируйте номер приемки</h2>
                         <input
                         className="scan-input"
-                            onChange={(e) => {
-                                if (e.target.value.length === 5) {                    
-                                    setAcceptanceNumber(e.target.value);
-                                    loadAcceptance();
-                                }
-                            }}
+                        onInput= {loadAcceptance}                                             
                             autoFocus
+                            inputMode="none"
                         />
                     </div>
                 )}
@@ -140,9 +137,9 @@ const TSDPlaceProduct = () => {
                         <h2>Сканируйте баркод товара</h2>
                         <input 
                         className="scan-input"
-                            onChange ={(e) =>{
-                                if (e.target.value.length >= 5) {{handleBarcodeScan(e); }}}} 
-                                autoFocus />
+                            onInput= {handleBarcodeScan} 
+                                autoFocus 
+                                inputMode="none"/>
                         {error && <p style={{ color: "red" }}>{error}</p>}
                     </div>
                 )}
@@ -151,7 +148,7 @@ const TSDPlaceProduct = () => {
                 {curretStep === 3 && currentProduct && (
                     <div className="scan-section">
                         <h2>Сканируйте место хранения</h2>
-                        <input value={place} onChange={(e) => setPlace(e.target.value)} autoFocus />
+                        <input value={place} onInput={(e) => {setPlace(e.target.value)}} autoFocus inputMode="none"/>
                         <button className='buttonCompl' onClick={() => setCurrentStep(4)}>Далее</button>
                     </div>
                 )}
@@ -167,7 +164,7 @@ const TSDPlaceProduct = () => {
                             </div>
                             <div className="quantity-input">   
                                 <label className='mainText'>Введите кол-во:</label>    
-                                <input type="number" value={quantity} onChange={handleQuantityChange} autoFocus />                             
+                                <input type="number" value={quantity} onChange={handleQuantityChange} autoFocus inputMode="none"/>                             
                             </div>
                             <button className='buttonCompl' onClick={submitData}>Подтвердить</button> 
                         </div>

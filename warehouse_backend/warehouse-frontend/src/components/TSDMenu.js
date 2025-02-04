@@ -12,8 +12,8 @@ const TSDMenu = () => {
       <div className="content">
         <Link className='buttonMenu' to="/add-product"><p>Оприходование</p></Link>
         <Link className='buttonMenu' to="/TSDmenu"><p>Отгрузка(в разработке)</p></Link>
-        <Link className='buttonMenu' to="/TSDmenu"><p>Перемещение(в разработке)</p></Link>
-        <Link className='buttonMenu' to="/TSDmenu"><p>Информация о ячейке(в разработке)</p></Link>
+        <Link className='buttonMenu' to="/change-place-tsd"><p>Перемещение</p></Link>
+        <Link className='buttonMenu' to="/info-place-tsd"><p>Информация о ячейке</p></Link>
         <Link className='buttonMenu' to="/info-product-tsd"><p>Информация о товаре</p></Link>
         <Link className='buttonMenu' to="/TSDmenu"><p>Инвентаризация(в разработке)</p></Link>
         <Link className='buttonMenu' to="/test-tsd"><p>Тест ТСД</p></Link>
