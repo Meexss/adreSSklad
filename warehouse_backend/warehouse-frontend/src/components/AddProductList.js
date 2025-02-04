@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,8 +8,13 @@ const AddProductList = () => {
     const [addproducts, setAddproducts] = useState([]);
     const navigate = useNavigate()
 
+    const api = useMemo(() => axios.create({
+        // baseURL: 'https://adressklad.onrender.com',
+        baseURL: 'http://127.0.0.1:8000',
+    }), []);
+
     useEffect(() => {
-        axios.get('https://adressklad.onrender.com/api/addproducts/')
+        api.get('/api/addproducts/')
             .then(response => setAddproducts(response.data))
             .catch(error => console.error(error));
     }, []);

@@ -21,6 +21,8 @@ const ShipmentDetails = () => {
     const [selectedStatus, setSelectedStatus] = useState("Хранение");
     const [showModal, setShowModal] = useState(false);
 
+
+
     const handleOpenModal = (item) => {
         console.log(item)
         setSelectedItem(item);
@@ -39,8 +41,10 @@ const ShipmentDetails = () => {
     const storageKey = `reservedData_${shipment?.shipment_number}`;
 
     const api = useMemo(() => axios.create({
-        baseURL: 'https://adressklad.onrender.com',
+        // baseURL: 'https://adressklad.onrender.com',
+        baseURL: 'http://127.0.0.1:8000',
     }), []);
+
 
     const updateShipmentStatus = (newStatus) => {
         setShipment(prev => ({ ...prev, progress: newStatus }));

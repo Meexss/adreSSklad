@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import Layout from './Layout';
 import axios from 'axios';
@@ -12,12 +12,19 @@ const AddProductDetails = () => {
     const [placeProducts, setPlaceProducts] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
 
+    const api = useMemo(() => axios.create({
+        // baseURL: 'https://adressklad.onrender.com',
+        baseURL: 'http://127.0.0.1:8000',
+    }), []);
+
+
+
     useEffect(() => {
         if (!addproducts?.add_number) return;
 
         const fetchAddData = async () => {
             try {
-                const response = await axios.get(`https://adressklad.onrender.com/api/addproducts/?add_number=${addproducts.add_number}`);
+                const response = await api.get(`api/addproducts/?add_number=${addproducts.add_number}`);
                 setDataProducts(response.data.length ? response.data[0] : null);
             } catch (error) {
                 console.error("Ошибка запроса:", error);
@@ -27,7 +34,7 @@ const AddProductDetails = () => {
 
         const fetchPlacedData = async () => {
             try {
-                const response = await axios.get(`https://adressklad.onrender.com/api/placeship/?add_number=${addproducts.add_number}`);
+                const response = await api.get(`/api/placeship/?add_number=${addproducts.add_number}`);
                 setPlaceProducts(response.data);
             } catch (error) {
                 console.error("Ошибка запроса:", error);

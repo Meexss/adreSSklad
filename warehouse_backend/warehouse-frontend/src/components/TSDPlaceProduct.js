@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import TSDLayout from './TSDLayout';
 
 // Компонент для процесса приёмки товаров
 const TSDPlaceProduct = () => {
@@ -12,13 +13,18 @@ const TSDPlaceProduct = () => {
     const [place, setPlace] = useState("");
     const [quantity, setQuantity] = useState("");
     const [error, setError] = useState("");
+
+    const api = useMemo(() => axios.create({
+        // baseURL: 'https://adressklad.onrender.com',
+        baseURL: 'http://127.0.0.1:8000',
+    }), []);
     
 
     // Функция загрузки товаров по номеру приемки
     const loadAcceptance = async () => {
         try {
-            const response = await axios.get(
-                `https://adressklad.onrender.com/api/addproducts/?add_number=${acceptanceNumber}`
+            const response = await api.get(
+                `/api/addproducts/?add_number=${acceptanceNumber}`
             );
             setProducts(response.data);
             setCurrentStep(2);
@@ -94,7 +100,7 @@ const TSDPlaceProduct = () => {
 
         console.log(requestData)
         try {
-            await axios.post("https://adressklad.onrender.com/api/placeship/", requestData);
+            await api.post("/api/placeship/", requestData);
             alert("Данные успешно отправлены!");
             setCurrentStep(2); // Возвращаемся к сканированию нового номера приемки
             setBarcode("");
@@ -107,55 +113,68 @@ const TSDPlaceProduct = () => {
     };
 
     return (
-        <div className="app-container">
-            <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
-            {curretStep === 1 && (
-                <div className="scan-section">
-                    <h2>Сканируйте номер приемки</h2>
-                    <input
-                    className="scan-input"
-                        onChange={(e) => {
-                            if (e.target.value.length === 5) {
-                                
-                                setAcceptanceNumber(e.target.value);
-                                loadAcceptance();
-                            }
-                        }}
-                        autoFocus
-                    />
-                </div>
-            )}
+        <TSDLayout>
+            <div className="containerr">
+                <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
+               
+                {/* Шаг первый установка номера поставки  */}
+                {curretStep === 1 && (
+                    <div className="scan-section">
+                        <h2>Сканируйте номер приемки</h2>
+                        <input
+                        className="scan-input"
+                            onChange={(e) => {
+                                if (e.target.value.length === 5) {                    
+                                    setAcceptanceNumber(e.target.value);
+                                    loadAcceptance();
+                                }
+                            }}
+                            autoFocus
+                        />
+                    </div>
+                )}
 
-            {curretStep === 2 && (
-                <div className="scan-section">
-                    <h2>Сканируйте баркод товара</h2>
-                    <input 
-                    className="scan-input"
-                        onChange ={(e) =>{
-                            if (e.target.value.length >= 5) {{handleBarcodeScan(e); }}}} 
-                            autoFocus />
-                    {error && <p style={{ color: "red" }}>{error}</p>}
-                </div>
-            )}
+                {/* Шаг второй установка баркода товара  */}
+                {curretStep === 2 && (
+                    <div className="scan-section">
+                        <h2>Сканируйте баркод товара</h2>
+                        <input 
+                        className="scan-input"
+                            onChange ={(e) =>{
+                                if (e.target.value.length >= 5) {{handleBarcodeScan(e); }}}} 
+                                autoFocus />
+                        {error && <p style={{ color: "red" }}>{error}</p>}
+                    </div>
+                )}
 
-            {curretStep === 3 && currentProduct && (
-                <div className="place-section">
-                    <h2>Сканируйте место хранения</h2>
-                    <input value={place} onChange={(e) => setPlace(e.target.value)} autoFocus />
-                    <button onClick={() => setCurrentStep(4)}>Далее</button>
-                </div>
-            )}
+                {/* Установка места хранения */}
+                {curretStep === 3 && currentProduct && (
+                    <div className="scan-section">
+                        <h2>Сканируйте место хранения</h2>
+                        <input value={place} onChange={(e) => setPlace(e.target.value)} autoFocus />
+                        <button className='buttonCompl' onClick={() => setCurrentStep(4)}>Далее</button>
+                    </div>
+                )}
 
-            {curretStep === 4 && currentProduct && (
-                <div className="quantity-section">
-                    <h2>Введите количество</h2>
-                    <label>Доступное количество:</label>
-                    <label>{currentProduct.final_quantity}</label>
-                    <input type="number" value={quantity} onChange={handleQuantityChange} autoFocus />
-                    <button onClick={submitData}>Подтвердить</button>
-                </div>
-            )}
-        </div>
+                {/* Шаг четвертый установка количества товара  */}
+                {curretStep === 4 && currentProduct && (
+                    <div className="quantity-section">
+                        <h2>Введите количество</h2>
+                        <div className="position-info">
+                            <div className='blockInfo'>
+                                <p className='supText'>Доступное количество: </p>
+                                <p className='mainText'>{currentProduct.final_quantity} шт.</p>
+                            </div>
+                            <div className="quantity-input">   
+                                <label className='mainText'>Введите кол-во:</label>    
+                                <input type="number" value={quantity} onChange={handleQuantityChange} autoFocus />                             
+                            </div>
+                            <button className='buttonCompl' onClick={submitData}>Подтвердить</button> 
+                        </div>
+                    </div>
+                )}
+            </div>
+        </TSDLayout>
     );
 };
 

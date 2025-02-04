@@ -1,6 +1,7 @@
-import React, {useState, useCallback } from 'react';
+import React, {useState, useCallback, useMemo  } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import TSDLayout from './TSDLayout';
 
 // Компонент для процесса приёмки товаров
 const TSDScanProduct = () => {
@@ -12,6 +13,12 @@ const TSDScanProduct = () => {
   const [error, setError] = useState(''); // Добавьте это состояние для ошибок
   const [apiData, setApiData] = useState([])
   const [numberAcceptance, setNumberAcceptance] = useState('')
+
+
+  const api = useMemo(() => axios.create({
+    // baseURL: 'https://adressklad.onrender.com',
+    baseURL: 'http://127.0.0.1:8000',
+}), []);
 
   const handleAcceptanceScan = async (e) => {
     const value = e.target.value;
@@ -34,7 +41,7 @@ const TSDScanProduct = () => {
   // Загрузка данных приёмки
   const loadAcceptance = () => {
     console.log("Запрос на сервер с номером: ", numberAcceptance);
-    axios.get(`https://adressklad.onrender.com/api/addproducts/?add_number=${numberAcceptance}`)
+    api.get(`/api/addproducts/?add_number=${numberAcceptance}`)
       .then(res => {
         if (res.data.length === 0) throw new Error('Приёмка не найдена');
         setPositions(res.data);
@@ -114,7 +121,7 @@ const TSDScanProduct = () => {
     console.log(scanRequest);
   
     // Отправка запроса
-    const scanResponse = await axios.post('https://adressklad.onrender.com/api/addproducts/', scanRequest);
+    const scanResponse = await api.post('/api/addproducts/', scanRequest);
     console.log(scanResponse);
 
 
@@ -132,73 +139,94 @@ const TSDScanProduct = () => {
   
 
   return (
-    <div className="app-container">
-      <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
-      {curretStep === 1  && (
-        <div className="scan-section">
-          <h2>Сканируйте номер приемки</h2>
-          <input className="scan-input" onChange={handleAcceptanceScan} autoFocus />
-        </div>
-      )}
-      
-      {curretStep === 2 && (
-        <div className="scan-section">
-          <h2>Сканируйте баркод товара</h2>
-          <input
-            className="scan-input"
-            value={barcode}
-            onChange ={(e) =>{handleBarcodeScan(e.target.value)}}
-            autoFocus
-            
-          /> 
-           {error && <p style={{ color: "red" }}>{error}</p>}
-          </div>)}
 
-          {curretStep === 3 && (
-            <div className="position-info">
-              <h3>Найдена позиция:</h3>
-              <p>Артикул: {foundPosition.article}</p>
-              <p>Наименование: {foundPosition.name}</p>
-              <div className="quantity-input">
-                <label>Количество к приемке:</label>
-                <label>{foundPosition.quantity - foundPosition.final_quantity}</label>
-                <br></br>
-                <label>Введите кол-во:</label>
-                <input
-                  type="number"
-                  onChange={handleFinalQuantityChange} // Сохраняем введенное количество
-                  autoFocus
-                />
-              </div>
-              <button onClick={handleSubmit}>Подтвердить</button>
+    <TSDLayout>
+      <div className="container">
+        <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
+        
+        {/* Шаг первый установка номера поставки  */}
+        {curretStep === 1  && (
+          <div className="scan-section">
+            <h2>Сканируйте номер приемки</h2>
+            <input className="scan-input" onChange={handleAcceptanceScan} autoFocus />
+          </div>
+          )}
+
+        {/* Шаг второй установка баркода товара  */}
+        {curretStep === 2 && (
+          <div className="scan-section">
+            <h2>Сканируйте баркод товара</h2>
+            <input
+              className="scan-input"
+              value={barcode}
+              onChange ={(e) =>{handleBarcodeScan(e.target.value)}}
+              autoFocus
+              
+            /> 
+            {error && <p style={{ color: "red" }}>{error}</p>}
             </div>
           )}
 
-          {curretStep === 4 && (
-              <div className="manual-select">
-                <h3>Выберите позицию вручную:</h3>
-                <div className="position-list">
-                    {positions.map((position, idx) => (
+        {/* Шаг третий вывод позиции и установка кол-ва  */}
+        {curretStep === 3 && (
+            <div>
+              <h3>Найдена позиция:</h3>
+              <div className="position-info">
+                <p className='mainText'>{foundPosition.name}</p>
+                <div className='blockInfo'>
+                  <p className='supText'>Артикул: </p>
+                  <p className='mainText'>{foundPosition.article}</p>
+                </div>
+                <div className='blockInfo'>
+                  <p className='supText'>К приемке:</p>
+                  <p className='mainText'>{foundPosition.quantity - foundPosition.final_quantity} шт.</p>
+                </div>
+                <div className="quantity-input">   
+                  <label className='mainText'>Введите кол-во:</label>
+                  <input
+                    type="number"
+                    onChange={handleFinalQuantityChange} // Сохраняем введенное количество
+                    autoFocus
+                  />
+                </div>
+                <button className='buttonCompl' onClick={handleSubmit}>Подтвердить</button>
+              </div>
+            </div>
+          )}
+
+        {/* Шаг четвертый выбор позиции при не соответствии баркода  */}
+        {curretStep === 4 && (
+            <div>
+              <h3>Выберите позицию вручную:</h3>
+              <div> 
+              {positions.map((position, idx) => (
                       <div key={idx} className="position-item">
                         {position.positionData?.map((item, i) => (
                           <div 
                             key={i} 
-                            className="position-detail" 
+                            className="position-info" 
                             onClick={() => hanleNewBarcode(item)} // Обновляем состояние с выбранной позицией
                           >
-                            <p>Артикул: {item.article}</p>
-                            <p>Наименование: {item.name}</p>
-                            <p>Баркод: {item.barcode}</p>
+                            <p className='mainText'>{item.name}</p>
+                            <div className='blockInfo'>
+                              <p className='supText'>Артикул: </p>
+                              <p className='mainText'>{item.article}</p>
+                            </div>
+                            <div className='blockInfo'>
+                              <p className='supText'>К приемке:</p>
+                              <p className='mainText'>{item.barcode}</p>
+                            </div>
                           </div>
                         ))}
                       </div>
-                    ))}
-                  </div>
-                  </div>
-                )}
+              ))}
               </div>
-
-            )}
+            </div>  
+          )}
+      </div>
+    </TSDLayout>
+  );
+};
 
 
 

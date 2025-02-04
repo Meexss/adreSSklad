@@ -1,19 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './TsdStyle.css';
+import TSDLayout from './TSDLayout';
 
 
 const TSDMenu = () => {
 
   return (
-    <div className="menu-container">
-      <h2>Выберете операцию</h2>
+    <TSDLayout>
+      <h3>Выберете операцию:</h3>
       <div className="content">
-        <Link to="/add-product"><button className='buttonMenu'>Оприходование</button></Link>
-        <button className='buttonMenu'>Отгрузка(в разработке)</button>
-        <button className='buttonMenu'>Перемещение(в разработке)</button>
-        <button className='buttonMenu'>Информация о ячейке(в разработке)</button>
+        <Link className='buttonMenu' to="/add-product"><p>Оприходование</p></Link>
+        <Link className='buttonMenu' to="/TSDmenu"><p>Отгрузка(в разработке)</p></Link>
+        <Link className='buttonMenu' to="/TSDmenu"><p>Перемещение(в разработке)</p></Link>
+        <Link className='buttonMenu' to="/TSDmenu"><p>Информация о ячейке(в разработке)</p></Link>
+        <Link className='buttonMenu' to="/info-product-tsd"><p>Информация о товаре</p></Link>
+        <Link className='buttonMenu' to="/TSDmenu"><p>Инвентаризация(в разработке)</p></Link>
+        <Link className='buttonMenu' to="/test-tsd"><p>Тест ТСД</p></Link>
+
       </div>
-    </div>
+    </TSDLayout>
   );
 };
 
