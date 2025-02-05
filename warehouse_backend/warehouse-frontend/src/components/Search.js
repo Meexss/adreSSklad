@@ -48,9 +48,13 @@ const Search = () => {
                 </button>
 
                 {loading ? (
-                    <p>Загрузка...</p>
+                        <div className='loaderWrap'>
+                            <span className="loader"></span>
+                        </div>
                 ) : error ? (
+                    <div className='loaderWrap'>
                     <p style={{ color: 'red' }}>{error}</p>
+                    </div>
                 ) : filteredProducts.length > 0 ? (
                     <table>
                         <thead>

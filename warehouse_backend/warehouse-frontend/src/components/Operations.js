@@ -32,9 +32,13 @@ const Operations = () => {
                 <h2>Расходные операции</h2>
 
                 {loading ? (
-                    <p>Загрузка...</p>
+                        <div className='loaderWrap'>
+                            <span className="loader"></span>
+                        </div>
                 ) : errorMessage ? (
+                    <div className='loaderWrap'>
                     <p style={{ color: 'red' }}>{errorMessage}</p>
+                    </div>
                 ) : (
                     <table>
                         <thead>

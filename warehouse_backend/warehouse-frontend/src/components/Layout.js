@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
                     </div>
                 </nav>
             </header>
-            <main>
+            <main className='ChildStyle'>
                 {children}
             </main>
         </div>

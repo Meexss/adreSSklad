@@ -197,8 +197,8 @@ const ShipmentDetails = () => {
         return <Layout><h2>Данные об отгрузке отсутствуют</h2></Layout>;
     }
 
-    if (loading) return <Layout><p>Загрузка...</p></Layout>;
-    if (error) return <Layout><div className="error-message">{error}</div></Layout>;
+    if (loading) return <Layout><div className='loaderWrap'><span className="loader"></span></div></Layout>;
+    if (error) return <Layout><div className='loaderWrap'><p style={{ color: 'red' }}>{error}</p></div></Layout>;
 
     return (
         <Layout>

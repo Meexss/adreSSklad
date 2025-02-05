@@ -18,20 +18,22 @@ const TSDSerchPlace = () => {
     }), []);
 
 
-    const handlePlaceScan = (place) => {
+    const handlePlaceScan = async (place) => {
+        setCurrentStep(0)
         setPlace(place);
         console.log(place);
-    
-        api.get(`/api/products/`)
-            .then((response) => {
-                setProducts(response.data);
-    
+        try{
+            const res = await api.get(`/api/products/`)
+        
+                setProducts(res.data);
                 // Фильтруем товары по ячейке
-                const foundProducts = response.data.filter((item) => item.place === place);
+                const foundProducts = res.data.filter((item) => item.place === place);
                 setFilteredProducts(foundProducts);
                 setCurrentStep(2);
-            })
-            .catch((error) => setError(error));
+        } catch (err) {
+            setCurrentStep(-1)
+            setError(err.message)
+        }
     
         console.log("Сканированное место:", place);
     };
@@ -42,7 +44,21 @@ const TSDSerchPlace = () => {
         <TSDLayout>
             <div className="containerr">
                 <Link to="/TSDmenu"><button class='buttonBack'>В меню</button></Link>
-               
+
+                {/* Шаг для загрузки данных  */}
+                {curretStep === 0 && (
+                    <div className="scan-section-loader">
+                        <span class="loader"></span>
+                    </div>
+                )}
+                {/* Шаг для ошибки данных  */}
+                {curretStep === -1 && (
+                    <div className="scan-section">
+                        <p className='mainText'>{error}</p>
+                        <p className='mainText'>Повторите действие повторно</p>
+                    </div>
+                )}
+
                {/* Шаг первый установка ячейки товара  */}
                {curretStep === 1 && (
                     <div className="scan-section">

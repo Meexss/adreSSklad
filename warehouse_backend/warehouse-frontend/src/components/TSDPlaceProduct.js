@@ -22,20 +22,25 @@ const TSDPlaceProduct = () => {
 
     // Функция загрузки товаров по номеру приемки
     const loadAcceptance = async (e) => {
+        const value = e.target.value
+        setCurrentStep(0)
+        setAcceptanceNumber(value)  
         try {
-            setAcceptanceNumber(e.target.value)    
             const response = await api.get(
-                `/api/addproducts/?add_number=${acceptanceNumber}`
+                `/api/addproducts/?add_number=${value}`
             );
             setProducts(response.data);
             setCurrentStep(2);
         } catch (error) {
-            console.error("Ошибка загрузки приемки:", error);
+            setCurrentStep(-1)
+            setError(`Ошибка загрузки приемки: ${error.message || error}`);
+            
         }
     };
 
     // Функция обработки сканирования баркода
     const handleBarcodeScan = (e) => {
+        setCurrentStep(0)
         const code = e.target.value;
         setBarcode(code);
         console.log("Сканированный баркод:", code);
@@ -76,17 +81,15 @@ const TSDPlaceProduct = () => {
         const enteredQuantity = parseInt(e.target.value, 10);
         if (currentProduct && enteredQuantity <= currentProduct.final_quantity) {
             setQuantity(enteredQuantity);
+            setError('')
         } else {
-            alert("Количество не может превышать допустимое значение!{currentProduct.final_quantity}");
+            setError(`Количество не может превышать допустимое значение! ${currentProduct.final_quantity}`)
         }
     };
 
     // Функция отправки данных на сервер
     const submitData = async () => {
-        if (!currentProduct || !place || !quantity) {
-            alert("Заполните все поля!");
-            return;
-        }
+        setCurrentStep(0)
 
         const requestData = [{
             add_number: acceptanceNumber,
@@ -102,14 +105,20 @@ const TSDPlaceProduct = () => {
         console.log(requestData)
         try {
             await api.post("/api/placeship/", requestData);
-            alert("Данные успешно отправлены!");
-            setCurrentStep(2); // Возвращаемся к сканированию нового номера приемки
+            setCurrentStep(5);
+            setTimeout(() => {
+              setCurrentStep(2);
+            }, 2000);
             setBarcode("");
             setCurrentProduct(null);
             setPlace("");
             setQuantity("");
+            setError('')
         } catch (error) {
-            console.error("Ошибка отправки данных:", error);
+            setCurrentStep(0)
+            setError(`Ошибка загрузки приемки: ${error.message || error}`);
+            setCurrentStep(-2);
+
         }
     };
 
@@ -117,6 +126,33 @@ const TSDPlaceProduct = () => {
         <TSDLayout>
             <div className="containerr">
                 <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
+                
+                {/* Шаг для загрузки данных  */}
+                {curretStep === 0 && (
+                            <div className="scan-section-loader">
+                                <span class="loader"></span>
+                            </div>
+                )}
+                {/* Шаг для ошибки данных  */}
+                {curretStep === -2 && (
+                            <div className="scan-section">
+                                <p className='mainText'>{error}</p>
+                                <p className='mainText'>Повторите действие повторно</p>
+                                <button className='buttonCompl' onClick={submitData}>Повторно отсканировать товар</button>
+                            </div>
+                )}
+                {curretStep === -1 && (
+                            <div className="scan-section">
+                                <p className='mainText'>{error}</p>
+                                <p className='mainText'>Повторите действие повторно</p>
+                            </div>
+                )}
+
+                {curretStep === 5 && (
+                            <div className="scan-section">
+                                <p className='mainText'>Данные успешно отправлены</p>
+                            </div>
+                )}
                
                 {/* Шаг первый установка номера поставки  */}
                 {curretStep === 1 && (
@@ -148,7 +184,7 @@ const TSDPlaceProduct = () => {
                 {curretStep === 3 && currentProduct && (
                     <div className="scan-section">
                         <h2>Сканируйте место хранения</h2>
-                        <input value={place} onInput={(e) => {setPlace(e.target.value)}} autoFocus inputMode="none"/>
+                        <input onInput={(e) => {setPlace(e.target.value)}} autoFocus inputMode="none"/>
                         <button className='buttonCompl' onClick={() => setCurrentStep(4)}>Далее</button>
                     </div>
                 )}
@@ -164,7 +200,8 @@ const TSDPlaceProduct = () => {
                             </div>
                             <div className="quantity-input">   
                                 <label className='mainText'>Введите кол-во:</label>    
-                                <input type="number" value={quantity} onChange={handleQuantityChange} autoFocus inputMode="none"/>                             
+                                <input type="number" onChange={handleQuantityChange} autoFocus inputMode="none"/>    
+                                {error && <p style={{ color: "red" }}>{error}</p>}                         
                             </div>
                             <button className='buttonCompl' onClick={submitData}>Подтвердить</button> 
                         </div>

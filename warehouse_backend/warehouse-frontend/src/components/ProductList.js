@@ -33,9 +33,13 @@ const ProductList = () => {
             <div>
                 <h2>Список товаров</h2>
                 {loading ? (
-                    <p>Загрузка...</p> // Здесь можно заменить на анимацию или спиннер
+                        <div className='loaderWrap'>
+                            <span className="loader"></span>
+                        </div>
                 ) : error ? (
-                    <p style={{ color: "red" }}>{error}</p>
+                    <div className='loaderWrap'>
+                    <p style={{ color: 'red' }}>{error}</p>
+                    </div>
                 ) : (
                     <div>
                         <table>

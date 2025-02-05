@@ -25,41 +25,44 @@ const TSDChangePlace = () => {
     }), []);
 
 
-    const handlePlaceScan = (place) => {
-        setPlace(place);
-        console.log(place);
-    
-        api.get(`/api/products/`)
-            .then((response) => {
-                setProducts(response.data);
-    
-                // Фильтруем товары по ячейке
-                const foundProducts = response.data.filter((item) => item.place === place);
-                setFilteredPlace(foundProducts);
-                setCurrentStep(2);
-            })
-            .catch((error) => setError(error));
-    
-        console.log("Сканированное место:", place);
+    const handlePlaceScan = async (e) => {
+        setCurrentStep(0)
+        const value = e.target.value
+        setPlace(value);
+        console.log(value);
+
+        try {
+            const response = await api.get(`/api/products/`)
+            const foundProducts = response.data.filter((item) => item.place === value);
+            setFilteredPlace(foundProducts);
+            setError('')
+            setCurrentStep(2);
+            console.log(foundProducts)
+        }
+        catch(err) {
+            setError(`Ошибка загрузки места: ${error.message || error}`);
+            setCurrentStep(-1)
+        }
+
+        console.log("Сканированное место:", value);
     };
 
-    const handleBarcodeScan = (barcode) => {
-        const code = barcode;
+    const handleBarcodeScan = async (e) => {
+        setCurrentStep(0)
+        const code = e.target.value;
         setBarcode(code);
         console.log(code)
 
         // Фильтруем нужные товары
         const foundProducts = filteredPlace.filter((item) => item.barcode === code);
+        if(foundProducts.length > 0){
             setFilteredBarcode(foundProducts);
-
-            console.log(error)
-            console.log(products)
-            console.log(filteredBarcode)
-            console.log("Сканированный баркод:", code);
-
             setSumPlace(foundProducts.reduce((acc, item) => acc + item.quantity, 0));
-            setCurrentStep(3);
             setCurrentStep(3)
+        } else {
+            setError('Баркод не найден')
+            setCurrentStep(2)
+        }
     };
 
     const handleFinalQuantityChange = (e) => {
@@ -71,22 +74,55 @@ const TSDChangePlace = () => {
         setCurrentStep(4)
     }
 
-    const handlePlaceScanFinal = (place) => {
-        setNewPlace(place);
-        console.log(place);
-        console.log(place, barcode, colChange, newPlace )
+    const handlePlaceScanFinal = async (e) => {
+        setCurrentStep(0)
+        setError('')
+        const updatedNewPlace = e.target.value; // Новое место из сканера
+        setNewPlace(updatedNewPlace);
     
+        console.log("Отправка запроса:", { place, barcode, colChange, newPlace: updatedNewPlace });
+    
+        try {
+            const response = await api.post("/api/products/", {
+                place: place,           // Откуда переносим
+                barcode: barcode,       // Штрихкод товара
+                colChange: colChange,   // Количество к переносу
+                newPlace: updatedNewPlace // Куда переносим
+            });
+            setCurrentStep(5)
+            setTimeout(() => {
+                setCurrentStep(1);})
+        } catch (error) {
+            setError(`Ошибка отправки данных: ${error.message || error}`);
+            setCurrentStep(4)
+        }
     };
-
-
-
-    
-
 
     return (
         <TSDLayout>
             <div className="containerr">
                 <Link to="/TSDmenu"><button class='buttonBack'>В меню</button></Link>
+
+
+                {/* Шаг для загрузки данных  */}
+                {curretStep === 0 && (
+                            <div className="scan-section-loader">
+                                <span class="loader"></span>
+                            </div>
+                )}
+
+                {curretStep === -1 && (
+                            <div className="scan-section">
+                                <p className='mainText'>{error}</p>
+                                <p className='mainText'>Повторите действие повторно</p>
+                            </div>
+                )}
+
+                {curretStep === 5 && (
+                            <div className="scan-section">
+                                <p className='mainText'>Данные успешно отправлены</p>
+                            </div>
+                )}
                
                {/* Шаг первый установка ячейки товара  */}
                {curretStep === 1 && (
@@ -94,10 +130,9 @@ const TSDChangePlace = () => {
                         <h2>Сканируйте ячейку товара</h2>
                         <input 
                         className="scan-input"
-                        onChange={(e) => handlePlaceScan(e.target.value)} // передаем только значение
+                        onInput= {handlePlaceScan} // передаем только значение
                                 autoFocus
                                 inputMode="none" />
-                        {error && <p style={{ color: "red" }}>{error}</p>}
                     </div>
                 )}
 
@@ -107,7 +142,7 @@ const TSDChangePlace = () => {
                         <h2>Сканируйте Штрихкод товара</h2>
                         <input 
                         className="scan-input"
-                        onChange={(e) => handleBarcodeScan(e.target.value)} // передаем только значение
+                        onInput= {handleBarcodeScan}// передаем только значение
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}
@@ -132,7 +167,7 @@ const TSDChangePlace = () => {
                         <label className='mainText'>Введите кол-во к перемещению:</label>
                         <input
                             type="number"
-                            onChange={handleFinalQuantityChange} // Сохраняем введенное количество
+                            onInput= {handleFinalQuantityChange} // Сохраняем введенное количество
                             autoFocus
                             inputMode="none"
                         />
@@ -148,7 +183,7 @@ const TSDChangePlace = () => {
                         <h2>Сканируйте НОВУЮ ячейку товара</h2>
                         <input 
                         className="scan-input"
-                        onChange={(e) => handlePlaceScanFinal(e.target.value)} // передаем только значение
+                        onInput= {handlePlaceScanFinal} // передаем только значение
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}

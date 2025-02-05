@@ -9,15 +9,11 @@ const Home = () => {
             <div style={{ textAlign: 'center' }}>
                 <h2>Добро пожаловать в систему управления складом</h2>
                 <div>
-                    <Link to="/products">
-                        <button style={{ margin: '10px', padding: '10px 20px' }}>Список товаров</button>
+                    <Link to="/TSDmenu">
+                        <button className='buttonTSDHome'>Меню ТСД</button>
                     </Link>
-                    <Link to="/operations">
-                        <button style={{ margin: '10px', padding: '10px 20px' }}>Операции</button>
-                    </Link>
-                    <Link to="/search">
-                        <button style={{ margin: '10px', padding: '10px 20px' }}>Поиск товара</button>
-                    </Link>
+
+
                 </div>
             </div>
         </Layout>

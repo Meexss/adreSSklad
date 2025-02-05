@@ -65,9 +65,13 @@ const AddProductDetails = () => {
                 </div>
 
                 {loading ? (
-                    <p>Загрузка...</p>
+                        <div className='loaderWrap'>
+                            <span className="loader"></span>
+                        </div>
                 ) : errorMessage ? (
-                    <p style={{ color: 'red' }}>{errorMessage}</p>
+                    <div className='loaderWrap'>
+                    <   p style={{ color: 'red' }}>{errorMessage}</p>
+                    </div>
                 ) : (
                     <table>
                         <thead>
@@ -76,40 +80,44 @@ const AddProductDetails = () => {
                                 <th>Наименование</th>
                                 <th>Количество по 1С</th>
                                 <th>Фактически принято</th>
+                                <th>Размещено товара</th>
                                 <th>Места товара</th>
                                 <th>Количество на месте</th>
                                 <th>Статус товара</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {addproducts.positionData?.map((stock, index) => (
-                                <tr key={index}>
-                                    <td>{stock.article}</td>
-                                    <td style={{ textAlign: 'left' }}>{stock.name}</td>
-                                    <td>{stock.quantity}</td>
-                                    <td>
-                                        {dataProducts?.positionData?.find(item => item.article === stock.article)?.final_quantity || '—'}
-                                    </td>
-                                    {placeProducts?.find(item => item.article === stock.article) ? (
-                                        (() => {
-                                            const product = placeProducts.find(item => item.article === stock.article);
-                                            return (
-                                                <>
-                                                    <td>{product.place || '—'}</td>
-                                                    <td>{product.quantity || '—'}</td>
-                                                    <td>{product.goods_status || '—'}</td>
-                                                </>
-                                            );
-                                        })()
-                                    ) : (
-                                        <>
-                                            <td>—</td>
-                                            <td>—</td>
-                                            <td>—</td>
-                                        </>
-                                    )}
-                                </tr>
-                            ))}
+                        {addproducts?.positionData?.map((stock, index) => {
+                            const finalQuantity =
+                            dataProducts?.positionData?.find(item => item.article === stock.article)?.final_quantity || '—';
+
+                            const filteredProducts = placeProducts?.filter(item => item.article === stock.article) || [];
+
+                            return (
+                            <tr key={index}>
+                                <td>{stock.article}</td>
+                                <td style={{ textAlign: 'left' }}>{stock.name}</td>
+                                <td>{stock.quantity}</td>
+                                <td>{finalQuantity}</td>
+                                <td>{filteredProducts.reduce((acc, item) => acc + item.quantity, 0)}</td>
+                                <td>
+                                {filteredProducts.length > 0
+                                    ? filteredProducts.map((p, i) => <div key={i}>{p.place || '—'}</div>)
+                                    : '—'}
+                                </td>
+                                <td>
+                                {filteredProducts.length > 0
+                                    ? filteredProducts.map((p, i) => <div key={i}>{p.quantity || '—'}</div>)
+                                    : '—'}
+                                </td>
+                                <td>
+                                {filteredProducts.length > 0
+                                    ? filteredProducts.map((p, i) => <div key={i}>{p.goods_status || '—'}</div>)
+                                    : '—'}
+                                </td>
+                            </tr>
+                            );
+                        })}
                         </tbody>
                     </table>
                 )}

@@ -32,9 +32,13 @@ const AddProductList = () => {
                 <h2>Список приходов с 1С (перемещение/ приход товара)</h2>
                 
                 {loading ? (
-                    <p>Загрузка...</p>
+                        <div className='loaderWrap'>
+                            <span className="loader"></span>
+                        </div>
                 ) : errorMessage ? (
+                    <div className='loaderWrap'>
                     <p style={{ color: 'red' }}>{errorMessage}</p>
+                    </div>
                 ) : (
                     <table>
                         <thead>

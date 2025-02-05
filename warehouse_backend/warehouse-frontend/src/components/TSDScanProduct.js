@@ -21,41 +21,28 @@ const TSDScanProduct = () => {
 }), []);
 
   const handleAcceptanceScan = async (e) => {
+    setCurrentStep(0)
     const value = e.target.value;
     console.log("Вводится значение:", value);
   
-    if (value.length === 5) {
-      setNumberAcceptance(value);
-  
       try {
-        await loadAcceptance(); // Дожидаемся загрузки данных
+        const loadResponse = await api.get(`/api/addproducts/?add_number=${value}`)
+        setPositions(loadResponse.data);
+        setApiData(loadResponse.data)
         setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
+        console.log(value)
+        console.log(positions)
       } catch (error) {
         console.error("Ошибка загрузки приемки:", error);
-        setError("Ошибка загрузки приемки");
+        setError(`Ошибка загрузки приемки: ${error.message || error}`);
+        setCurrentStep(-1)
       }
-    }
   };
 
-
-  // Загрузка данных приёмки
-  const loadAcceptance = () => {
-    console.log("Запрос на сервер с номером: ", numberAcceptance);
-    api.get(`/api/addproducts/?add_number=${numberAcceptance}`)
-      .then(res => {
-        if (res.data.length === 0) throw new Error('Приёмка не найдена');
-        setPositions(res.data);
-        setApiData(res.data)
-        setError('');
-        console.log(res)
-        console.log(res.data)
-      })
-      .catch(err => setError(err.message));
-  };
 
   // Обработка сканирования баркода
   const handleBarcodeScan = (e) => {
-    const code = e;
+    const code = e.target.value;
     setBarcode(code);
     console.log("Сканированный баркод:", code);
 
@@ -101,7 +88,7 @@ const TSDScanProduct = () => {
     // Вычисляем новое значение final_quantity
     const sumcol = Number(foundPosition.final_quantity) + Number(enteredQuantity);
     console.log("Обновленное final_quantity:", sumcol);
-  
+    setCurrentStep(0)
     // Обновляем состояние с использованием предыдущего значения
     setFoundPosition(prevState => {
       const updatedPosition = { ...prevState, final_quantity: sumcol };
@@ -121,21 +108,50 @@ const TSDScanProduct = () => {
     console.log(scanRequest);
   
     // Отправка запроса
-    const scanResponse = await api.post('/api/addproducts/', scanRequest);
-    console.log(scanResponse);
 
-
-  
-    if (scanResponse.status === 201) {
-      loadAcceptance()
+    try {
+      const scanResponse = await api.post('/api/addproducts/', scanRequest);
+      console.log(scanResponse);
+        try {
+          const loadResponse = await api.get(`/api/addproducts/?add_number=${numberAcceptance}`)
+          setPositions(loadResponse.data);
+          setApiData(loadResponse.data)
+          setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
+        } catch (error) {
+          setError(`Ошибка загрузки приемки: ${error.message || error}`);
+        }
       console.log("200");
       setBarcode('');
       setFoundPosition(null);
       setEnteredQuantity('');
-      setCurrentStep(2);
+      setCurrentStep(5);
+
+      setTimeout(() => {
+        setCurrentStep(2);
+      }, 2000);
+    }catch (err) {
+      setError(`Данные не отправлены по причине: ${err.message || err}`);
+      setCurrentStep(-2)
+      console.log(barcode, foundPosition, enteredQuantity)
     }
     
   }, [foundPosition, enteredQuantity, apiData]); // Добавляем зависимости
+
+  const newTry = async () => {
+    try {
+      const loadResponse = await api.get(`/api/addproducts/?add_number=${numberAcceptance}`)
+      setPositions(loadResponse.data);
+      setApiData(loadResponse.data)
+      setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
+    } catch (error) {
+      setError(`Ошибка загрузки приемки: ${error.message || error}`);
+    }
+    setBarcode('');
+    setFoundPosition(null);
+    setEnteredQuantity('');
+    setCurrentStep(2);
+
+  }
   
 
   return (
@@ -143,6 +159,33 @@ const TSDScanProduct = () => {
     <TSDLayout>
       <div className="container">
         <Link to="/add-product"><button class='buttonBack'>В меню</button></Link>
+
+        {/* Шаг для загрузки данных  */}
+        {curretStep === 0 && (
+                    <div className="scan-section-loader">
+                        <span class="loader"></span>
+                    </div>
+          )}
+        {/* Шаг для ошибки данных  */}
+        {curretStep === -2 && (
+                    <div className="scan-section">
+                        <p className='mainText'>{error}</p>
+                        <p className='mainText'>Повторите действие повторно</p>
+                        <button className='buttonCompl' onClick={newTry}>Повторно отсканировать товар</button>
+                    </div>
+          )}
+          {curretStep === -1 && (
+                    <div className="scan-section">
+                        <p className='mainText'>{error}</p>
+                        <p className='mainText'>Повторите действие повторно</p>
+                    </div>
+          )}
+
+        {curretStep === 5 && (
+                    <div className="scan-section">
+                        <p className='mainText'>Данные успешно отправлены</p>
+                    </div>
+          )}
         
         {/* Шаг первый установка номера поставки  */}
         {curretStep === 1  && (
@@ -158,7 +201,6 @@ const TSDScanProduct = () => {
             <h2>Сканируйте баркод товара</h2>
             <input
               className="scan-input"
-              value={barcode}
               onInput= {handleBarcodeScan}
               autoFocus
               inputMode="none"
@@ -198,7 +240,7 @@ const TSDScanProduct = () => {
         {/* Шаг четвертый выбор позиции при не соответствии баркода  */}
         {curretStep === 4 && (
             <div>
-              <h3>Выберите позицию вручную:</h3>
+              <h3>Штрихкод не найден выберите позицию вручную:</h3>
               <div> 
               {positions.map((position, idx) => (
                       <div key={idx} className="position-item">

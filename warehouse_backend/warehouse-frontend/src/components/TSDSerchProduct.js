@@ -18,25 +18,26 @@ const TSDSerchProduct = () => {
     }), []);
 
 
-    const handleBarcodeScan = (e) => {
+    const handleBarcodeScan = async (e) => {
+        setCurrentStep(0)
         const code = e.target.value;
         setBarcode(code);
         console.log(code)
 
-        api.get(`/api/products/`)
-            .then((response) => {
-                setProducts(response.data);
 
-        // Фильтруем нужные товары
-        const foundProducts = response.data.filter((item) => item.barcode === code);
-            setFilteredProducts(foundProducts);
-            setCurrentStep(2)
-        })
-            .catch((error) => setError(error));
-            console.log(error)
-            console.log(products)
-            console.log(filteredProducts)
-            console.log("Сканированный баркод:", code);
+        try{
+            const res = await api.get(`/api/products/`)
+        
+                setProducts(res.data);
+                // Фильтруем товары по ячейке
+                const foundProducts = res.data.filter((item) => item.barcode === code);
+                setFilteredProducts(foundProducts);
+                setCurrentStep(2);
+        } catch (err) {
+            setCurrentStep(-1)
+            setError(err.message)
+        }
+
 };
 
 
@@ -44,6 +45,21 @@ const TSDSerchProduct = () => {
         <TSDLayout>
             <div className="containerr">
                 <Link to="/TSDmenu"><button class='buttonBack'>В меню</button></Link>
+
+                
+                {/* Шаг для загрузки данных  */}
+                {curretStep === 0 && (
+                    <div className="scan-section-loader">
+                        <span class="loader"></span>
+                    </div>
+                )}
+                {/* Шаг для ошибки данных  */}
+                {curretStep === -1 && (
+                    <div className="scan-section">
+                        <p className='mainText'>{error}</p>
+                        <p className='mainText'>Повторите действие повторно</p>
+                    </div>
+                )}
                
                {/* Шаг первый установка баркода товара  */}
                {curretStep === 1 && (

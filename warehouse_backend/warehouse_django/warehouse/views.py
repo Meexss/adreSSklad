@@ -68,11 +68,17 @@ class AddProductListView(APIView):
             # Фильтрация по add_number
             if add_number:
                 filtered_products = [p for p in all_products if str(p.get("add_number")) == str(add_number)]
-                print(f"Поиск товара article={filtered_products}")  # Логирование
+                
+                if not filtered_products:  # Если список пустой, отправляем 404
+                    return Response({"error": "Товар не найден"}, status=status.HTTP_404_NOT_FOUND)
+
+                print(f"Найденные товары: {filtered_products}")  # Логирование
                 return Response(filtered_products, status=status.HTTP_200_OK)
 
             return Response(all_products, status=status.HTTP_200_OK)
+        
         except Exception as e:
+            print(f"Ошибка сервера: {e}")  # Логирование ошибки
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
@@ -116,33 +122,85 @@ class AddProductListView(APIView):
 class ProductListView(APIView):
     def post(self, request):
         try:
-            serializer = ProductSerializer(data=request.data)
-            if serializer.is_valid():
-                Product.add(serializer.validated_data)
-                return Response({"status": "success"}, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data = request.data
+            place = data.get("place")
+            barcode = data.get("barcode")
+            colChange = int(data.get("colChange", 0))
+            newPlace = data.get("newPlace")
+
+            if not all([place, barcode, colChange, newPlace]):
+                return Response({"error": "Не все поля заполнены"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Загружаем данные из JSON
+            products = read_json("products.json")
+
+            # Фильтруем товары по месту и штрихкоду
+            matching_products = [p for p in products if p["place"] == place and p["barcode"] == barcode]
+
+            if not matching_products:
+                return Response({"error": "Товар не найден в указанной ячейке"}, status=status.HTTP_404_NOT_FOUND)
+
+            remaining_qty = colChange  # Количество, которое нужно переместить
+
+            for product in matching_products:
+                if remaining_qty <= 0:
+                    break  # Если уже перенесли всё нужное количество — выходим
+
+                if product["quantity"] <= remaining_qty:
+                    # Если количество полностью переносится — просто меняем `place`
+                    product["place"] = newPlace
+                    remaining_qty -= product["quantity"]
+                else:
+                    # Если часть остается, делаем "разделение" записи
+                    new_product = {
+                        "unique_id": str(uuid.uuid4()),  # Новый уникальный ID
+                        "article": product["article"],
+                        "name": product["name"],
+                        "barcode": product["barcode"],
+                        "place": newPlace,  # Меняем место
+                        "quantity": remaining_qty,  # Только часть переносим
+                        "goods_status": product["goods_status"],
+                    }
+                    products.append(new_product)
+
+                    # Уменьшаем количество в старой позиции
+                    product["quantity"] -= remaining_qty
+                    remaining_qty = 0
+
+            # Записываем обновленные данные обратно в JSON
+            write_json("products.json", products)
+
+            return Response({"status": "success"}, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     def get(self, request):
         try:
+            print("Получен запрос на список товаров")
+
             products = Product.get_all()
-            
-            # Фильтрация
-            if article := request.query_params.get('article'):
-                products = [p for p in products if p.article == article]
-            
-            if barcode := request.query_params.get('barcode'):
-                products = [p for p in products if p.barcode == barcode]
-            
+            if not products:
+                print("Список товаров пуст")
+                return Response({"error": "Товары не найдены"}, status=status.HTTP_404_NOT_FOUND)
+
             # Сортировка
             sort_by = request.query_params.get('sort', 'article')
             reverse = request.query_params.get('order', 'asc') == 'desc'
-            products.sort(key=lambda x: getattr(x, sort_by, ''), reverse=reverse)
-            
+
+            try:
+                products.sort(key=lambda x: getattr(x, sort_by, ''), reverse=reverse)
+                print(f"Сортировка по {sort_by}, порядок {'убывающий' if reverse else 'возрастающий'}")
+            except AttributeError as e:
+                print(f"Ошибка при сортировке: {e}")
+                return Response({"error": f"Некорректное поле сортировки: {sort_by}"}, status=status.HTTP_400_BAD_REQUEST)
+
             serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data)
+            print("Данные успешно отправлены")
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            print(f"Ошибка сервера: {e}")
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Обработчик для работы с резервом на отгрузку
 class ReserveAllView(APIView):
