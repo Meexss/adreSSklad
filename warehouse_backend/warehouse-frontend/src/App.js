@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import { Route, Routes } from 'react-router-dom';
 import Operations from './components/Operations';
 import ProductList from './components/ProductList';
@@ -15,14 +15,31 @@ import TSDSerchProduct from './components/TSDSerchProduct';
 import TSDTest from './components/TSDTest';
 import TSDSerchPlace from './components/TSDSerchPlace';
 import TSDChangePlace from './components/TSDChangePlace';
+import PrivateRoute from './components/PrivateRoute'; // Импортируем новый компонент
+import Login from './components/Login'; // Импортируем новый компонент
 
 
 const App = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    // Проверка состояния авторизации при загрузке страницы
+    useEffect(() => {
+        console.log(isAuthenticated)
+        console.log(isAuthenticated)
+
+        const token = localStorage.getItem('access_token');
+        console.log(token)
+        if (token) {
+            console.log("успешная смена флага"            )
+            setIsAuthenticated(true);
+        }
+    }, []);
+
     return (
             <Routes>
                 <Route path="/" element={<Home />} />
 
-                <Route path="/operations" element={<Operations />} /> {/* информация о реализации товара  */}
+                <Route path="/operations" element={<PrivateRoute element={Operations} isAuthenticated={isAuthenticated} />} /> {/* информация о реализации товара  */}
                     <Route path="/shipment/:id" element={<ShipmentDetails />} /> {/* информация о деталях реализации товара  */}             
                 
                 <Route path="/add-product-list" element={<AddProductList />} /> {/* информация о приходе товара  */}   
@@ -40,7 +57,11 @@ const App = () => {
                     <Route path="/info-product-tsd" element={<TSDSerchProduct />} /> {/* информация о товаре в ячейках  */}
                     <Route path="/ship-info-tsd" element={<TSDMenu />} /> {/* отгрузка товара  */}
                     <Route path="/invent-product-tsd" element={<TSDMenu />} /> {/* инвентаризация товара  */}
-                    <Route path="/test-tsd" element={<TSDTest />} /> {/* инвентаризация товара  */}                   
+                    <Route path="/test-tsd" element={<TSDTest />} /> {/* инвентаризация товара  */}   
+                
+                
+                <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} /> 
+
 
 
 

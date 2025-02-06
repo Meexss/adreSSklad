@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import Layout from './Layout';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons';
+import Barcode from "react-barcode";
+import { useReactToPrint } from 'react-to-print';
 
 const ShipmentDetails = () => {
     const location = useLocation();
@@ -23,6 +25,13 @@ const ShipmentDetails = () => {
     const [selectedStatus, setSelectedStatus] = useState("Хранение");
     const [showModal, setShowModal] = useState(false);
 
+    console.log(shipment)
+    console.log(reservedData)
+    console.log(showReservedData)
+    console.log(summarizedData)
+    console.log(loading)
+
+
     const handleOpenModal = (item) => {
         setSelectedItem(item);
         setSelectedQuantity(item.quantity);
@@ -34,7 +43,7 @@ const ShipmentDetails = () => {
     };
 
     const statusOptions = ["Хранение", "Брак", "Недостача"];
-    const storageKey = `reservedData_${shipment?.shipment_number}`;
+    const storageKey = `reservedData_${shipment?.uid_ship}`;
 
     const api = useMemo(() => axios.create({
         baseURL: 'http://127.0.0.1:8000',
@@ -53,7 +62,7 @@ const ShipmentDetails = () => {
             setMessage("");
 
             const reserveRequest = {
-                shipment_number: shipment.shipment_number,
+                uid_ship: shipment.uid_ship,
                 stocks: shipment.stocks.map((stock) => ({
                     article: stock.article,
                     quantity: stock.quantity,
@@ -62,13 +71,14 @@ const ShipmentDetails = () => {
 
             const reserveResponse = await api.post('/api/reserve/', reserveRequest);
             
+
             if (reserveResponse.status === 200) {
                 setMessage("Резервирование успешно завершено.");
-                const shipmentNumber = shipment.shipment_number;
-                const getResponse = await api.get(`/api/reserve/?shipment_number=${shipmentNumber}`);
+                const uid_ship = shipment.uid_ship;
+                const getResponse = await api.get(`/api/reserve/?uid_ship=${uid_ship}`);
                 
                 await api.post('/api/shipments/', {
-                    shipment_number: shipment.shipment_number,
+                    uid_ship: shipment.uid_ship,
                     progress: "В работе"
                 });
                 
@@ -106,7 +116,7 @@ const ShipmentDetails = () => {
 
             if (cancelResponse.status === 200) {
                 setMessage("Частичная отмена выполнена успешно.");
-                await api.get(`/api/reserve/?shipment_number=${shipment.shipment_number}`);
+                await api.get(`/api/reserve/?uid_ship=${shipment.uid_ship}`);
             }
         } catch (error) {
             setError(error.response?.data?.error || "Ошибка при частичной отмене");
@@ -115,6 +125,39 @@ const ShipmentDetails = () => {
             setLoading(false);
         }
     };
+
+    const handleCloseShip = async () => {
+        try {
+            const request = reservedData.map((item) => ({
+                type: item.type,
+                shipment_number: shipment.shipment_number,
+                shipment_date: shipment.shipment_date,
+                uid_ship: item.uid_ship,
+                progress: 'Завершен',
+                unique_id: item.unique_id,
+                article: item.article,
+                name: item.name,
+                quantity: item.quantity,
+                place: item.place,
+                goods_status: 'Отгружен',
+                barcode: item.barcode
+            }));
+    
+            // Отправка данных через API
+            const reserveResponse = await api.post('/api/archiveShip/', request);
+    
+            // Обработка успешного ответа
+            if (reserveResponse.status === 200) {
+                console.log('Ships archived successfully', reserveResponse.data);
+            } else {
+                console.log('Error archiving ships', reserveResponse);
+            }
+        } catch (error) {
+            // Обработка ошибки запроса
+            console.error('Error in API request:', error);
+        }
+    };
+
 
     const handleMassCancelReservation = useCallback(async () => {
         try {
@@ -135,7 +178,7 @@ const ShipmentDetails = () => {
                 setMessage("Массовое резервирование успешно отменено");
 
                 await api.post('/api/shipments/', {
-                    shipment_number: shipment.shipment_number,
+                    uid_ship: shipment.uid_ship,
                     progress: "Черновик"
                 });
 
@@ -147,7 +190,7 @@ const ShipmentDetails = () => {
         } finally {
             setLoading(false);
         }
-    }, [api, reservedData, storageKey, shipment?.shipment_number]);
+    }, [api, reservedData, storageKey, shipment?.uid_ship]);
 
     useEffect(() => {
         const fetchReservationData = async () => {
@@ -157,8 +200,8 @@ const ShipmentDetails = () => {
                 setLoading(true);
                 setError(null);
                 
-                const shipmentNumber = shipment.shipment_number;
-                const response = await api.get(`/api/reserve/?shipment_number=${shipmentNumber}`);
+                const uid_ship = shipment.uid_ship;
+                const response = await api.get(`/api/reserve/?uid_ship=${uid_ship}`);
 
                 if (response.status === 200 && response.data.length > 0) {
                     setReservedData(response.data);
@@ -193,6 +236,14 @@ const ShipmentDetails = () => {
         }
     }, [reservedData]);
 
+     const contentRef = useRef(null);
+    
+        const handlePrint = useReactToPrint({
+            // documentTitle: 'Title',
+            contentRef: contentRef,
+         })
+    
+
     if (!shipment) {
         return <Layout><h2>Данные об отгрузке отсутствуют</h2></Layout>;
     }
@@ -202,7 +253,7 @@ const ShipmentDetails = () => {
 
     return (
         <Layout>
-            <div style={{ padding: '20px' }}>
+            <div ref={contentRef} style={{ padding: '20px' }}>
 
             {error && <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
             {message && <div className="success-message" style={{ color: 'green', margin: '10px 0' }}>{message}</div>}
@@ -219,9 +270,14 @@ const ShipmentDetails = () => {
                 />
                 <span style={{ fontSize: '12px' }}>Назад</span>
             </Link>
-                <h1>Детали отгрузки</h1>
+                <button className='no-print' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
+                                    <FontAwesomeIcon icon={faPrint} /> Печать
+                </button>
+                <h2>Детали отгрузки</h2>
+                {/* <Barcode className="print-only" value={shipment.uid_ship} format="CODE128"/> */}
                 {!showReservedData && (
-                    <button
+                    <button 
+                        className='no-print'
                         onClick={handleReserveAll}
                         style={{
                             backgroundColor: 'green',
@@ -232,6 +288,8 @@ const ShipmentDetails = () => {
                 )}
                 {showReservedData && (
                     <Link to="/operations"><button
+                        onClick={handleCloseShip}
+                        className='no-print'
                         style={{
                             backgroundColor: 'grey',
                         }}
@@ -242,6 +300,7 @@ const ShipmentDetails = () => {
                 {showReservedData && (
                     <Link to="/operations"><button
                         onClick={handleMassCancelReservation}
+                        className='no-print'
                         style={{
                             backgroundColor: 'red',
                         }}
@@ -250,11 +309,13 @@ const ShipmentDetails = () => {
                     </button></Link>
                 )}
                 <div className="data_wraper">
+                    {/* <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.uid_ship}</p></div> */}
+                    <div className="data_info"><p><strong>Тип:</strong> {shipment.type}</p></div>
                     <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.shipment_number}</p></div>
                     <div className="data_info"><p><strong>Дата отгрузки:</strong> {shipment.shipment_date}</p></div>
                     <div className="data_info"><p><strong>Контрагент:</strong> {shipment.counterparty}</p></div>
                     <div className="data_info"><p><strong>Склад:</strong> {shipment.warehouse}</p></div>
-                    <div className="data_info"><p><strong>Статус:</strong> {shipment.progress}</p></div>
+                    <div className="data_info no-print"><p><strong>Статус:</strong> {shipment.progress}</p></div>
                 </div>
 
 
@@ -271,8 +332,8 @@ const ShipmentDetails = () => {
                                     <th >Сумма резерва</th>
                                     <th >Место Хранение</th>
                                     <th >Кол-во к отбору</th>
-                                    <th >Статус</th>
-                                    <th ></th>
+                                    <th className='.no-print'>Статус</th>
+                                    <th > </th>
                                 </>
                             )}
                         </tr>
@@ -299,8 +360,9 @@ const ShipmentDetails = () => {
                                         )}
                                         <td >{reservedItem.place}</td>
                                         <td >{reservedItem.quantity}</td>
-                                        <td >{reservedItem.goods_status}</td>
+                                        <td className='no-print'>{reservedItem.goods_status}</td>
                                         <FontAwesomeIcon
+                                            className='no-print'
                                             icon={faEdit}
                                             onClick={() => handleOpenModal(reservedItem)}
                                             style={{

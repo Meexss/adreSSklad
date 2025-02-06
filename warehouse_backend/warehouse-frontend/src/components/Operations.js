@@ -56,11 +56,11 @@ const Operations = () => {
                         <tbody>
                             {shipments.map(shipment => (
                                 <tr
-                                    key={shipment.shipment_number}
-                                    onClick={() => navigate(`/shipment/${shipment.shipment_number}`, { state: { shipment } })}
+                                    key={shipment.uid_ship}
+                                    onClick={() => navigate(`/shipment/${shipment.uid_ship}`, { state: { shipment } })}
                                     style={{ cursor: 'pointer' }}
                                 >
-                                    <td>Добавить в API</td>
+                                    <td>{shipment.type}</td>
                                     <td>{shipment.shipment_number}</td>
                                     <td>{shipment.shipment_date}</td>
                                     <td>{shipment.counterparty}</td>

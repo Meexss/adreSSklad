@@ -18,6 +18,7 @@ const AddProductList = () => {
             .then(response => {
                 setAddproducts(response.data);
                 setLoading(false);
+                console.log(response.data)
             })
             .catch(error => {
                 console.error("Ошибка запроса:", error);
@@ -43,7 +44,7 @@ const AddProductList = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th></th>
+                                <th>Тип</th>
                                 <th>Номер прихода 1С</th>
                                 <th>Дата</th>
                                 <th>Поставщик</th>
@@ -55,13 +56,13 @@ const AddProductList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {addproducts.map(addproduct => (
+                        {addproducts.map(addproduct => (
                                 <tr
                                     key={addproduct.add_number}
-                                    onClick={() => navigate(`/add-product/${addproduct.add_number}`, { state: { addproducts: addproduct } })}
+                                    onClick={() => navigate(`/add-product/${addproduct.uid_add}`, { state: { addproducts: addproduct } })}
                                     style={{ cursor: 'pointer' }}
                                 >
-                                    <td>Добавить в API</td>
+                                    <td>{addproduct.type}</td>
                                     <td>{addproduct.add_number}</td>
                                     <td>{addproduct.add_date}</td>
                                     <td>{addproduct.counterparty}</td>

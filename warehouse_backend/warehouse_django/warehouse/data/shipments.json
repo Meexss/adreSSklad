@@ -1,10 +1,12 @@
 [
     {
+        "type": "перемещение, отгрузка",
         "shipment_number": "номер",
         "shipment_date": "дата",
         "counterparty": "название компании",
         "warehouse": "Склад",
         "progress": "Черновик",
+        "uid_ship": "Уникальный Id отгрузки",
         "stocks": [
             {
                 "article": "Артикул товара",
@@ -21,11 +23,13 @@
         ]
     },
     {
+        "type": "отгрузка",
         "shipment_number": "SH124",
         "shipment_date": "2023-10-01",
         "counterparty": "Company B",
         "warehouse": "Warehouse 1",
         "progress": "В работе",
+        "uid_ship": "561494sdfdsfsd",
         "stocks": [
             {
                 "article": "ART001",

@@ -1,0 +1,11 @@
+[
+    {
+        "unique_id": "22689b75-47f4-4dc0-a7e0-fd50a19b4e1c",
+        "article": "ART002",
+        "name": "Product 2",
+        "quantity": 1,
+        "place": "A-1-1-2",
+        "goods_status": "Брак",
+        "barcode": "150499116843"
+    }
+]

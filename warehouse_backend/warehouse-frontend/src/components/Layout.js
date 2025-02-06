@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, } from 'react';
 import { NavLink } from 'react-router-dom';
 import './Layout.css';
+
 
 const Layout = ({ children }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,6 +9,7 @@ const Layout = ({ children }) => {
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
+
 
     return (
         <div >
@@ -28,11 +30,20 @@ const Layout = ({ children }) => {
                             <li><NavLink to="/add-product-list" className={({ isActive }) => isActive ? "active" : ""}>Список приходов</NavLink></li>
                             <li><NavLink to="/TSDmenu" className={({ isActive }) => isActive ? "active" : ""}>Меню ТСД</NavLink></li>
                             <li><NavLink to="/search" className={({ isActive }) => isActive ? "active" : ""}>Поиск</NavLink></li>
+                            <li className="dropdown">
+                                <span className="dropdown-toggle">Архив</span>
+                                <ul className="dropdown-menu">
+                                    <li><NavLink to="/archive/products">Архив товаров</NavLink></li>
+                                    <li><NavLink to="/archive/shipments">Архив отгрузок</NavLink></li>
+                                    <li><NavLink to="/archive/receipts">Архив приемок</NavLink></li>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </nav>
+            
             </header>
-            <main className='ChildStyle'>
+            <main  className='ChildStyle'>
                 {children}
             </main>
         </div>

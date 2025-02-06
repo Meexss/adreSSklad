@@ -1,6 +1,6 @@
 [
     {
-        "shipment_number": "номер",
+        "uid_ship": "uid_ship",
         "reserve_data": "дата резервирования",
         "unique_id": "Уникальный id",
         "article": "Артикул товара",
@@ -11,31 +11,20 @@
         "barcode": "Штрихкод"
     },
     {
-        "shipment_number": "SH124",
-        "reserve_data": "2025-02-05",
-        "unique_id": "d02ad2be-ac96-49c3-960f-2c39d982ac06",
-        "article": "ART001",
-        "name": "Product 1",
-        "quantity": 3,
-        "place": "A-1-1-3",
-        "goods_status": "В отгрузке",
-        "barcode": "150499116844"
-    },
-    {
-        "shipment_number": "SH124",
-        "reserve_data": "2025-02-05",
-        "unique_id": "f09d1a2b-5eb1-41c8-9754-44a5dd405330",
-        "article": "ART001",
-        "name": "Product 1",
+        "uid_ship": "561494sdfdsfsd",
+        "reserve_data": "2025-02-06",
+        "unique_id": "ea5c8ba6-752b-4982-a44c-5585d20baf26",
+        "article": "ART002",
+        "name": "Product 2",
         "quantity": 2,
         "place": "A-1-1-3",
         "goods_status": "В отгрузке",
-        "barcode": "150499116844"
+        "barcode": "150499116843"
     },
     {
-        "shipment_number": "SH124",
-        "reserve_data": "2025-02-05",
-        "unique_id": "b0a5c854-a196-4a4d-a59f-87c81a201c3d",
+        "uid_ship": "561494sdfdsfsd",
+        "reserve_data": "2025-02-06",
+        "unique_id": "82a68d57-bba8-4f62-892e-ba7bf8b2a1b5",
         "article": "ART002",
         "name": "Product 2",
         "quantity": 1,
@@ -44,12 +33,12 @@
         "barcode": "150499116843"
     },
     {
-        "shipment_number": "SH124",
-        "reserve_data": "2025-02-05",
-        "unique_id": "ea5c8ba6-752b-4982-a44c-5585d20baf26",
+        "uid_ship": "561494sdfdsfsd",
+        "reserve_data": "2025-02-06",
+        "unique_id": "7c0b1e07-e31a-4b3f-9d21-0a6d5f40c996",
         "article": "ART002",
         "name": "Product 2",
-        "quantity": 3,
+        "quantity": 1,
         "place": "A-1-1-3",
         "goods_status": "В отгрузке",
         "barcode": "150499116843"

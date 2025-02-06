@@ -121,6 +121,10 @@ main > * {
     max-width: 96vw;
 }
 
+.miniTable {
+  border-bottom: 1px solid black;
+}
+
 /* Обёртка таблицы */
 table {
   background-color: white;
@@ -346,6 +350,40 @@ main {
   }
 }
 
+
+.print-only {
+  display: none;
+}
+
+.no-print {
+  /* display: block; */
+}
+
+/* Печать */
+@media print {
+  @page {
+    margin: 0; /* Убираем внешние поля, чтобы браузер не вставлял дату/время */
+    size: auto; /* Авторазмер страницы */
+  }
+  body {
+    -webkit-print-color-adjust: exact; /* Улучшает цветопередачу в печати */
+    print-color-adjust: exact;
+    
+  }
+  table {
+    /* width: 500px; */
+  }
+  .print-container {
+    position: relative;
+
+  }
+  .print-only {
+    display: block !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
 
 
 

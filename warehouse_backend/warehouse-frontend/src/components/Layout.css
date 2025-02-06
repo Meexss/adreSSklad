@@ -129,3 +129,41 @@ header {
         margin-top: 5px;
       }
 }
+
+
+.dropdown {
+    position: relative;
+    color: black;
+  }
+  
+  .dropdown-toggle {
+    cursor: pointer;
+    padding: 10px;
+  }
+  
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    list-style: none;
+    padding: 5px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 20vw;
+  }
+  
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
+  
+  .dropdown-menu li {
+    padding: 20px 15px;
+    border-bottom: 1px;
+  }
+
+  .dropdown-menu li:hover {
+    padding: 20px 15px;
+    border-bottom: 1px;
+    background-color: #7dc25e;
+  }

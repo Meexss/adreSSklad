@@ -26,7 +26,7 @@ const TSDScanProduct = () => {
     console.log("Вводится значение:", value);
   
       try {
-        const loadResponse = await api.get(`/api/addproducts/?add_number=${value}`)
+        const loadResponse = await api.get(`/api/addproducts/?uid_add=${value}`)
         setPositions(loadResponse.data);
         setApiData(loadResponse.data)
         setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
@@ -98,6 +98,8 @@ const TSDScanProduct = () => {
   
     // Формируем запрос для API
     const scanRequest = {
+      type: apiData[0]?.type,
+      uid_add: apiData[0]?.uid_add,
       add_number: apiData[0]?.add_number,
       add_date: apiData[0]?.add_date,
       counterparty: apiData[0]?.counterparty,
@@ -113,7 +115,7 @@ const TSDScanProduct = () => {
       const scanResponse = await api.post('/api/addproducts/', scanRequest);
       console.log(scanResponse);
         try {
-          const loadResponse = await api.get(`/api/addproducts/?add_number=${numberAcceptance}`)
+          const loadResponse = await api.get(`/api/addproducts/?uid_add=${numberAcceptance}`)
           setPositions(loadResponse.data);
           setApiData(loadResponse.data)
           setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
@@ -139,7 +141,7 @@ const TSDScanProduct = () => {
 
   const newTry = async () => {
     try {
-      const loadResponse = await api.get(`/api/addproducts/?add_number=${numberAcceptance}`)
+      const loadResponse = await api.get(`/api/addproducts/?uid_add=${numberAcceptance}`)
       setPositions(loadResponse.data);
       setApiData(loadResponse.data)
       setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2

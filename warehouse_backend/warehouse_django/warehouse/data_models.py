@@ -1,12 +1,14 @@
 from .utils import read_json, write_json
 
 class Shipment:
-    def __init__(self, shipment_number, shipment_date, counterparty, warehouse, progress, stocks):
+    def __init__(self, type, shipment_number, shipment_date, counterparty, warehouse, progress, uid_ship, stocks):
+        self.type = type
         self.shipment_number = shipment_number
         self.shipment_date = shipment_date
         self.counterparty = counterparty
         self.warehouse = warehouse
         self.progress = progress
+        self.uid_ship = uid_ship
         self.stocks = stocks
 
     @staticmethod
@@ -25,12 +27,14 @@ class Shipment:
         write_json('shipments.json', data)
 
 class AddProduct:
-    def __init__(self, add_number, add_date, counterparty, warehouse, progress, positionData):
+    def __init__(self, type, add_number, add_date, counterparty, warehouse, progress, uid_add, positionData):
+        self.type = type
         self.add_number = add_number
         self.add_date = add_date
         self.counterparty = counterparty
         self.warehouse = warehouse
         self.progress = progress
+        self.uid_add = uid_add
         self.positionData = positionData
 
     @staticmethod
@@ -70,8 +74,8 @@ class Product:
         write_json('products.json', data)
 
 class Reserv:
-    def __init__(self, shipment_number, reserve_data, unique_id, article, name, quantity, place, goods_status, barcode):
-        self.shipment_number = shipment_number
+    def __init__(self, uid_ship, reserve_data, unique_id, article, name, quantity, place, goods_status, barcode):
+        self.uid_ship = uid_ship
         self.reserve_data = reserve_data
         self.unique_id = unique_id
         self.article = article
@@ -97,7 +101,9 @@ class Reserv:
         write_json('reserv.json', data)
 
 class PlaceProducr:
-    def __init__(self, add_number, article, name, barcode, quantity, unique_id, place, goods_status):
+    def __init__(self, type, uid_add,  add_number, article, name, barcode, quantity, unique_id, place, goods_status):
+        self.type = type
+        self.uid_add = uid_add
         self.add_number = add_number
         self.article = article
         self.name = name

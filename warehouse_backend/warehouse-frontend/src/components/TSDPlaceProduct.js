@@ -27,7 +27,7 @@ const TSDPlaceProduct = () => {
         setAcceptanceNumber(value)  
         try {
             const response = await api.get(
-                `/api/addproducts/?add_number=${value}`
+                `/api/addproducts/?uid_add=${value}`
             );
             setProducts(response.data);
             setCurrentStep(2);
@@ -92,6 +92,8 @@ const TSDPlaceProduct = () => {
         setCurrentStep(0)
 
         const requestData = [{
+            type: currentProduct.type,
+            uid_add: currentProduct.uid_add,
             add_number: acceptanceNumber,
             article: currentProduct.article,
             name: currentProduct.name,

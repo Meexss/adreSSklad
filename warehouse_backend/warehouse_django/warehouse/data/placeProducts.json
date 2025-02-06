@@ -1,5 +1,7 @@
 [
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "уникальный id",
         "add_number": "Номер прихода",
         "article": "артикул",
         "name": "Наименование",
@@ -10,6 +12,8 @@
         "goods_status": "статус хранения"
     },
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "sdfsdfs41891",
         "add_number": "59438",
         "article": "ART002",
         "name": "Product 2",
@@ -20,6 +24,8 @@
         "goods_status": "Хранение"
     },
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "sdfsdfs41891",
         "add_number": "59438",
         "article": "ART001",
         "name": "Product 1",
@@ -30,6 +36,8 @@
         "goods_status": "Хранение"
     },
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "sdfsdfs518196",
         "add_number": "59438",
         "article": "ART001",
         "name": "Product 1",
@@ -40,6 +48,8 @@
         "goods_status": "Хранение"
     },
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "уникальный id",
         "add_number": "59438",
         "article": "ART002",
         "name": "Product 2",
@@ -50,6 +60,8 @@
         "goods_status": "Хранение"
     },
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "уникальный id",
         "add_number": "59438",
         "article": "ART002",
         "name": "Product 2",
@@ -60,6 +72,8 @@
         "goods_status": "Хранение"
     },
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "уникальный id",
         "add_number": "59438",
         "article": "ART001",
         "name": "Культиватор бензиновый FERMER FM-812MB Black edition",
@@ -70,6 +84,8 @@
         "goods_status": "Хранение"
     },
     {
+        "type": "отгрузка,перемещение",
+        "uid_add": "уникальный id",
         "add_number": "59438",
         "article": "ART001",
         "name": "Культиватор бензиновый FERMER FM-812MB Black edition",
