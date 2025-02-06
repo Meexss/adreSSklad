@@ -1,31 +1,24 @@
 [
     {
-        "type": "перемещение, отгрузка",
         "add_number": "Номер прихода",
-        "add_date": "Дата прихода",
+        "add_date": "",
         "counterparty": "Компания поставщик",
         "warehouse": "Склад",
-        "progress": "В работе",
-        "uid_add": "Уникальный Id отгрузки",
         "positionData": [
             {
                 "article": "артикул",
                 "name": "Наименование",
                 "quantity": 10,
-                "barcode": "Штрихкод",
-                "error_barcode": false,
-                "newbarcode": "Новый Штрихкод",
-                "final_quantity": 6
-            },
+                "barcode": "Штрихкод" },
             {
                 "article": "артикул",
                 "name": "Наименование",
                 "quantity": 10,
-                "barcode": "Штрихкод",
-                "error_barcode": false,
-                "newbarcode": "Новый Штрихкод",
-                "final_quantity": 6
+                "barcode": "Штрихкод"
+            
             }
         ]
     }
 ]
+
+

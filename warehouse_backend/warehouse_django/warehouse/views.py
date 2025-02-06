@@ -91,7 +91,7 @@ class ArchiveAdd(APIView):
             # Обрабатываем ошибки чтения/записи файлов
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+# есть код SQLite
 class ArchiveShip(APIView):
     def post(self, request):
         # Получаем данные из запроса (массив объектов)
@@ -159,7 +159,7 @@ class ArchiveShip(APIView):
             # Обрабатываем ошибки чтения/записи файлов
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
        
-
+# есть код SQLite
 # Обработчик для получения всех отгрузок
 class ShipmentListView(APIView):
     def get(self, request):
@@ -205,7 +205,8 @@ class ShipmentListView(APIView):
             return Response({"status": "success"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": f"Ошибка на сервере: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
+# есть код SQLite
 # Обработчик для получения всех добавленных продуктов
 class AddProductListView(APIView):
     def get(self, request):
@@ -269,6 +270,7 @@ class AddProductListView(APIView):
         except Exception as e:
             return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# есть код SQLite
 # Обработчик для работы с продуктами
 class ProductListView(APIView):
     def post(self, request):
@@ -353,6 +355,7 @@ class ProductListView(APIView):
             print(f"Ошибка сервера: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# есть код SQLite
 # Обработчик для работы с резервом на отгрузку
 class ReserveAllView(APIView):
     def post(self, request):
@@ -507,6 +510,8 @@ class ReserveAllView(APIView):
             print(f"Ошибка в reserve_product: {str(e)}")
             raise
 
+
+# есть код SQLite
 class CancelReservation(APIView):
     def post(self, request):
         try:
@@ -625,6 +630,7 @@ class CancelReservation(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+# есть код SQLite
 class PlaceProducts(APIView):
     def get(self, request):
         try:
