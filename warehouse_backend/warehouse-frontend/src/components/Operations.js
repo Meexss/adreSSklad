@@ -16,7 +16,7 @@ const Operations = () => {
     useEffect(() => {
         api.get('/api/shipments/')
             .then(response => {
-                setShipments(response.data);
+                setShipments(groupShipmentsByUniqueId(response.data));  
                 setLoading(false);
             })
             .catch(error => {
@@ -26,18 +26,38 @@ const Operations = () => {
             });
     }, [api]);
 
+    const groupShipmentsByUniqueId = (data) => {
+        return data.reduce((acc, shipment) => {
+            const { unique_id_ship } = shipment;
+            if (!acc[unique_id_ship]) {
+                acc[unique_id_ship] = {
+                    unique_id_ship,
+                    type: shipment.type,
+                    ship_number: shipment.ship_number,
+                    ship_date: shipment.ship_date,
+                    counterparty: shipment.counterparty,
+                    warehouse: shipment.warehouse,
+                    progress: shipment.progress,
+                    items: [],
+                };
+            }
+            acc[unique_id_ship].items.push(shipment);
+            return acc;
+        }, {});
+    };
+
     return (
         <Layout>
             <div>
                 <h2>Расходные операции</h2>
 
                 {loading ? (
-                        <div className='loaderWrap'>
-                            <span className="loader"></span>
-                        </div>
+                    <div className='loaderWrap'>
+                        <span className="loader"></span>
+                    </div>
                 ) : errorMessage ? (
                     <div className='loaderWrap'>
-                    <p style={{ color: 'red' }}>{errorMessage}</p>
+                        <p style={{ color: 'red' }}>{errorMessage}</p>
                     </div>
                 ) : (
                     <table>
@@ -47,26 +67,26 @@ const Operations = () => {
                                 <th>Номер отгрузки</th>
                                 <th>Дата</th>
                                 <th>Контрагент</th>
-                                <th>Склад</th>
+                                <th>Склад отгрузки</th>
                                 <th>Кол-во позиций</th>
                                 <th>Кол-во единиц товара</th>
                                 <th>Статус</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {shipments.map(shipment => (
+                            {Object.values(shipments).map(shipment => (
                                 <tr
-                                    key={shipment.uid_ship}
-                                    onClick={() => navigate(`/shipment/${shipment.uid_ship}`, { state: { shipment } })}
+                                    key={shipment.unique_id_ship}
+                                    onClick={() => navigate(`/shipment/${shipment.unique_id_ship}`, { state: { shipment } })}
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <td>{shipment.type}</td>
-                                    <td>{shipment.shipment_number}</td>
-                                    <td>{shipment.shipment_date}</td>
+                                    <td>{shipment.ship_number}</td>
+                                    <td>{shipment.ship_date}</td>
                                     <td>{shipment.counterparty}</td>
                                     <td>{shipment.warehouse}</td>
-                                    <td>{shipment.stocks.length}</td>
-                                    <td>{shipment.stocks.reduce((total, stock) => total + stock.quantity, 0)}</td>
+                                    <td>{shipment.items.length}</td>
+                                    <td>{shipment.items.reduce((total, item) => total + (item.quantity || 0), 0)}</td>
                                     <td>{shipment.progress}</td>
                                 </tr>
                             ))}

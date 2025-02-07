@@ -39,7 +39,8 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
 
-                <Route path="/operations" element={<PrivateRoute element={Operations} isAuthenticated={isAuthenticated} />} /> {/* информация о реализации товара  */}
+                {/* <Route path="/operations" element={<PrivateRoute element={Operations} isAuthenticated={isAuthenticated} />} />  */}
+                <Route path="/operations" element={<Operations />} /> {/* информация о реализации товара  */}
                     <Route path="/shipment/:id" element={<ShipmentDetails />} /> {/* информация о деталях реализации товара  */}             
                 
                 <Route path="/add-product-list" element={<AddProductList />} /> {/* информация о приходе товара  */}   

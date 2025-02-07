@@ -1,131 +1,176 @@
-from .utils import read_json, write_json
+from django.db import models
+import uuid
 
-class Shipment:
-    def __init__(self, type, shipment_number, shipment_date, counterparty, warehouse, progress, uid_ship, stocks):
-        self.type = type
-        self.shipment_number = shipment_number
-        self.shipment_date = shipment_date
-        self.counterparty = counterparty
-        self.warehouse = warehouse
-        self.progress = progress
-        self.uid_ship = uid_ship
-        self.stocks = stocks
+# Гтово прием данных о перемещении 1С
+class TranzitData(models.Model):
+    tranz_number =  models.CharField(max_length=100) #Номер перемещения 1С
+    tranz_date = models.DateField() #Дата перемещения 1С
+    from_house = models.CharField(max_length=100) #Отправиьель 1С
+    to_house = models.CharField(max_length=100) #Получатель 1С
 
-    @staticmethod
-    def get_all():
-        data = read_json('shipments.json')
-        print("Данные из shipments.json:", data)  # Проверяем содержимое
-        return [Shipment(**item) for item in data]
-
-    @staticmethod
-    def add(shipment_data):
-        # Читаем текущие данные из shipments.json
-        data = read_json('shipments.json')
-        # Добавляем новые данные
-        data.append(shipment_data)
-        # Записываем обратно в файл
-        write_json('shipments.json', data)
-
-class AddProduct:
-    def __init__(self, type, add_number, add_date, counterparty, warehouse, progress, uid_add, positionData):
-        self.type = type
-        self.add_number = add_number
-        self.add_date = add_date
-        self.counterparty = counterparty
-        self.warehouse = warehouse
-        self.progress = progress
-        self.uid_add = uid_add
-        self.positionData = positionData
-
-    @staticmethod
-    def get_all():
-        # Читаем данные из addproduct.json
-        data = read_json('addproduct.json')
-        return [AddProduct(**item) for item in data]
-
-    @staticmethod
-    def add(addproduct_data):
-        # Читаем текущие данные из addproduct.json
-        data = read_json('addproduct.json')
-        # Добавляем новые данные
-        data.append(addproduct_data)
-        # Записываем обратно в файл
-        write_json('addproduct.json', data)
-
-class Product:
-    def __init__(self, unique_id, article, name, quantity, place, goods_status, barcode):
-        self.unique_id = unique_id
-        self.article = article
-        self.name = name
-        self.quantity = quantity
-        self.place = place
-        self.goods_status = goods_status
-        self.barcode = barcode
-
-    @staticmethod
-    def get_all():
-        data = read_json('products.json')
-        return [Product(**item) for item in data]
-
-    @staticmethod
-    def add(product_data):
-        data = read_json('products.json')
-        data.append(product_data)
-        write_json('products.json', data)
-
-class Reserv:
-    def __init__(self, uid_ship, reserve_data, unique_id, article, name, quantity, place, goods_status, barcode):
-        self.uid_ship = uid_ship
-        self.reserve_data = reserve_data
-        self.unique_id = unique_id
-        self.article = article
-        self.name = name
-        self.quantity = quantity
-        self.place = place
-        self.goods_status = goods_status
-        self.barcode = barcode
-
-    @staticmethod
-    def get_all():
-        # Читаем данные из addproduct.json
-        data = read_json('reserv.json')
-        return [Reserv(**item) for item in data]
-
-    @staticmethod
-    def add(addproduct_data):
-        # Читаем текущие данные из addproduct.json
-        data = read_json('reserv.json')
-        # Добавляем новые данные
-        data.append(addproduct_data)
-        # Записываем обратно в файл
-        write_json('reserv.json', data)
-
-class PlaceProducr:
-    def __init__(self, type, uid_add,  add_number, article, name, barcode, quantity, unique_id, place, goods_status):
-        self.type = type
-        self.uid_add = uid_add
-        self.add_number = add_number
-        self.article = article
-        self.name = name
-        self.barcode = barcode
-        self.quantity = quantity
-        self.unique_id = unique_id
-        self.place = place
-        self.goods_status = goods_status
-
-    @staticmethod
-    def get_all():
-        data = read_json('scanProducts.json')
-        print("Данные из scanProducts.json:", data)  # Проверяем содержимое
-        return [Shipment(**item) for item in data]
-
-    @staticmethod
-    def add(scanProducts_data):
-        # Читаем текущие данные из shipments.json
-        data = read_json('scanProducts.json')
-        # Добавляем новые данные
-        data.append(scanProducts_data)
-        # Записываем обратно в файл
-        write_json('scanProducts.json', data)
+    article = models.CharField(max_length=100) 
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) #баркод 1С
+    quantity = models.IntegerField() #количество 1С
 
 
+# Готово прием данных о релизации 1С
+class ShipData(models.Model):
+    ship_number = models.CharField(max_length=100) #Номер реализации 1С
+    ship_date = models.DateField() #Дата реализации 1С
+    counterparty = models.CharField(max_length=100) #Контрагент 1С
+    warehouse = models.CharField(max_length=100) #Склад отгрузки 1С
+
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) #баркод 1С
+    quantity = models.IntegerField() #количество 1С
+
+
+# Готово прием данных о поступлении 1С
+class AddData(models.Model):
+    add_number = models.CharField(max_length=100) #Номер поступления 1С
+    add_date = models.DateField() #Дата поступления 1С
+    counterparty = models.CharField(max_length=100) #Контрагент 1С
+    warehouse = models.CharField(max_length=100) #Склад поступления 1С
+
+    article = models.CharField(max_length=100) 
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) #баркод 1С
+    quantity = models.IntegerField() #количество 1С
+    
+
+# Готово хранение данных об отгрузках/перемещениях с ЦС
+class ShipList(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    unique_id_ship = models.UUIDField(default=uuid.uuid4, editable=True) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
+    type = models.CharField(max_length=100) #Тип задания реализация/перемещение
+    ship_number = models.CharField(max_length=100) #tranz_number или ship_number
+    ship_date = models.DateField() #tranz_date или ship_date
+    counterparty = models.CharField(max_length=100) #Из ShipData counterparty или to_house != Центральный новый
+    warehouse = models.CharField(max_length=100) #Из ShipData warehouse или  from_house === Центральный новый
+    progress = models.CharField(max_length=100) #На входе устанавливаем статус отгрузки на Новый
+
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) #баркод 1С
+    quantity = models.IntegerField() #количество 1С
+
+
+# Готово хранение данных об приемках перемещениях на ЦС
+class AddList(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    unique_id_add = models.UUIDField(default=uuid.uuid4, editable=True) #при перемещении с AddData и TranzitData присваиваем номер отгрузки
+    type = models.CharField(max_length=100) #Тип задания реализация/перемещение
+    add_number = models.CharField(max_length=100) #tranz_number или add_number
+    add_date = models.DateField() #tranz_date или add_date
+    counterparty = models.CharField(max_length=100) #Из AddData counterparty или from_house != Центральный новый
+    warehouse = models.CharField(max_length=100) #Из AddData warehouse или  to_house === Центральный новый
+    progress = models.CharField(max_length=100) #На входе устанавливаем статус прихода на Новый
+
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) #баркод 1С
+    quantity = models.IntegerField()  #количество 1С
+    error_barcode = models.BooleanField(default=False) #Ошибка Штрихкода
+    newbarcode = models.CharField(max_length=100)  #Новый баркод на товаре
+    final_quantity = models.IntegerField(default=0) #финальное принятое кол-во
+    goods_status = models.CharField(max_length=100) #Устанавливаем статус товара на входе Приёмка далее после приемке устанавливаем Принят
+
+
+# Готово хранение данных о товарах на ЦС
+class ProductList(models.Model):
+    unique_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) #уникальный id товара
+    add_date = models.DateField() #дата поступления
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) #если ошибка error_barcode === true то новый баркод если false то шк 1С
+    place = models.CharField(max_length=100) #место хранения на складе
+    quantity = models.IntegerField() #размещенное кол-во в ячейке
+    goods_status = models.CharField(max_length=100) #в этом списке только Хранение
+
+
+# Готово хранение данных о резерве товара под отгрузку
+class ReservList(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    unique_id_ship = models.UUIDField( default=uuid.uuid4, editable=True)  #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
+    type = models.CharField(max_length=100) #Тип задания реализация/перемещение
+    ship_number = models.CharField(max_length=100)  #tranz_number или ship_number
+    ship_date = models.DateField()  #tranz_date или ship_date
+    counterparty = models.CharField(max_length=100) #Из ShipData counterparty или to_house != Центральный новый
+    warehouse = models.CharField(max_length=100)  #Из ShipData warehouse или  from_house === Центральный новый
+    progress = models.CharField(max_length=100) #при переходе в эту базу ставим В работе 
+    reserve_data = models.DateField() #дата установки в резерв
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True) #уникальный id товара
+    add_date = models.DateField()  #tranz_date или add_date
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) 
+    quantity = models.IntegerField()
+    place = models.CharField(max_length=100)
+    goods_status = models.CharField(max_length=100) #при переходе в эту базу статус Резерв
+
+
+# Готово хранение данных о резмещение товара на месте хранения удаление после закрытия приемки
+class PlaceProduct(models.Model):
+    unique_id_add = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)  #при перемещении с AddData и TranzitData присваиваем номер отгрузки
+    type = models.CharField(max_length=100) #Тип задания реализация/перемещение
+    add_number = models.CharField(max_length=100) #tranz_number или add_number
+
+    unique_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=True) #На этом этапе присваивается уникальный id
+    add_date = models.DateField() #tranz_date или add_date
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100)
+    place = models.CharField(max_length=100) #тут устанавливается место хранения
+    quantity = models.IntegerField() #тут и дальше идет размещенное кол-во
+    goods_status = models.CharField(max_length=100) #тут статус тавара устанавливается на Хранение
+
+
+# Готово архив хранения данных об отгруженных позициях
+class ArchiveShip(models.Model):
+    unique_id_ship = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
+    type = models.CharField(max_length=100) #Тип задания реализация/перемещение
+    ship_number = models.CharField(max_length=100) #tranz_number или ship_number
+    ship_date = models.DateField() #tranz_date или ship_date
+    counterparty = models.CharField(max_length=100)  #Из ShipData counterparty или to_house != Центральный новый
+    warehouse = models.CharField(max_length=100)  #Из ShipData warehouse или  from_house === Центральный новый
+    progress = models.CharField(max_length=100) #На этом этапе устанавливается завершенный
+    reserve_data = models.DateField() #дата установки в резерв
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100)
+    quantity = models.IntegerField()
+    place = models.CharField(max_length=100) 
+    final_ship_date = models.DateField() #дата отгрузки устанавливается при переносе в эту базу
+
+
+# Готово хранения данных о приходе товара 
+class ArchiveAdd(models.Model):
+    unique_id_add = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)  #при перемещении с AddData и TranzitData присваиваем номер отгрузки
+    type = models.CharField(max_length=100)  #Тип задания реализация/перемещение
+    add_number = models.CharField(max_length=100)  #tranz_number или add_number
+    add_date = models.DateField() #tranz_date или add_date
+    unique_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=True)
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100)
+    place = models.CharField(max_length=100) #
+    quantity_start = models.IntegerField() #количество на входе
+    quanity_place = models.IntegerField() #Финальное кол-во размещенного товара 
+    goods_status = models.CharField(max_length=100) #статус товара
+    close_add_date = models.DateField() #дата закрытия приемки
+
+
+# Готво хранение данных о товарах перенесенных на брак или недостачу
+class ArchiveProduct(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    add_date = models.DateField()
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100)
+    quantity = models.IntegerField()
+    place = models.CharField(max_length=100)
+    goods_status = models.CharField(max_length=100) #при удалении из резерва устанавливаетя Брак или Недостача
+    close_product_date = models.DateField() #дата переноса в эту таблицу

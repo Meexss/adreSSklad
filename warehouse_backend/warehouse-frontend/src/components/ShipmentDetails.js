@@ -24,20 +24,17 @@ const ShipmentDetails = () => {
     const [selectedQuantity, setSelectedQuantity] = useState(0);
     const [selectedStatus, setSelectedStatus] = useState("Хранение");
     const [showModal, setShowModal] = useState(false);
-
-    console.log(shipment)
-    console.log(reservedData)
-    console.log(showReservedData)
-    console.log(summarizedData)
-    console.log(loading)
+    const [noReserv, setNoReserv] = useState([])
 
 
+    // модалка
     const handleOpenModal = (item) => {
+        console.log(item)
         setSelectedItem(item);
         setSelectedQuantity(item.quantity);
         setShowModal(true);
     };
-
+    // модалка
     const handleCloseModal = () => {
         setShowModal(false);
     };
@@ -53,42 +50,50 @@ const ShipmentDetails = () => {
         setShipment(prev => ({ ...prev, progress: newStatus }));
     };
 
+
+    // Резервировать все
     const handleReserveAll = useCallback(async () => {
         try {
-            if (!shipment) return;
-            
             setLoading(true);
             setError(null);
             setMessage("");
-
+    
             const reserveRequest = {
-                uid_ship: shipment.uid_ship,
-                stocks: shipment.stocks.map((stock) => ({
+                uid_ship: shipment.unique_id_ship, // Убедитесь, что поле соответствует API
+                type: shipment.type,
+                ship_number: shipment.ship_number,
+                ship_date: shipment.ship_date,
+                counterparty: shipment.counterparty,
+                warehouse: shipment.warehouse,
+                progress: shipment.progress,
+                stocks: shipment.items.map((stock) => ({
                     article: stock.article,
                     quantity: stock.quantity,
                 })),
             };
-
+    
             const reserveResponse = await api.post('/api/reserve/', reserveRequest);
-            
-
+    
             if (reserveResponse.status === 200) {
+                console.log("Резервирование успешно завершено.");
                 setMessage("Резервирование успешно завершено.");
-                const uid_ship = shipment.uid_ship;
+    
+                const uid_ship = shipment.unique_id_ship; // Используем корректное поле
                 const getResponse = await api.get(`/api/reserve/?uid_ship=${uid_ship}`);
-                
-                await api.post('/api/shipments/', {
-                    uid_ship: shipment.uid_ship,
-                    progress: "В работе"
-                });
-                
-                updateShipmentStatus("В работе");
-
+    
                 if (getResponse.status === 200) {
+                    console.log(getResponse);
                     setReservedData(getResponse.data);
                     setShowReservedData(true);
                     localStorage.setItem(storageKey, JSON.stringify(getResponse.data));
                 }
+    
+                await api.post('/api/shipments/', {
+                    uid_ship,
+                    progress: "В работе"
+                });
+    
+                updateShipmentStatus("В работе");
             }
         } catch (error) {
             setError(error.response?.data?.error || "Ошибка при резервировании");
@@ -96,8 +101,9 @@ const ShipmentDetails = () => {
         } finally {
             setLoading(false);
         }
-    }, [api, shipment, storageKey]);
+    }, [api, shipment, storageKey, updateShipmentStatus]);
 
+    // частичная отмена работает но подумать над ошибкой 500
     const handleSubmitPartialCancel = async () => {
         try {
             setLoading(true);
@@ -117,15 +123,16 @@ const ShipmentDetails = () => {
             if (cancelResponse.status === 200) {
                 setMessage("Частичная отмена выполнена успешно.");
                 await api.get(`/api/reserve/?uid_ship=${shipment.uid_ship}`);
+            } else if (cancelResponse.status === 500) {
+                setMessage("Ошибка на сервере. Пожалуйста, попробуйте позже.");
+                await api.get(`/api/reserve/?uid_ship=${shipment.uid_ship}`);
             }
-        } catch (error) {
-            setError(error.response?.data?.error || "Ошибка при частичной отмене");
-            console.error("Ошибка отмены:", error);
         } finally {
             setLoading(false);
         }
     };
 
+    //Закрыть отгрузку
     const handleCloseShip = async () => {
         try {
             const request = reservedData.map((item) => ({
@@ -158,7 +165,7 @@ const ShipmentDetails = () => {
         }
     };
 
-
+    // Массовая отмена резервирования
     const handleMassCancelReservation = useCallback(async () => {
         try {
             if (!reservedData.length) return;
@@ -178,7 +185,7 @@ const ShipmentDetails = () => {
                 setMessage("Массовое резервирование успешно отменено");
 
                 await api.post('/api/shipments/', {
-                    uid_ship: shipment.uid_ship,
+                    uid_ship: shipment.unique_id_ship,
                     progress: "Черновик"
                 });
 
@@ -192,6 +199,8 @@ const ShipmentDetails = () => {
         }
     }, [api, reservedData, storageKey, shipment?.uid_ship]);
 
+
+    // получение данных о резерве
     useEffect(() => {
         const fetchReservationData = async () => {
             try {
@@ -200,7 +209,7 @@ const ShipmentDetails = () => {
                 setLoading(true);
                 setError(null);
                 
-                const uid_ship = shipment.uid_ship;
+                const uid_ship = shipment.unique_id_ship;
                 const response = await api.get(`/api/reserve/?uid_ship=${uid_ship}`);
 
                 if (response.status === 200 && response.data.length > 0) {
@@ -210,7 +219,8 @@ const ShipmentDetails = () => {
                 }
             } catch (error) {
                 if (error.response?.status !== 404) {
-                    setError(error.response?.data?.error || "Ошибка загрузки данных");
+                    // setError(error.response?.data?.error || "Ошибка загрузки данных");
+                    console.log(error)
                 }
             } finally {
                 setLoading(false);
@@ -220,24 +230,10 @@ const ShipmentDetails = () => {
         fetchReservationData();
     }, [shipment, storageKey, api]);
 
-    useEffect(() => {
-        if (reservedData.length > 0) {
-            const groupedData = reservedData.reduce((acc, item) => {
-                acc[item.article] = (acc[item.article] || 0) + item.quantity;
-                return acc;
-            }, {});
 
-            const result = Object.entries(groupedData).map(([article, quantity]) => ({
-                article,
-                quantity,
-            }));
-
-            setSummarizedData(result);
-        }
-    }, [reservedData]);
-
+    // Печать
      const contentRef = useRef(null);
-    
+    // Печать
         const handlePrint = useReactToPrint({
             // documentTitle: 'Title',
             contentRef: contentRef,
@@ -257,21 +253,22 @@ const ShipmentDetails = () => {
 
             {error && <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
             {message && <div className="success-message" style={{ color: 'green', margin: '10px 0' }}>{message}</div>}
-
-            <Link to="/operations" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-                <FontAwesomeIcon
-                    icon={faArrowLeft}
-                    style={{
-                        cursor: 'pointer',
-                        fontSize: '15px',
-                        padding: '10px',
-                        borderRadius: '50%',
-                    }}
-                />
-                <span style={{ fontSize: '12px' }}>Назад</span>
-            </Link>
+                {/* кнопка назад */}
+                <Link to="/operations" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                    <FontAwesomeIcon
+                        icon={faArrowLeft}
+                        style={{
+                            cursor: 'pointer',
+                            fontSize: '15px',
+                            padding: '10px',
+                            borderRadius: '50%',
+                        }}
+                    />
+                    <span style={{ fontSize: '12px' }}>Назад</span>
+                </Link>
+                
                 <button className='no-print' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
-                                    <FontAwesomeIcon icon={faPrint} /> Печать
+                <FontAwesomeIcon icon={faPrint} /> Печать
                 </button>
                 <h2>Детали отгрузки</h2>
                 {/* <Barcode className="print-only" value={shipment.uid_ship} format="CODE128"/> */}
@@ -311,8 +308,8 @@ const ShipmentDetails = () => {
                 <div className="data_wraper">
                     {/* <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.uid_ship}</p></div> */}
                     <div className="data_info"><p><strong>Тип:</strong> {shipment.type}</p></div>
-                    <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.shipment_number}</p></div>
-                    <div className="data_info"><p><strong>Дата отгрузки:</strong> {shipment.shipment_date}</p></div>
+                    <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.ship_number}</p></div>
+                    <div className="data_info"><p><strong>Дата отгрузки:</strong> {shipment.ship_date}</p></div>
                     <div className="data_info"><p><strong>Контрагент:</strong> {shipment.counterparty}</p></div>
                     <div className="data_info"><p><strong>Склад:</strong> {shipment.warehouse}</p></div>
                     <div className="data_info no-print"><p><strong>Статус:</strong> {shipment.progress}</p></div>
@@ -323,23 +320,22 @@ const ShipmentDetails = () => {
                 <h3>{showReservedData ? "Зарезервированные товары:" : "Товары для отгрузки:"}</h3>
                 <table >
                     <thead>
-                        <tr >
-                            <th >Артикул</th>
-                            <th >Наименование</th>
-                            <th >Количество общее</th>
-                            {showReservedData && (
-                                <>
-                                    <th >Сумма резерва</th>
-                                    <th >Место Хранение</th>
-                                    <th >Кол-во к отбору</th>
-                                    <th className='.no-print'>Статус</th>
-                                    <th > </th>
-                                </>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {shipment.stocks.map((stock, index) => {
+    <tr>
+      <th>Артикул</th>
+      <th>Наименование</th>
+      <th>Количество общее</th>
+      {(showReservedData || shipment.items.some(stock => noReserv.filter(item => item.article === stock.article).length > 0)) && (
+        <>
+          <th>Место Хранение</th>
+          <th>Кол-во к отбору</th>
+          <th className="no-print">Статус</th>
+          <th> </th>
+        </>
+      )}
+    </tr>
+  </thead>
+  <tbody>
+  {shipment.items.map((stock, index) => {
                             // Фильтруем все записи из reservedData, соответствующие данному артикулу
                             const reservedItems = reservedData.filter(item => item.article === stock.article);
 
@@ -353,9 +349,9 @@ const ShipmentDetails = () => {
                                                 <td rowSpan={reservedItems.length} >{stock.article}</td>
                                                 <td rowSpan={reservedItems.length} style={{ textAlign: 'left'}}>{stock.name}</td>
                                                 <td rowSpan={reservedItems.length} >{stock.quantity}</td>
-                                                <td rowSpan={reservedItems.length} >
-                                                    {summarizedData.find(item => item.article === reservedItem.article)?.quantity ?? 0}
-                                                </td>
+                                                
+                                                
+                            
                                             </>
                                         )}
                                         <td >{reservedItem.place}</td>
@@ -386,6 +382,9 @@ const ShipmentDetails = () => {
                                 </tr>
                             );
                         })}
+
+
+
                     </tbody>
                 </table>
                 {showModal && selectedItem && (
@@ -456,4 +455,4 @@ const ShipmentDetails = () => {
     );
 };
 
-export default ShipmentDetails;
+export default ShipmentDetails

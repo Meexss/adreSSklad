@@ -1,70 +1,65 @@
 from rest_framework import serializers
+from .data_models import (
+    TranzitData, ShipData, AddData, ShipList, AddList, ProductList,
+    ReservList, PlaceProduct, ArchiveShip, ArchiveAdd, ArchiveProduct
+)
 
-class StockSerializer(serializers.Serializer):
-    article = serializers.CharField()
-    name = serializers.CharField()
-    quantity = serializers.IntegerField()
-    barcode = serializers.CharField()
+class TranzitDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TranzitData
+        fields = '__all__'
 
-class PositionDataSerializer(serializers.Serializer):
-    article = serializers.CharField()
-    name = serializers.CharField()
-    quantity = serializers.IntegerField()
-    barcode = serializers.CharField()
-    error_barcode = serializers.BooleanField()
-    newbarcode = serializers.CharField()
-    final_quantity = serializers.IntegerField()
+class ShipDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShipData
+        fields = '__all__'
 
-class AddProductSerializer(serializers.Serializer):
-    type = serializers.CharField()
-    add_number = serializers.CharField()
-    add_date = serializers.DateField()
-    counterparty = serializers.CharField()
-    warehouse = serializers.CharField()
-    progress = serializers.CharField()
-    uid_add = serializers.CharField()
-    positionData = PositionDataSerializer(many=True)
+class AddDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AddData
+        fields = '__all__'
 
+class ShipListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShipList
+        fields = '__all__'
 
-class ShipmentSerializer(serializers.Serializer):
-    type = serializers.CharField()
-    shipment_number = serializers.CharField()
-    shipment_date = serializers.DateField()
-    counterparty = serializers.CharField()
-    warehouse = serializers.CharField()
-    progress = serializers.CharField()
-    uid_ship = serializers.CharField()
-    stocks = StockSerializer(many=True)
+class AddListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AddList
+        fields = '__all__'
 
-class ProductSerializer(serializers.Serializer):
-    unique_id = serializers.CharField()
-    article = serializers.CharField()
-    name = serializers.CharField()
-    quantity = serializers.IntegerField()
-    place = serializers.CharField()
-    goods_status = serializers.CharField()
-    barcode = serializers.CharField()
+class ProductListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductList
+        fields = '__all__'
 
-class ReservSerializer(serializers.Serializer):
-    uid_ship = serializers.CharField()
-    reserve_data = serializers.CharField()
-    unique_id = serializers.CharField()
-    article = serializers.CharField()
-    name = serializers.CharField()
-    quantity = serializers.IntegerField()
-    place = serializers.CharField()
-    goods_status = serializers.CharField()
-    barcode = serializers.CharField()
+class ReservListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReservList
+        fields = '__all__'
 
-class PlaceProductsSerializer(serializers.Serializer):
-    type = serializers.CharField()
-    uid_add = serializers.CharField()
-    add_number = serializers.CharField()
-    article = serializers.CharField()
-    name = serializers.CharField()
-    barcode = serializers.CharField()
-    quantity = serializers.IntegerField()
-    unique_id = serializers.CharField()
-    place = serializers.CharField()
-    goods_status = serializers.CharField()
-   
+class PlaceProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlaceProduct
+        fields = '__all__'
+
+class ArchiveShipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArchiveShip
+        fields = '__all__'
+
+class ArchiveAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArchiveAdd
+        fields = '__all__'
+
+class ArchiveProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArchiveProduct
+        fields = '__all__'
+
+class ProductListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductList
+        fields = '__all__'       
