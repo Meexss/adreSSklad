@@ -130,6 +130,9 @@ table {
   background-color: white;
   border-collapse: collapse;
   width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+  border-radius: 10px;
+
   /* height: 80vh; */
   /* position: relative;
    overflow-y: auto; */
@@ -141,10 +144,19 @@ thead {
   top: 0;
   background-color: white;
   z-index: 1;
+  border-radius: 0 0 0 10px;
+
 }
 
 th {
   background-color: #a4ae9e;
+}
+
+th:first-child {
+  border-radius: 10px 0 0 0 ;
+}
+th:last-child {
+  border-radius:  0 10px 0 0;
 }
 
 /* Стилизация ячеек */

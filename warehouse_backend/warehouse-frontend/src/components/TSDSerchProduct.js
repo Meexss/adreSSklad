@@ -26,12 +26,9 @@ const TSDSerchProduct = () => {
 
 
         try{
-            const res = await api.get(`/api/products/`)
-        
-                setProducts(res.data);
-                // Фильтруем товары по ячейке
-                const foundProducts = res.data.filter((item) => item.barcode === code);
-                setFilteredProducts(foundProducts);
+            const res = await api.get(`/api/serch_product/?barcode=${code}`)
+                console.log(res)
+                setFilteredProducts(res.data);
                 setCurrentStep(2);
         } catch (err) {
             setCurrentStep(-1)

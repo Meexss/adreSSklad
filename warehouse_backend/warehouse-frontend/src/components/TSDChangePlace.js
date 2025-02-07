@@ -32,12 +32,12 @@ const TSDChangePlace = () => {
         console.log(value);
 
         try {
-            const response = await api.get(`/api/products/`)
-            const foundProducts = response.data.filter((item) => item.place === value);
-            setFilteredPlace(foundProducts);
+            const response = await api.get(`/api/serch_place/?place=${value}`)
+            console.log(response)
+            setFilteredPlace(response.data);
             setError('')
             setCurrentStep(2);
-            console.log(foundProducts)
+
         }
         catch(err) {
             setError(`Ошибка загрузки места: ${error.message || error}`);
@@ -56,6 +56,7 @@ const TSDChangePlace = () => {
         // Фильтруем нужные товары
         const foundProducts = filteredPlace.filter((item) => item.barcode === code);
         if(foundProducts.length > 0){
+            console.log(foundProducts)
             setFilteredBarcode(foundProducts);
             setSumPlace(foundProducts.reduce((acc, item) => acc + item.quantity, 0));
             setCurrentStep(3)
@@ -92,6 +93,12 @@ const TSDChangePlace = () => {
             setCurrentStep(5)
             setTimeout(() => {
                 setCurrentStep(1);})
+            setError('')
+            setBarcode('')
+            setColChange('')
+            setFilteredPlace('')
+            setFilteredBarcode('')
+            setSumPlace('')
         } catch (error) {
             setError(`Ошибка отправки данных: ${error.message || error}`);
             setCurrentStep(4)
@@ -127,7 +134,7 @@ const TSDChangePlace = () => {
                {/* Шаг первый установка ячейки товара  */}
                {curretStep === 1 && (
                     <div className="scan-section">
-                        <h2>Сканируйте ячейку товара</h2>
+                        <h2>Сканируйте ячейку товара с Которой переместить!!!</h2>
                         <input 
                         className="scan-input"
                         onInput= {handlePlaceScan} // передаем только значение

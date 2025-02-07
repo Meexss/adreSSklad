@@ -31,7 +31,7 @@ const TSDScanProduct = () => {
         setApiData(loadResponse.data)
         setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
         console.log(value)
-        console.log(positions)
+        console.log(loadResponse)
       } catch (error) {
         console.error("Ошибка загрузки приемки:", error);
         setError(`Ошибка загрузки приемки: ${error.message || error}`);
@@ -46,26 +46,22 @@ const TSDScanProduct = () => {
     setBarcode(code);
     console.log("Сканированный баркод:", code);
 
-    // Проверка на пустоту массива позиций
     if (positions.length === 0) {
         setError('Нет данных для поиска');
         return;
     }
+    console.log(positions);
 
-    // Ищем баркод среди всех позиций
-    let foundPosition = null;
-    for (let position of positions) {
-        foundPosition = position.positionData?.find(positionData => positionData.barcode === code);
-        if (foundPosition) break; // Если нашли, прерываем цикл
-    }
+    // Поиск среди всех позиций
+    const foundPosition = positions.find(position => position.barcode === code);
 
     if (foundPosition) {
-      console.log(foundPosition)
+        console.log(foundPosition);
         setFoundPosition(foundPosition);
-        setCurrentStep(3)
+        setCurrentStep(3);
     } else {
         setError('Баркод не найден');
-        setCurrentStep(4)
+        setCurrentStep(4);
     }
 };
 
@@ -78,7 +74,7 @@ const TSDScanProduct = () => {
     setFoundPosition(prevState => ({
       ...prevState,
       newbarcode: barcode,
-      error_barcodeL: true,
+      error_barcode: true,
     }));
     setCurrentStep(3)
 
@@ -99,7 +95,7 @@ const TSDScanProduct = () => {
     // Формируем запрос для API
     const scanRequest = {
       type: apiData[0]?.type,
-      uid_add: apiData[0]?.uid_add,
+      uid_add: apiData[0]?.unique_id_add,
       add_number: apiData[0]?.add_number,
       add_date: apiData[0]?.add_date,
       counterparty: apiData[0]?.counterparty,
@@ -127,7 +123,7 @@ const TSDScanProduct = () => {
       setFoundPosition(null);
       setEnteredQuantity('');
       setCurrentStep(5);
-
+      setError('')
       setTimeout(() => {
         setCurrentStep(2);
       }, 2000);
@@ -245,25 +241,22 @@ const TSDScanProduct = () => {
               <h3>Штрихкод не найден выберите позицию вручную:</h3>
               <div> 
               {positions.map((position, idx) => (
-                      <div key={idx} className="position-item">
-                        {position.positionData?.map((item, i) => (
                           <div 
-                            key={i} 
+                            key={idx} 
                             className="position-info" 
-                            onClick={() => hanleNewBarcode(item)} // Обновляем состояние с выбранной позицией
+                            onClick={() => hanleNewBarcode(position)} // Обновляем состояние с выбранной позицией
                           >
-                            <p className='mainText'>{item.name}</p>
+                            <p className='mainText'>{position.name}</p>
                             <div className='blockInfo'>
                               <p className='supText'>Артикул: </p>
-                              <p className='mainText'>{item.article}</p>
+                              <p className='mainText'>{position.article}</p>
                             </div>
                             <div className='blockInfo'>
                               <p className='supText'>К приемке:</p>
-                              <p className='mainText'>{item.barcode}</p>
+                              <p className='mainText'>{position.quantity-position.final_quantity}</p>
                             </div>
                           </div>
-                        ))}
-                      </div>
+                      
               ))}
               </div>
             </div>  

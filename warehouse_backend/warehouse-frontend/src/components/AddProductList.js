@@ -16,7 +16,8 @@ const AddProductList = () => {
     useEffect(() => {
         api.get('/api/addproducts/')
             .then(response => {
-                setAddproducts(response.data);
+                setAddproducts(groupShipmentsByUniqueId(response.data));
+                console.log(groupShipmentsByUniqueId(response.data))
                 setLoading(false);
                 console.log(response.data)
             })
@@ -26,6 +27,27 @@ const AddProductList = () => {
                 setLoading(false);
             });
     }, [api]);
+
+
+    const groupShipmentsByUniqueId = (data) => {
+        return data.reduce((acc, add) => {
+            const { unique_id_add } = add;
+            if (!acc[unique_id_add]) {
+                acc[unique_id_add] = {
+                    unique_id_add,
+                    type: add.type,
+                    add_number: add.add_number,
+                    add_date: add.add_date,
+                    counterparty: add.counterparty,
+                    warehouse: add.warehouse,
+                    progress: add.progress,
+                    items: [],
+                };
+            }
+            acc[unique_id_add].items.push(add);
+            return acc;
+        }, {});
+    };
 
     return (
         <Layout>
@@ -56,10 +78,10 @@ const AddProductList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        {addproducts.map(addproduct => (
+                        {Object.values(addproducts).map(addproduct => (
                                 <tr
-                                    key={addproduct.add_number}
-                                    onClick={() => navigate(`/add-product/${addproduct.uid_add}`, { state: { addproducts: addproduct } })}
+                                    key={addproduct.items.unique_id_add}
+                                    onClick={() => navigate(`/add-product/${addproduct.unique_id_add}`, { state: { addproducts: addproduct } })}
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <td>{addproduct.type}</td>
@@ -67,12 +89,12 @@ const AddProductList = () => {
                                     <td>{addproduct.add_date}</td>
                                     <td>{addproduct.counterparty}</td>
                                     <td>{addproduct.warehouse}</td>
-                                    <td>{addproduct.positionData.length}</td>
+                                    <td>{addproduct.items.length}</td>
                                     <td>
-                                        {addproduct.positionData.reduce((total, stock) => total + stock.quantity, 0)}
+                                        {addproduct.items.reduce((total, stock) => total + stock.quantity, 0)}
                                     </td>
                                     <td>
-                                        {addproduct.positionData.reduce((total, stock) => total + stock.final_quantity, 0)}
+                                        {addproduct.items.reduce((total, stock) => total + stock.final_quantity, 0)}
                                     </td>
                                     <td>{addproduct.progress}</td>
                                 </tr>

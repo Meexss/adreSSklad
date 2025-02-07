@@ -16,6 +16,7 @@ from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+import traceback
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -395,6 +396,7 @@ class ProductListView(APIView):
             print(f"Ошибка сервера: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
 
+# Работает get и post
 # Для установки места есть сомнения в Post
 class PlaceProducts(APIView):
 
@@ -422,16 +424,26 @@ class PlaceProducts(APIView):
             if not isinstance(new_products, list):
                 return Response({"error": "Ожидается список объектов"}, status=status.HTTP_400_BAD_REQUEST)
 
+            created_products = []
+           
             for product in new_products:
-                unique_id = uuid.uuid4()
-                unique_id_add = product.get("unique_id_add", "")    
-                # Создаем объект PlaceProduct
+                add_date = product.get("add_date")
+    
+                if add_date:
+                    try:
+                        add_date_fin = datetime.fromisoformat(add_date).date()
+                    except ValueError:
+                        return Response({"error": f"Неверный формат даты: {add_date}"}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({"error": "Поле add_date обязательно"}, status=status.HTTP_400_BAD_REQUEST)
+            
+                # Исключаем `unique_id`, так как Django сам его создаст
                 place_product = PlaceProduct.objects.create(
-                    unique_id=unique_id,
-                    unique_id_add=unique_id_add,  # Пример, нужно использовать ваш uid_add
+                    unique_id_add = product.get("uid_add", ""),
+                    unique_id=uuid.uuid4(),
                     type=product.get("type", ""),
                     add_number=product.get("add_number", ""),
-                    add_date=product.get("add_date"),
+                    add_date=add_date_fin,
                     article=product.get("article"),
                     name=product.get("name"),
                     barcode=product.get("barcode"),
@@ -439,20 +451,19 @@ class PlaceProducts(APIView):
                     quantity=product.get("quantity"),
                     goods_status=product.get("goods_status")
                 )
-            
-                        # Создаем сериализатор с данными
-                serializer = PlaceProductSerializer(data=place_product)
 
-                if serializer.is_valid():
-                    serializer.save()  # Сохраняем данные в базе
-                else:
-                    return Response({"error": "Неверные данные", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                # Сериализуем объект
+                serializer = PlaceProductSerializer(place_product)
+                created_products.append(serializer.data)
 
-            return Response({"message": "Данные успешно добавлены"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Данные успешно добавлены", "data": created_products}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
-            return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+            print("Ошибка сервера:", traceback.format_exc())  # Теперь traceback работает
+            return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# Работает get и post
 # Обработчик для получения всех добавленных продуктов 
 class AddProductListView(APIView):
     def get(self, request):
@@ -462,7 +473,7 @@ class AddProductListView(APIView):
 
             # Фильтрация по add_number (uid_add)
             if uid_add:
-                products = AddList.objects.filter(add_number=uid_add)
+                products = AddList.objects.filter(unique_id_add=uid_add)
                 if not products:
                     return Response({"error": "Товар не найден"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -485,35 +496,43 @@ class AddProductListView(APIView):
             position_data = addproduct_data.get('positionData')
             new_progress = addproduct_data.get('progress')
 
-            # Находим продукт по add_number (uid_add)
-            product = AddList.objects.filter(add_number=uid_add).first()
+            # Находим список позиций по unique_id_add
+            products = AddList.objects.filter(unique_id_add=uid_add)
 
-            if product:
-                print("Position data:", position_data)
-                # Обновляем данные для найденных позиций
+            if not products.exists():
+                return Response({"error": "Product with this add_number not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            print("Position data:", position_data)
+
+            # Обновляем данные для найденных позиций
+            updated = False
+            for product in products:
                 for new_position in position_data:
                     article = new_position.get("article")
+
+                    # Проверяем, есть ли позиция с таким артикулом в списке
                     if product.article == article:
-                        # Обновляем данные
                         product.error_barcode = new_position.get("error_barcode", product.error_barcode)
                         product.newbarcode = new_position.get("newbarcode", product.newbarcode)
-                        product.final_quantity = new_position.get("final_quantity", 0)
+                        product.final_quantity = new_position.get("final_quantity", product.final_quantity)
+                        updated = True
 
                 if new_progress:
                     product.progress = new_progress
+                    updated = True
 
-                # Сохраняем обновленные данные в базе
-                product.save()
+                product.save()  # Сохраняем только если обновили
+
+            if updated:
                 return Response({"status": "success"}, status=status.HTTP_201_CREATED)
-
             else:
-                return Response({"error": "Product with this add_number not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "No matching articles found"}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+            return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-#Работает Post и get не правильно работает дублирует при добавлении 
+#Работает Post и get
 # Обработчик для работы с резервом на отгрузку Не увидел больших проблем 
 class ReserveAllView(APIView):
     def post(self, request):
@@ -1001,4 +1020,68 @@ class ProductListCreateView(APIView):
             return Response({"status": "success"}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+
+
+class FindBarcodeViews(APIView):
+    def get(self, request):
+        try:
+            # Получаем штрих-код из параметров запроса
+            code = request.data.get("barcode", "")
+            print(f"Поиск по штрих-коду: {code}")
+
+            # Проверка, если штрих-код передан
+            if code:
+                # Проверка на корректность формата штрих-кода (по желанию)
+                # if len(code) != 13:  # Например, для стандартного штрих-кода EAN-13
+                #     return Response({"error": "Некорректный формат штрих-кода"}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Ищем товары по штрих-коду
+                filtered_products = ProductList.objects.filter(barcode=code)
+                print(f"Поиск по штрих-коду: {filtered_products}")
+            else:
+                # Если штрих-код не передан, возвращаем все товары
+                filtered_products = ProductList.objects.all()
+
+            # Если товары не найдены
+            if not filtered_products:
+                return Response({"message": "Товары не найдены"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Сериализация данных для ответа
+            serializer = ProductListSerializer(filtered_products, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Ошибка сервера: {str(e)}")  # Логируем ошибку
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+
+
+class FindPlaceViews(APIView):
+    def get(self, request):
+        try:
+            # Получаем значение места из параметров запроса (используем query_params, а не data)
+            code = request.query_params.get("place", "")
+            print(f"Поиск по месту: {code}")
+
+            # Инициализируем переменную `filtered_products`
+            filtered_products = ProductList.objects.none()  # Пустой QuerySet, если ничего не найдено
+
+            if code:
+                # Ищем товары по месту хранения
+                filtered_products = ProductList.objects.filter(place=code)
+                print(f"Найденные товары: {filtered_products}")
+
+            # Проверяем, нашлись ли товары
+            if not filtered_products.exists():
+                return Response({"message": "Товары не найдены"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Сериализация данных для ответа
+            serializer = ProductListSerializer(filtered_products, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Ошибка сервера: {str(e)}")  # Логируем ошибку
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+                  

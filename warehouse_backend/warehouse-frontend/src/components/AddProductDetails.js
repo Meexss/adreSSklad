@@ -10,8 +10,8 @@ import Barcode from "react-barcode";
 const AddProductDetails = () => {
     const location = useLocation();
     const { addproducts } = location.state;
-    const [dataProducts, setDataProducts] = useState(null);
-    const [placeProducts, setPlaceProducts] = useState(null);
+    const [dataProducts, setDataProducts] = useState([]);
+    const [placeProducts, setPlaceProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -20,21 +20,22 @@ const AddProductDetails = () => {
     }), []);
 
     useEffect(() => {
-        if (!addproducts?.add_number) return;
-
+        if (!addproducts?.unique_id_add) return;
+        console.log(addproducts)
         const fetchData = async () => {
-            try {
+            try { 
                 const [addResponse, placeResponse] = await Promise.all([
-                    api.get(`/api/addproducts/?uid_add=${addproducts.uid_add}`),
-                    api.get(`/api/placeship/?uid_add=${addproducts.uid_add}`)
+                    api.get(`/api/addproducts/?uid_add=${addproducts.unique_id_add}`),
+                    api.get(`/api/placeship/?uid_add=${addproducts.unique_id_add}`)
                 ]);
+                console.log(addResponse.data)
+                setDataProducts(addResponse.length ? addResponse[0] : null);
 
-                setDataProducts(addResponse.data.length ? addResponse.data[0] : null);
                 setPlaceProducts(placeResponse.data);
                 setLoading(false);
             } catch (error) {
                 console.error("Ошибка запроса:", error);
-                setErrorMessage(`Ошибка: ${error.response?.data?.error || error.message}`);
+                // setErrorMessage(`Ошибка: ${error.response?.data?.error || error.message}`);
                 setLoading(false);
             }
         };
@@ -42,14 +43,14 @@ const AddProductDetails = () => {
         fetchData();
     }, [addproducts, api]);
 
+    // Печать
     const contentRef = useRef(null);
-
+    
+    // Печать
     const handlePrint = useReactToPrint({
         // documentTitle: 'Title',
         contentRef: contentRef,
      })
-
-     console.log(placeProducts)
  
 
     //плохо работает
@@ -106,8 +107,8 @@ const AddProductDetails = () => {
                         <FontAwesomeIcon icon={faPrint} /> Печать
                     </button>
                 <h2>Детали прихода</h2>
-                <Barcode className="print-only" value={addproducts.uid_add} format="CODE128"/>
-                                    <Link to="/add-product-list"><button
+                <Barcode className="print-only" value={addproducts.unique_id_add} format="CODE128"/>
+                <Link to="/add-product-list"><button
                                         onClick={handleCloseAdd}
                                         className='no-print'
                                         style={{
@@ -115,7 +116,7 @@ const AddProductDetails = () => {
                                         }}
                                     >
                                         Завершить отгрузку
-                                    </button></Link>
+                </button></Link>
                 <div  className="data_wraper" >
                     
                     <div className="data_info"><p><strong>Номер прихода:</strong> {addproducts.add_number}</p></div>
@@ -153,11 +154,12 @@ const AddProductDetails = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        {addproducts?.positionData?.map((stock, index) => {
-                            const finalQuantity =
-                            dataProducts?.positionData?.find(item => item.article === stock.article)?.final_quantity || '—';
-
-                            const filteredProducts = placeProducts?.filter(item => item.article === stock.article) || [];
+                        {addproducts.items.map((stock, index) => {
+                            const finalQuantity = Array.isArray(dataProducts) 
+                            ? dataProducts.find(item => item.article === stock.article)?.final_quantity || '0' 
+                            : '0';
+                            console.log(dataProducts)
+                            const filteredProducts = placeProducts.filter(item => item.article === stock.article) || [];
 
                             return (
                             <tr key={index}>

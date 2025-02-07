@@ -50,20 +50,8 @@ const TSDPlaceProduct = () => {
             setError('Нет данных для поиска');
             return;
         }
-    
-        let foundProduct = null;
-    
-        // Проходим по всем позициям и ищем нужный barcode
-        for (let product of products) {
-            if (product.positionData) {
-                foundProduct = product.positionData.find(
-                    (pos) => pos.barcode === code
-                );
-                if (foundProduct) {
-                    break; // Если нашли, выходим из цикла
-                }
-            }
-        }
+
+        const foundProduct = products.find(position => position.barcode === code);
     
         if (foundProduct) {
             console.log("Товар найден:", foundProduct);
@@ -87,19 +75,20 @@ const TSDPlaceProduct = () => {
         }
     };
 
+    
     // Функция отправки данных на сервер
     const submitData = async () => {
         setCurrentStep(0)
 
         const requestData = [{
             type: currentProduct.type,
-            uid_add: currentProduct.uid_add,
+            uid_add: currentProduct.unique_id_add,
+            add_date: currentProduct.add_date,
             add_number: acceptanceNumber,
             article: currentProduct.article,
             name: currentProduct.name,
             barcode: barcode,
             quantity: quantity,
-            unique_id: "",
             place: place,
             goods_status: "Хранение"
         }];

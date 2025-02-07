@@ -18,24 +18,25 @@ const TSDSerchPlace = () => {
     }), []);
 
 
-    const handlePlaceScan = async (place) => {
+    const handlePlaceScan = async (e) => {
         setCurrentStep(0)
-        setPlace(place);
+        
+        const data = e.target.value
+        setPlace(data);
         console.log(place);
         try{
-            const res = await api.get(`/api/products/`)
+            const res = await api.get(`/api/serch_place/?place=${data}`)
         
-                setProducts(res.data);
+                console.log(res)
                 // Фильтруем товары по ячейке
-                const foundProducts = res.data.filter((item) => item.place === place);
-                setFilteredProducts(foundProducts);
+                setFilteredProducts(res.data);
                 setCurrentStep(2);
         } catch (err) {
             setCurrentStep(-1)
             setError(err.message)
         }
     
-        console.log("Сканированное место:", place);
+        console.log("Сканированное место:", data);
     };
     
 
@@ -65,7 +66,7 @@ const TSDSerchPlace = () => {
                         <h2>Сканируйте ячейку товара</h2>
                         <input 
                         className="scan-input"
-                        onChange={(e) => handlePlaceScan(e.target.value)} // передаем только значение
+                        onInput= {handlePlaceScan} // передаем только значение
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}

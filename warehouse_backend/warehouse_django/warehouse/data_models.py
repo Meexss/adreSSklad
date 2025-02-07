@@ -113,11 +113,11 @@ class ReservList(models.Model):
 
 # Готово хранение данных о резмещение товара на месте хранения удаление после закрытия приемки
 class PlaceProduct(models.Model):
-    unique_id_add = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)  #при перемещении с AddData и TranzitData присваиваем номер отгрузки
+    unique_id_add = models.UUIDField(default=uuid.uuid4, editable=True)  #при перемещении с AddData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     add_number = models.CharField(max_length=100) #tranz_number или add_number
 
-    unique_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=True) #На этом этапе присваивается уникальный id
+    unique_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) #На этом этапе присваивается уникальный id
     add_date = models.DateField() #tranz_date или add_date
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
