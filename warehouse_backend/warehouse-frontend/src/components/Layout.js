@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
 
 
     return (
-        <div >
+        <div className='toPMainWrap'>
             <header>
                 <div className="mainWrapper">
                     <h1>Акватехнологии.Склад</h1>

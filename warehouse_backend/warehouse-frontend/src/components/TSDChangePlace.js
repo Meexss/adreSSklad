@@ -24,7 +24,7 @@ const TSDChangePlace = () => {
     //     // baseURL: 'https://adressklad.onrender.com',
     //     baseURL: 'http://127.0.0.1:8000',
     // }), []);
-
+ 
 
     const handlePlaceScan = async (e) => {
         setCurrentStep(0)
@@ -93,7 +93,7 @@ const TSDChangePlace = () => {
             });
             setCurrentStep(5)
             setTimeout(() => {
-                setCurrentStep(1);})
+                setCurrentStep(1);}, 2000)
             setError('')
             setBarcode('')
             setColChange('')
@@ -135,7 +135,7 @@ const TSDChangePlace = () => {
                {/* Шаг первый установка ячейки товара  */}
                {curretStep === 1 && (
                     <div className="scan-section">
-                        <h2>Сканируйте ячейку товара с Которой переместить!!!</h2>
+                        <h2>Сканируйте ячейку товара от куда переместить!!!</h2>
                         <input 
                         className="scan-input"
                         onKeyDown={(e) => {

@@ -128,7 +128,7 @@ const AddProductDetails = () => {
                     value={addproducts.add_number}
                     format="CODE128"
                     width={2}         // Уменьшаем ширину штрих-кода
-                    height={20}       // Уменьшаем высоту штрих-кода
+                    height={40}       // Уменьшаем высоту штрих-кода
                     />
                 <Link to="/add-product-list"><button
                                         onClick={handleCloseAdd}
@@ -163,13 +163,14 @@ const AddProductDetails = () => {
                             <tr>
                                 <th>Артикул</th>
                                 <th>Наименование</th>
-                                <th>Штрихкод товара по 1С</th>
-                                <th>Штрихкод товара при приемке</th>
+                                <th >Штрихкод товара по 1С</th>
+                                <th >Штрихкод товара при приемке</th>
                                 <th>Количество по 1С</th>
                                 <th>Фактически принято</th>
                                 <th>Размещено товара</th>
                                 <th>Места товара</th>
                                 <th>Количество на месте</th>
+                            
                                 {/* <th>Статус товара</th> */}
                                 
 
@@ -187,9 +188,11 @@ const AddProductDetails = () => {
                             <tr key={index}>
                                 <td>{stock.article}</td>
                                 <td className='text-left'>{stock.name}</td>
-                                <td >
+                                
+                                <td>
                                     {stock.barcode}
                                 </td>
+                                
                                 <td style={{ color: stock.error_barcode === true ? 'red' : 'inherit' }}>
                                     {filteredProducts.length > 0 ? stock.error_barcode === true ? 
                                         stock.newbarcode : stock.barcode : '—'}

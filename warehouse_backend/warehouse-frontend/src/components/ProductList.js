@@ -42,7 +42,7 @@ const ProductList = () => {
                     <p style={{ color: 'red' }}>{error}</p>
                     </div>
                 ) : (
-                    <div>
+                    <div className="table-container">
                         <table>
                             <thead>
                                 <tr>
