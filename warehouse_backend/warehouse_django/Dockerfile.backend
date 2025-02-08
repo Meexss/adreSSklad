@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Копируем файл с зависимостями
-COPY requirements.txt .
+COPY warehouse_django/requirements.txt .
 
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r /app/requirements.txt
@@ -16,8 +16,11 @@ COPY . /app/
 # Создаём директорию для базы данных
 RUN mkdir -p /app/db
 
-# Указываем, что ФАЙЛ базы данных должен сохраняться даже при пересоздании контейнера
+# Указываем, что файл базы данных должен сохраняться даже при пересоздании контейнера
 VOLUME /app/db.sqlite3
 
+# Устанавливаем переменную окружения для указания пути к базе данных
+ENV DB_PATH=/app/db.sqlite3
+
 # Команда для запуска сервера Django
-CMD ["python", "manage.py", "runserver"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

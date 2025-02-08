@@ -1,5 +1,4 @@
-import React, {useState, useCallback, useMemo  } from 'react';
-import axios from 'axios';
+import React, {useState, useCallback  } from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -29,6 +28,7 @@ const TSDScanProduct = () => {
   
       try {
         const loadResponse = await api.get(`/api/addproducts/?uid_add=${value}`)
+        console.log(loadResponse.data)
         setPositions(loadResponse.data);
         setApiData(loadResponse.data)
         setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
@@ -111,7 +111,7 @@ const TSDScanProduct = () => {
 
     try {
       const scanResponse = await api.post('/api/addproducts/', scanRequest);
-      console.log(scanResponse);
+      console.log("запрос:", scanRequest);
         try {
           const loadResponse = await api.get(`/api/addproducts/?uid_add=${numberAcceptance}`)
           setPositions(loadResponse.data);
@@ -191,7 +191,14 @@ const TSDScanProduct = () => {
         {curretStep === 1  && (
           <div className="scan-section">
             <h2>Сканируйте номер приемки</h2>
-            <input className="scan-input" onInput= {handleAcceptanceScan} autoFocus inputMode="none"/>
+            <input className="scan-input" 
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAcceptanceScan(e);
+              }
+          }} 
+      
+             autoFocus inputMode="none"/>
           </div>
           )}
 
@@ -201,7 +208,11 @@ const TSDScanProduct = () => {
             <h2>Сканируйте баркод товара</h2>
             <input
               className="scan-input"
-              onInput= {handleBarcodeScan}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleBarcodeScan(e);
+                }
+            }}
               autoFocus
               inputMode="none"
             /> 
@@ -227,7 +238,12 @@ const TSDScanProduct = () => {
                   <label className='mainText'>Введите кол-во:</label>
                   <input
                     type="number"
-                    onChange={handleFinalQuantityChange} // Сохраняем введенное количество
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleFinalQuantityChange(e);
+                      }
+                  }}
+                  
                     autoFocus
                     inputMode="none"
                   />

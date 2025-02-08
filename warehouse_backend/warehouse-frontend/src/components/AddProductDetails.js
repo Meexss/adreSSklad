@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import Layout from './Layout';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useReactToPrint } from 'react-to-print';
@@ -108,7 +107,13 @@ const AddProductDetails = () => {
                         <FontAwesomeIcon icon={faPrint} /> Печать
                     </button>
                 <h2>Детали прихода</h2>
-                <Barcode className="print-only" value={addproducts.unique_id_add} format="CODE128"/>
+                <Barcode
+                    className="print-only"
+                    value={addproducts.unique_id_add}
+                    format="CODE128"
+                    width={2}         // Уменьшаем ширину штрих-кода
+                    height={20}       // Уменьшаем высоту штрих-кода
+                    />
                 <Link to="/add-product-list"><button
                                         onClick={handleCloseAdd}
                                         className='no-print'

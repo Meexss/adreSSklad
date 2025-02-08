@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import Layout from './Layout';
 import api from './api'; // Импортируешь созданный файл
 

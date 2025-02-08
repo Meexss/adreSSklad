@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import axios from 'axios';
+import React, { useState} from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -44,7 +43,8 @@ const TSDPlaceProduct = () => {
     const handleBarcodeScan = (e) => {
         setCurrentStep(0)
         const code = e.target.value;
-        setBarcode(code);
+
+        setTimeout(() => setBarcode(code), 200)
         console.log("Сканированный баркод:", code);
         console.log("Данные API:", products);
     
@@ -153,7 +153,11 @@ const TSDPlaceProduct = () => {
                         <h2>Сканируйте номер приемки</h2>
                         <input
                         className="scan-input"
-                        onInput= {loadAcceptance}                                             
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                loadAcceptance(e);
+                            }
+                        }}                                              
                             autoFocus
                             inputMode="none"
                         />
@@ -166,7 +170,12 @@ const TSDPlaceProduct = () => {
                         <h2>Сканируйте баркод товара</h2>
                         <input 
                         className="scan-input"
-                            onInput= {handleBarcodeScan} 
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleBarcodeScan(e);
+                            }
+                        }} 
+                    
                                 autoFocus 
                                 inputMode="none"/>
                         {error && <p style={{ color: "red" }}>{error}</p>}
@@ -177,7 +186,7 @@ const TSDPlaceProduct = () => {
                 {curretStep === 3 && currentProduct && (
                     <div className="scan-section">
                         <h2>Сканируйте место хранения</h2>
-                        <input onInput={(e) => {setPlace(e.target.value)}} autoFocus inputMode="none"/>
+                        <input onChange={(e) => {setPlace(e.target.value)}} autoFocus inputMode="none"/>
                         <button className='buttonCompl' onClick={() => setCurrentStep(4)}>Далее</button>
                     </div>
                 )}

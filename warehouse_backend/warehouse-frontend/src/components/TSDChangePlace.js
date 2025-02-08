@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -139,7 +138,12 @@ const TSDChangePlace = () => {
                         <h2>Сканируйте ячейку товара с Которой переместить!!!</h2>
                         <input 
                         className="scan-input"
-                        onInput= {handlePlaceScan} // передаем только значение
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handlePlaceScan(e);
+                            }
+                        }}
+                        
                                 autoFocus
                                 inputMode="none" />
                     </div>
@@ -151,7 +155,12 @@ const TSDChangePlace = () => {
                         <h2>Сканируйте Штрихкод товара</h2>
                         <input 
                         className="scan-input"
-                        onInput= {handleBarcodeScan}// передаем только значение
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleBarcodeScan(e);
+                            }
+                        }}
+                        
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}
@@ -192,7 +201,12 @@ const TSDChangePlace = () => {
                         <h2>Сканируйте НОВУЮ ячейку товара</h2>
                         <input 
                         className="scan-input"
-                        onInput= {handlePlaceScanFinal} // передаем только значение
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handlePlaceScanFinal(e);
+                            }
+                        }}
+                        
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}

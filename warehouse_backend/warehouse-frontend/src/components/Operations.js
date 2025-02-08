@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import Layout from './Layout';
 import { useNavigate } from 'react-router-dom';
 import api from './api'; // Импортируешь созданный файл

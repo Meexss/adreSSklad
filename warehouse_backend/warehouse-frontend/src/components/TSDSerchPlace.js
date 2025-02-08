@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -45,12 +44,12 @@ const TSDSerchPlace = () => {
     return (
         <TSDLayout>
             <div className="containerr">
-                <Link to="/TSDmenu"><button class='buttonBack'>В меню</button></Link>
+                <Link to="/TSDmenu"><button className='buttonBack'>В меню</button></Link>
 
                 {/* Шаг для загрузки данных  */}
                 {curretStep === 0 && (
                     <div className="scan-section-loader">
-                        <span class="loader"></span>
+                        <span className="loader"></span>
                     </div>
                 )}
                 {/* Шаг для ошибки данных  */}
@@ -67,7 +66,12 @@ const TSDSerchPlace = () => {
                         <h2>Сканируйте ячейку товара</h2>
                         <input 
                         className="scan-input"
-                        onInput= {handlePlaceScan} // передаем только значение
+                                    onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handlePlaceScan(e);
+                                    }
+                                }}
+                        
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}

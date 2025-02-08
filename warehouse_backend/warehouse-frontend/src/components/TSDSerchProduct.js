@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -66,7 +65,12 @@ const TSDSerchProduct = () => {
                         <h2>Сканируйте баркод товара</h2>
                         <input 
                         className="scan-input"
-                        onInput= {handleBarcodeScan} 
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleBarcodeScan(e);
+                            }
+                        }}
+                        
                                 autoFocus
                                 inputMode="none" />
                         {error && <p style={{ color: "red" }}>{error}</p>}
