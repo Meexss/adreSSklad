@@ -11,7 +11,7 @@ COPY warehouse_django/requirements.txt .
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Копируем весь проект в контейнер
-COPY warehouse_django/ /app/
+COPY . /app/
 
 
 # Выполняем миграции и собираем статичные файлы
