@@ -468,25 +468,28 @@ class PlaceProducts(APIView):
 class AddProductListView(APIView):
     def get(self, request):
         try:
-            uid_add = request.data.get("uid_add")
-            print(f"Поиск товара add_number={uid_add}")  # Логирование
+            print(f"Query params: {request.query_params}")  # Логирование запроса
+            uid_add = request.query_params.get("uid_add")
+            print(f"Получен параметр uid_add: {uid_add}")  # Логирование
 
-            # Фильтрация по add_number (uid_add)
             if uid_add:
                 products = AddList.objects.filter(unique_id_add=uid_add)
-                if not products:
+                print(f"Найдено записей: {products.count()}")  # Логирование результатов запроса
+
+                if not products.exists():
+                    print("Товар не найден")  
                     return Response({"error": "Товар не найден"}, status=status.HTTP_404_NOT_FOUND)
 
                 serializer = AddListSerializer(products, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-            # Если uid_add не передан, возвращаем все товары
+            print("uid_add не передан! Возвращаем все записи.")  # Лог
             products = AddList.objects.all()
             serializer = AddListSerializer(products, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(f"Ошибка сервера: {e}")  # Логирование ошибки
+            print(f"Ошибка сервера: {e}")
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):

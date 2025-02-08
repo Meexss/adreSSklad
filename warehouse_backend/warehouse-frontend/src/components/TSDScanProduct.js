@@ -27,7 +27,9 @@ const TSDScanProduct = () => {
     console.log("Вводится значение:", value);
   
       try {
-        const loadResponse = await api.get(`/api/addproducts/?uid_add=${value}`)
+        const loadResponse = await api.get(`/api/addproducts/`, {
+          params: { uid_add: value }  // Отправляем параметры правильно
+      });
         console.log(loadResponse.data)
         setPositions(loadResponse.data);
         setApiData(loadResponse.data)
