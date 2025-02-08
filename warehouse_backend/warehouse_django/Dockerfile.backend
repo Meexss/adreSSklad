@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Копируем файл с зависимостями
-COPY warehouse_django/requirements.txt /app/
+COPY requirements.txt /app/
 
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r /app/requirements.txt
