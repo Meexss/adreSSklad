@@ -48,23 +48,30 @@ const TSDScanProduct = () => {
     setBarcode(code);
     console.log("Сканированный баркод:", code);
 
-    if (positions.length === 0) {
-        setError('Нет данных для поиска');
+    if (code.length === 8 || code.length  === 13 ) {
+      
+          // Поиск среди всех позиций
+          const foundPosition = positions.find(position => position.barcode === code);
+
+          if (foundPosition) {
+              console.log(foundPosition);
+              setFoundPosition(foundPosition);
+              setCurrentStep(3);
+          } else {
+              setError('Баркод не найден');
+              setCurrentStep(4);
+          }
+
+    
+      } else {
+        setError('не верный баркод');
+        setCurrentStep(2)
         return;
-    }
+      }
+
+
     console.log(positions);
 
-    // Поиск среди всех позиций
-    const foundPosition = positions.find(position => position.barcode === code);
-
-    if (foundPosition) {
-        console.log(foundPosition);
-        setFoundPosition(foundPosition);
-        setCurrentStep(3);
-    } else {
-        setError('Баркод не найден');
-        setCurrentStep(4);
-    }
 };
 
   const handleFinalQuantityChange = (e) => {

@@ -468,7 +468,7 @@ class PlaceProducts(APIView):
 class AddProductListView(APIView):
     def get(self, request):
         try:
-            uid_add = request.query_params.get("uid_add")
+            uid_add = request.data.get("uid_add")
             print(f"Поиск товара add_number={uid_add}")  # Логирование
 
             # Фильтрация по add_number (uid_add)
