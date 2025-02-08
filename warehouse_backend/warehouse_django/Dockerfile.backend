@@ -14,9 +14,6 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY warehouse_django/ /app/
 
 
-# Копируем файл .env в контейнер
-COPY warehouse_django/.env .
-
 # Выполняем миграции и собираем статичные файлы
 RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput

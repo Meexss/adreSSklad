@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -90,23 +89,14 @@ WSGI_APPLICATION = 'warehouse_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-load_dotenv()
-
-DB_HOST = os.getenv('DB_HOST')
-DB_PORT = os.getenv('DB_PORT', '5432')
-DB_NAME = os.getenv('DB_NAME')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-
-# Настройка базы данных PostgreSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
+        'NAME': 'sklad_adres_db',  # Укажите название вашей базы данных
+        'USER': 'sklad_adres_db_user',  # Укажите пользователя базы данных
+        'PASSWORD': 'oEw7Rl5Yus0sXd0EUhGI8ZUOTjouPwrQ',  # Укажите пароль
+        'HOST': 'dpg-cujnp8d6l47c73c4olhg-a.frankfurt-postgres.render.com',  # Укажите хост
+        'PORT': '5432',  # Укажите порт, если нужно
     }
 }
 
