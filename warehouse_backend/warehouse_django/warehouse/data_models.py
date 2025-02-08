@@ -1,5 +1,7 @@
 from django.db import models
 import uuid
+from django.db import migrations, models
+
 
 # Гтово прием данных о перемещении 1С
 class TranzitData(models.Model):
@@ -42,8 +44,7 @@ class AddData(models.Model):
 
 # Готово хранение данных об отгрузках/перемещениях с ЦС
 class ShipList(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    unique_id_ship = models.UUIDField(default=uuid.uuid4, editable=True) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
+    unique_id_ship = models.CharField(max_length=255, default=uuid.uuid4) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     ship_number = models.CharField(max_length=100) #tranz_number или ship_number
     ship_date = models.DateField() #tranz_date или ship_date
@@ -59,8 +60,7 @@ class ShipList(models.Model):
 
 # Готово хранение данных об приемках перемещениях на ЦС
 class AddList(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    unique_id_add = models.UUIDField(default=uuid.uuid4, editable=True) #при перемещении с AddData и TranzitData присваиваем номер отгрузки
+    unique_id_add = models.CharField(max_length=255, default=uuid.uuid4) #при перемещении с AddData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     add_number = models.CharField(max_length=100) #tranz_number или add_number
     add_date = models.DateField() #tranz_date или add_date
@@ -80,7 +80,7 @@ class AddList(models.Model):
 
 # Готово хранение данных о товарах на ЦС
 class ProductList(models.Model):
-    unique_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) #уникальный id товара
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=True) #уникальный id товара
     add_date = models.DateField() #дата поступления
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
@@ -92,7 +92,6 @@ class ProductList(models.Model):
 
 # Готово хранение данных о резерве товара под отгрузку
 class ReservList(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     unique_id_ship = models.UUIDField( default=uuid.uuid4, editable=True)  #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     ship_number = models.CharField(max_length=100)  #tranz_number или ship_number
@@ -101,7 +100,7 @@ class ReservList(models.Model):
     warehouse = models.CharField(max_length=100)  #Из ShipData warehouse или  from_house === Центральный новый
     progress = models.CharField(max_length=100) #при переходе в эту базу ставим В работе 
     reserve_data = models.DateField() #дата установки в резерв
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True) #уникальный id товара
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False) #уникальный id товара
     add_date = models.DateField()  #tranz_date или add_date
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
@@ -117,7 +116,7 @@ class PlaceProduct(models.Model):
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     add_number = models.CharField(max_length=100) #tranz_number или add_number
 
-    unique_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) #На этом этапе присваивается уникальный id
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=True) #На этом этапе присваивается уникальный id
     add_date = models.DateField() #tranz_date или add_date
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
@@ -129,7 +128,7 @@ class PlaceProduct(models.Model):
 
 # Готово архив хранения данных об отгруженных позициях
 class ArchiveShip(models.Model):
-    unique_id_ship = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
+    unique_id_ship = models.UUIDField(default=uuid.uuid4, editable=True) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     ship_number = models.CharField(max_length=100) #tranz_number или ship_number
     ship_date = models.DateField() #tranz_date или ship_date
@@ -137,7 +136,7 @@ class ArchiveShip(models.Model):
     warehouse = models.CharField(max_length=100)  #Из ShipData warehouse или  from_house === Центральный новый
     progress = models.CharField(max_length=100) #На этом этапе устанавливается завершенный
     reserve_data = models.DateField() #дата установки в резерв
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False)
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100)
@@ -148,7 +147,7 @@ class ArchiveShip(models.Model):
 
 # Готово хранения данных о приходе товара 
 class ArchiveAdd(models.Model):
-    unique_id_add = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)  #при перемещении с AddData и TranzitData присваиваем номер отгрузки
+    unique_id_add = models.UUIDField(default=uuid.uuid4, editable=True)  #при перемещении с AddData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100)  #Тип задания реализация/перемещение
     add_number = models.CharField(max_length=100)  #tranz_number или add_number
     add_date = models.DateField() #tranz_date или add_date
@@ -165,7 +164,7 @@ class ArchiveAdd(models.Model):
 
 # Готво хранение данных о товарах перенесенных на брак или недостачу
 class ArchiveProduct(models.Model):
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False)
     add_date = models.DateField()
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)

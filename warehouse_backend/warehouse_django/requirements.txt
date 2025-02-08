@@ -3,3 +3,5 @@ djangorestframework>=3.14,<4.0
 django-cors-headers
 pytz
 djangorestframework-simplejwt
+psycopg2-binary>=2.9,<3.0
+python-dotenv>=0.19.0
