@@ -473,7 +473,7 @@ class AddProductListView(APIView):
             print(f"Получен параметр uid_add: {uid_add}")  # Логирование
 
             if uid_add:
-                products = AddList.objects.filter(unique_id_add=uid_add)
+                products = AddList.objects.filter(add_number=uid_add)
                 print(f"Найдено записей: {products.count()}")  # Логирование результатов запроса
 
                 if not products.exists():

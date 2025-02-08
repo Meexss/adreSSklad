@@ -109,7 +109,7 @@ const AddProductDetails = () => {
                 <h2>Детали прихода</h2>
                 <Barcode
                     className="print-only"
-                    value={addproducts.unique_id_add}
+                    value={addproducts.add_number}
                     format="CODE128"
                     width={2}         // Уменьшаем ширину штрих-кода
                     height={20}       // Уменьшаем высоту штрих-кода
