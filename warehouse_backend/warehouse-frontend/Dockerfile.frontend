@@ -6,14 +6,14 @@ WORKDIR /app
 
 # Копируем package.json и package-lock.json
 # COPY warehouse-frontend/package*.json ./
-COPY package*.json ./
+COPY warehouse-frontend/package*.json ./
 
 # Устанавливаем зависимости
-RUN npm install
+RUN npm install --legacy-peer-deps 
 
 # Копируем весь проект в контейнер
 # COPY warehouse-frontend/ .
-COPY . .
+COPY warehouse-frontend .  
 
 # Собираем проект
 RUN npm run build

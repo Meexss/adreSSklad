@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useReactToPrint } from 'react-to-print';
 import Barcode from "react-barcode";
+import api from './api'; // Импортируешь созданный файл
 
 const AddProductDetails = () => {
     const location = useLocation();
@@ -15,9 +16,9 @@ const AddProductDetails = () => {
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const api = useMemo(() => axios.create({
-        baseURL: 'http://127.0.0.1:8000',
-    }), []);
+    // const api = useMemo(() => axios.create({
+    //     baseURL: 'http://127.0.0.1:8000',
+    // }), []);
 
     useEffect(() => {
         if (!addproducts?.unique_id_add) return;
@@ -164,7 +165,7 @@ const AddProductDetails = () => {
                             return (
                             <tr key={index}>
                                 <td>{stock.article}</td>
-                                <td style={{ textAlign: 'left' }}>{stock.name}</td>
+                                <td className='text-left'>{stock.name}</td>
                                 <td >
                                     {stock.barcode}
                                 </td>

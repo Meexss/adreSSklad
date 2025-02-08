@@ -5,18 +5,19 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Копируем файл с зависимостями
-# COPY warehouse_django/requirements.txt .
-COPY requirements.txt .
+COPY warehouse_django/requirements.txt /app/
+
 # Устанавливаем зависимости
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Копируем весь проект в контейнер
-# COPY warehouse_django/ .
-# COPY warehouse_django /app/
 COPY . /app/
 
-# Монтируем папку с JSON-файлами
-VOLUME /app/data
+# Создаём директорию для базы данных
+RUN mkdir -p /app/db
+
+# Указываем, что ФАЙЛ базы данных должен сохраняться даже при пересоздании контейнера
+VOLUME /app/db.sqlite3
 
 # Команда для запуска сервера Django
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     volumes:
       - ./warehouse_django:/app
-      - ./warehouse_django/warehouse/data:/app/data  # Монтируем папку с JSON-файлами
+      - ./warehouse_django/db.sqlite3:/app/db.sqlite3  # Монтируем базу данных SQLite
     environment:
       - DEBUG=1
 

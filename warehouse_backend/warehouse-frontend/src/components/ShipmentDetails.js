@@ -8,6 +8,9 @@ import { faEdit, faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Barcode from "react-barcode";
 import { useReactToPrint } from 'react-to-print';
 
+import api from './api'; // Импортируешь созданный файл
+
+
 const ShipmentDetails = () => {
     const location = useLocation();
     const { shipment: initialShipment } = location.state || {};
@@ -42,9 +45,9 @@ const ShipmentDetails = () => {
     const statusOptions = ["Хранение", "Брак", "Недостача"];
     const storageKey = `reservedData_${shipment?.uid_ship}`;
 
-    const api = useMemo(() => axios.create({
-        baseURL: 'http://127.0.0.1:8000',
-    }), []);
+    // const api = useMemo(() => axios.create({
+    //     baseURL: 'http://127.0.0.1:8000',
+    // }), []);
 
     const updateShipmentStatus = (newStatus) => {
         setShipment(prev => ({ ...prev, progress: newStatus }));
@@ -347,14 +350,23 @@ const ShipmentDetails = () => {
                                         {subIndex === 0 && (
                                             <>
                                                 <td rowSpan={reservedItems.length} >{stock.article}</td>
-                                                <td rowSpan={reservedItems.length} style={{ textAlign: 'left'}}>{stock.name}</td>
+                                                <td className='text-left' rowSpan={reservedItems.length} >{stock.name}</td>
                                                 <td rowSpan={reservedItems.length} >{stock.quantity}</td>
                                                 
                                                 
                             
                                             </>
                                         )}
-                                        <td >{reservedItem.place}</td>
+                                        <td>
+                                            <div 
+                                                style={{
+                                                color: reservedItem.place === "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ" ? "white" : "inherit",
+                                                backgroundColor: reservedItem.place === "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ" ? "red" : "inherit",
+                                                }}
+                                            >
+                                                {reservedItem.place}
+                                            </div>
+                                            </td>
                                         <td >{reservedItem.quantity}</td>
                                         <td className='no-print'>{reservedItem.goods_status}</td>
                                         <FontAwesomeIcon
@@ -375,7 +387,7 @@ const ShipmentDetails = () => {
                                 // Если зарезервированных данных нет, создаем одну строку
                                 <tr key={index}>
                                     <td >{stock.article}</td>
-                                    <td >{stock.name}</td>
+                                    <td className='text-left'>{stock.name}</td>
                                     <td >{stock.quantity}</td>
                                     <td >—</td>
                                     <td >—</td>
@@ -398,7 +410,7 @@ const ShipmentDetails = () => {
                         }}>
                             <h3>Изменить статус товара</h3>
                             <p><strong>Артикул:</strong> {selectedItem.article}</p>
-                            <p><strong>Наименование:</strong> {selectedItem.name}</p>
+                            <p ><strong>Наименование:</strong> {selectedItem.name}</p>
 
                             <label>Количество:</label>
                             <input

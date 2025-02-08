@@ -32,7 +32,7 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         # Очистка таблицы
         TranzitData.objects.all().delete()
-
+        print(f"Получены данные: {request.data}")
         if not isinstance(request.data, list):
             return Response({"error": "Ожидался массив данных"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1008,7 +1008,7 @@ class ProductListCreateView(APIView):
                     barcode=item['barcode'],
                     place=item['place'],
                     quantity=item['quantity'],
-                    goods_status=item['goods_status']  # Статус товара
+                    goods_status="Хранение"  # Статус товара
                 )
 
                 # Добавляем товар в список для массового сохранения

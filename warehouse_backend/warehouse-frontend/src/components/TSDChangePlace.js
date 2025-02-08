@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
+import api from './api'; // Импортируешь созданный файл
+
 
 // Компонент для поиска товара
 const TSDChangePlace = () => {
@@ -19,10 +21,10 @@ const TSDChangePlace = () => {
     
 
 
-    const api = useMemo(() => axios.create({
-        // baseURL: 'https://adressklad.onrender.com',
-        baseURL: 'http://127.0.0.1:8000',
-    }), []);
+    // const api = useMemo(() => axios.create({
+    //     // baseURL: 'https://adressklad.onrender.com',
+    //     baseURL: 'http://127.0.0.1:8000',
+    // }), []);
 
 
     const handlePlaceScan = async (e) => {

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
 import { useNavigate } from 'react-router-dom';
+import api from './api'; // Импортируешь созданный файл
 
 const AddProductList = () => {
     const [addproducts, setAddproducts] = useState([]);
@@ -9,9 +10,9 @@ const AddProductList = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
-    const api = useMemo(() => axios.create({
-        baseURL: 'http://127.0.0.1:8000',
-    }), []);
+    // const api = useMemo(() => axios.create({
+    //     baseURL: 'http://127.0.0.1:8000',
+    // }), []);
 
     useEffect(() => {
         api.get('/api/addproducts/')
@@ -87,7 +88,7 @@ const AddProductList = () => {
                                     <td>{addproduct.type}</td>
                                     <td>{addproduct.add_number}</td>
                                     <td>{addproduct.add_date}</td>
-                                    <td>{addproduct.counterparty}</td>
+                                    <td className='text-left'>{addproduct.counterparty}</td>
                                     <td>{addproduct.warehouse}</td>
                                     <td>{addproduct.items.length}</td>
                                     <td>

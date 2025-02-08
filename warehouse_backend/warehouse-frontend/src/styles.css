@@ -397,7 +397,9 @@ main {
   }
 }
 
-
+.text-left {
+  text-align: left;
+}
 
 
 

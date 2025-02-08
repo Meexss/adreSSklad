@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
 import { useNavigate } from 'react-router-dom';
+import api from './api'; // Импортируешь созданный файл
+
 
 const Operations = () => {
     const [shipments, setShipments] = useState([]);
@@ -9,9 +11,9 @@ const Operations = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
-    const api = useMemo(() => axios.create({
-        baseURL: 'http://127.0.0.1:8000',
-    }), []);
+    // const api = useMemo(() => axios.create({
+    //     baseURL: 'http://127.0.0.1:8000',
+    // }), []);
 
     useEffect(() => {
         api.get('/api/shipments/')
@@ -83,7 +85,7 @@ const Operations = () => {
                                     <td>{shipment.type}</td>
                                     <td>{shipment.ship_number}</td>
                                     <td>{shipment.ship_date}</td>
-                                    <td>{shipment.counterparty}</td>
+                                    <td className='text-left'>{shipment.counterparty}</td>
                                     <td>{shipment.warehouse}</td>
                                     <td>{shipment.items.length}</td>
                                     <td>{shipment.items.reduce((total, item) => total + (item.quantity || 0), 0)}</td>

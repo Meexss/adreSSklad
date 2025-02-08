@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
+import api from './api'; // Импортируешь созданный файл
+
 
 // Компонент для процесса приёмки товаров
 const TSDPlaceProduct = () => {
@@ -14,10 +16,10 @@ const TSDPlaceProduct = () => {
     const [quantity, setQuantity] = useState("");
     const [error, setError] = useState("");
 
-    const api = useMemo(() => axios.create({
-        // baseURL: 'https://adressklad.onrender.com',
-        baseURL: 'http://127.0.0.1:8000',
-    }), []);
+    // const api = useMemo(() => axios.create({
+    //     // baseURL: 'https://adressklad.onrender.com',
+    //     baseURL: 'http://127.0.0.1:8000',
+    // }), []);
     
 
     // Функция загрузки товаров по номеру приемки

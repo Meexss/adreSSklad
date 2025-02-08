@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
+import api from './api'; // Импортируешь созданный файл
+
 
 const Search = () => {
     const [article, setArticle] = useState("");
@@ -9,9 +11,9 @@ const Search = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const api = useMemo(() => axios.create({
-        baseURL: 'http://127.0.0.1:8000',
-    }), []);
+    // const api = useMemo(() => axios.create({
+    //     baseURL: 'http://127.0.0.1:8000',
+    // }), []);
 
     const handleSearch = () => {
         setLoading(true);
