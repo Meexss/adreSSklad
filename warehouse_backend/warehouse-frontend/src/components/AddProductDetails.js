@@ -21,26 +21,42 @@ const AddProductDetails = () => {
 
     useEffect(() => {
         if (!addproducts?.unique_id_add) return;
-        console.log(addproducts)
+    
+        console.log("Fetching data for:", addproducts);
+    
         const fetchData = async () => {
             try { 
                 const [addResponse, placeResponse] = await Promise.all([
-                    api.get(`/api/addproducts/?uid_add=${addproducts.unique_id_add}`),
+                    api.get(`/api/addproducts/?uid_add=${addproducts.add_number}`),
                     api.get(`/api/placeship/?uid_add=${addproducts.unique_id_add}`)
                 ]);
-                console.log(addResponse.data)
-                setDataProducts(addResponse.length ? addResponse[0] : null);
-
-                setPlaceProducts(placeResponse.data);
-                setLoading(false);
+    
+                console.log("addResponse:", addResponse.data);
+                console.log("placeResponse:", placeResponse.data);
+    
+                // Проверяем, есть ли данные перед записью
+                if (addResponse.data && addResponse.data.length > 0) {
+                    setDataProducts(addResponse.data); 
+                }
+    
+                if (placeResponse.data && placeResponse.data.length > 0) {
+                    setPlaceProducts(placeResponse.data);
+                }
+    
             } catch (error) {
                 console.error("Ошибка запроса:", error);
-                // setErrorMessage(`Ошибка: ${error.response?.data?.error || error.message}`);
+            } finally {
                 setLoading(false);
             }
         };
-
+    
         fetchData();
+
+          // Обновление данных каждые 60 секунд (60000 миллисекунд)
+    const interval = setInterval(fetchData, 60000);
+
+    // Очистка интервала при размонтировании компонента
+    return () => clearInterval(interval);
     }, [addproducts, api]);
 
     // Печать

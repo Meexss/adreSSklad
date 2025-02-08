@@ -19,24 +19,26 @@ const TSDPlaceProduct = () => {
     //     // baseURL: 'https://adressklad.onrender.com',
     //     baseURL: 'http://127.0.0.1:8000',
     // }), []);
+
+    const loadData = async (uid) => {
+        try {
+            const response = await api.get(`/api/addproducts/?uid_add=${uid}`);
+            setProducts(response.data);
+            setCurrentStep(2);
+        } catch (error) {
+            setCurrentStep(-1);
+            setError(`Ошибка загрузки приемки: ${error.message || error}`);
+        }
+    };
     
 
     // Функция загрузки товаров по номеру приемки
     const loadAcceptance = async (e) => {
-        const value = e.target.value
-        setCurrentStep(0)
-        setAcceptanceNumber(value)  
-        try {
-            const response = await api.get(
-                `/api/addproducts/?uid_add=${value}`
-            );
-            setProducts(response.data);
-            setCurrentStep(2);
-        } catch (error) {
-            setCurrentStep(-1)
-            setError(`Ошибка загрузки приемки: ${error.message || error}`);
-            
-        }
+        const value = e.target.value;
+        setCurrentStep(0);
+        setAcceptanceNumber(value);
+        
+        await loadData(value); // ✅ Передаем значение сразу
     };
 
     // Функция обработки сканирования баркода
@@ -47,13 +49,9 @@ const TSDPlaceProduct = () => {
         setTimeout(() => setBarcode(code), 200)
         console.log("Сканированный баркод:", code);
         console.log("Данные API:", products);
-    
-        if (products.length === 0) {
-            setError('Нет данных для поиска');
-            return;
-        }
-
-        const foundProduct = products.find(position => position.barcode === code);
+       
+        if (code.length === 8 || code.length  === 13 ) {
+            const foundProduct = products.find(position => position.barcode === code);
     
         if (foundProduct) {
             console.log("Товар найден:", foundProduct);
@@ -63,6 +61,21 @@ const TSDPlaceProduct = () => {
         } else {
             setError("Баркод не найден!");
             setCurrentStep(2);
+        }
+
+
+        } else {
+            setError('Не верный баркод');
+            setCurrentStep(2);
+            return;
+        }
+        
+    };
+
+    // Функия места
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            setPlace(e.target.value); // Сохраняем значение при нажатии Enter
         }
     };
 
@@ -98,6 +111,7 @@ const TSDPlaceProduct = () => {
         console.log(requestData)
         try {
             await api.post("/api/placeship/", requestData);
+            await loadData(acceptanceNumber)
             setCurrentStep(5);
             setTimeout(() => {
               setCurrentStep(2);
@@ -107,6 +121,7 @@ const TSDPlaceProduct = () => {
             setPlace("");
             setQuantity("");
             setError('')
+            
         } catch (error) {
             setCurrentStep(0)
             setError(`Ошибка загрузки приемки: ${error.message || error}`);
@@ -186,7 +201,13 @@ const TSDPlaceProduct = () => {
                 {curretStep === 3 && currentProduct && (
                     <div className="scan-section">
                         <h2>Сканируйте место хранения</h2>
-                        <input onChange={(e) => {setPlace(e.target.value)}} autoFocus inputMode="none"/>
+                        <input 
+                            value={place} // Значение input привязано к состоянию
+                            onKeyDown={handleKeyDown} 
+                            onChange={(e) => setPlace(e.target.value)} // Обновление состояния при изменении текста
+                            autoFocus 
+                            inputMode="none"
+                        />
                         <button className='buttonCompl' onClick={() => setCurrentStep(4)}>Далее</button>
                     </div>
                 )}
@@ -202,7 +223,18 @@ const TSDPlaceProduct = () => {
                             </div>
                             <div className="quantity-input">   
                                 <label className='mainText'>Введите кол-во:</label>    
-                                <input type="number" onChange={handleQuantityChange} autoFocus inputMode="none"/>    
+                                <input
+                                    type="number"
+                                    value={quantity}  // Связываем input с состоянием
+                                    onChange={handleQuantityChange} // Обновляем при вводе
+                                    onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        console.log("Отправка количества:", quantity); // Проверяем текущее значение
+                                    }
+                                    }}
+                                    autoFocus
+                                    inputMode="numeric"  // Лучше использовать "numeric" для чисел
+                                /> 
                                 {error && <p style={{ color: "red" }}>{error}</p>}                         
                             </div>
                             <button className='buttonCompl' onClick={submitData}>Подтвердить</button> 

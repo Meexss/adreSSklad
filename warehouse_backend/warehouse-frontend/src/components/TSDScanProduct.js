@@ -24,18 +24,17 @@ const TSDScanProduct = () => {
   const handleAcceptanceScan = async (e) => {
     setCurrentStep(0)
     const value = e.target.value;
+    setNumberAcceptance(value)
     console.log("Вводится значение:", value);
   
       try {
         const loadResponse = await api.get(`/api/addproducts/`, {
           params: { uid_add: value }  // Отправляем параметры правильно
       });
-        console.log(loadResponse.data)
+        console.log("Получены данные:", loadResponse.data)
         setPositions(loadResponse.data);
         setApiData(loadResponse.data)
         setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
-        console.log(value)
-        console.log(loadResponse)
       } catch (error) {
         console.error("Ошибка загрузки приемки:", error);
         setError(`Ошибка загрузки приемки: ${error.message || error}`);
@@ -56,7 +55,7 @@ const TSDScanProduct = () => {
           const foundPosition = positions.find(position => position.barcode === code);
 
           if (foundPosition) {
-              console.log(foundPosition);
+              console.log("Отфильтрованыне данные:", foundPosition)
               setFoundPosition(foundPosition);
               setCurrentStep(3);
           } else {
@@ -77,7 +76,9 @@ const TSDScanProduct = () => {
 };
 
   const handleFinalQuantityChange = (e) => {
-    setEnteredQuantity(e.target.value); // Обновляем введенное значение
+    const value = e.target.value.replace(/\D/g, ""); // Убираем все нечисловые символы
+    setEnteredQuantity(value);
+    console.log("число:", value);
   };
 
   const hanleNewBarcode = (item) => {
@@ -93,13 +94,14 @@ const TSDScanProduct = () => {
 
   const handleSubmit = useCallback(async () => {
     // Вычисляем новое значение final_quantity
+    console.log("число приемки:", enteredQuantity)
     const sumcol = Number(foundPosition.final_quantity) + Number(enteredQuantity);
     console.log("Обновленное final_quantity:", sumcol);
     setCurrentStep(0)
     // Обновляем состояние с использованием предыдущего значения
     setFoundPosition(prevState => {
       const updatedPosition = { ...prevState, final_quantity: sumcol };
-      console.log("Updated foundPosition:", updatedPosition);
+      console.log("с новым количеством foundPosition:", updatedPosition);
       return updatedPosition;
     });
   
@@ -114,7 +116,7 @@ const TSDScanProduct = () => {
       progress: "В работе",
       positionData: [{ ...foundPosition, final_quantity: sumcol }] // Используем обновленное значение для запроса
     };
-    console.log(scanRequest);
+    console.log("параметры запроса:",scanRequest);
   
     // Отправка запроса
 
@@ -123,6 +125,7 @@ const TSDScanProduct = () => {
       console.log("запрос:", scanRequest);
         try {
           const loadResponse = await api.get(`/api/addproducts/?uid_add=${numberAcceptance}`)
+          console.log("получены даныне поставки:", loadResponse.data);
           setPositions(loadResponse.data);
           setApiData(loadResponse.data)
           setCurrentStep(2); // Только после успешной загрузки переходим к шагу 2
@@ -247,14 +250,15 @@ const TSDScanProduct = () => {
                   <label className='mainText'>Введите кол-во:</label>
                   <input
                     type="number"
+                    value={enteredQuantity}  // Связываем input с состоянием
+                    onChange={handleFinalQuantityChange} // Обновляем при вводе
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        handleFinalQuantityChange(e);
+                        console.log("Отправка количества:", enteredQuantity); // Проверяем текущее значение
                       }
-                  }}
-                  
+                    }}
                     autoFocus
-                    inputMode="none"
+                    inputMode="numeric"  // Лучше использовать "numeric" для чисел
                   />
                 </div>
                 <button className='buttonCompl' onClick={handleSubmit}>Подтвердить</button>

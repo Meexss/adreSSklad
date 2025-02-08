@@ -1030,34 +1030,27 @@ class FindBarcodeViews(APIView):
     def get(self, request):
         try:
             # Получаем штрих-код из параметров запроса
-            code = request.data.get("barcode", "")
+            code = request.query_params.get("barcode", "").strip()
             print(f"Поиск по штрих-коду: {code}")
 
-            # Проверка, если штрих-код передан
-            if code:
-                # Проверка на корректность формата штрих-кода (по желанию)
-                # if len(code) != 13:  # Например, для стандартного штрих-кода EAN-13
-                #     return Response({"error": "Некорректный формат штрих-кода"}, status=status.HTTP_400_BAD_REQUEST)
-                
-                # Ищем товары по штрих-коду
-                filtered_products = ProductList.objects.filter(barcode=code)
-                print(f"Поиск по штрих-коду: {filtered_products}")
-            else:
-                # Если штрих-код не передан, возвращаем все товары
-                filtered_products = ProductList.objects.all()
+            # Проверяем, передан ли штрих-код
+            if not code:
+                return Response({"error": "Штрих-код не указан"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Поиск товаров по штрих-коду
+            filtered_products = ProductList.objects.filter(barcode=code)
 
             # Если товары не найдены
-            if not filtered_products:
+            if not filtered_products.exists():
                 return Response({"message": "Товары не найдены"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Сериализация данных для ответа
+            # Сериализация данных
             serializer = ProductListSerializer(filtered_products, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(f"Ошибка сервера: {str(e)}")  # Логируем ошибку
-            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
-
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class FindPlaceViews(APIView):
     def get(self, request):
