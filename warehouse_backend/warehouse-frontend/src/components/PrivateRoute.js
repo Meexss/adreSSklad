@@ -15,7 +15,7 @@ const PrivateRoute = ({ element: Component, isAuthenticated, ...rest }) => {
         if (refreshToken) {
           try {
             // Пытаемся обновить токен
-            const response = await axios.post("http://127.0.0.1:8000/api/token/refresh/", {
+            const response = await axios.post("https://adressklad.onrender.com/api/token/refresh/", {
               refresh: refreshToken,
             });
             token = response.data.access;

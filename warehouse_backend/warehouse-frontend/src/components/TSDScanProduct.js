@@ -258,7 +258,7 @@ const TSDScanProduct = () => {
                       }
                     }}
                     autoFocus
-                    inputMode="numeric"  // Лучше использовать "numeric" для чисел
+                    inputMode="none"  // Лучше использовать "numeric" для чисел
                   />
                 </div>
                 <button className='buttonCompl' onClick={handleSubmit}>Подтвердить</button>

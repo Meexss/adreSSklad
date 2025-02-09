@@ -1098,7 +1098,7 @@ class FindPlaceViews(APIView):
             print(f"Поиск по месту: {code}")
 
             # Инициализируем переменную `filtered_products`
-            filtered_products = ProductList.objects.none()  # Пустой QuerySet, если ничего не найдено
+           
 
             if code:
                 # Ищем товары по месту хранения
