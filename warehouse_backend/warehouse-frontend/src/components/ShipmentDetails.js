@@ -160,7 +160,7 @@ const ShipmentDetails = () => {
 
             console.log("массив к отправке", request)
             // Отправка данных через API
-            const reserveResponse = await api.post('/api/archiveShi/', request);
+            const reserveResponse = await api.post('/api/archiveShip/', request);
     
             // Обработка успешного ответа
             if (reserveResponse.status === 200) {

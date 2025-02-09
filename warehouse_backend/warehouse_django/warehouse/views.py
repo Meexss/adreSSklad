@@ -870,47 +870,59 @@ class ArchiveShipView(APIView):
         data = request.data  # Получаем список объектов
         if not isinstance(data, list):
             return Response({"error": "Invalid data format, expected a list"}, status=400)
+        print(f"полученные данные : {data}")
+        unique_id_ship = data[0].get("unique_id_ship")  # Берем `unique_id_ship` из первого элемента
 
         try:
             with transaction.atomic():  # Группируем операции в одну транзакцию
+                # Архивируем данные для ShipList и ReservList
+                archive_ship_data = []
+                archive_product_data = []
+
                 for item in data:
-                    unique_id_ship = item.get("unique_id_ship")
-
-                    # Найти и удалить записи в ShipList, переместив их в ArchiveShip
-                    ship_entries = ShipList.objects.filter(unique_id_ship=unique_id_ship)
-                    ArchiveShip.objects.create(
-                        unique_id_ship=item.get("unique_id_ship"),
-                        type=item.get("type"),
-                        ship_number=item.get("ship_number"),
-                        ship_date=item.get("ship_date"),
-                        counterparty=item.get("counterparty"),
-                        warehouse=item.get("warehouse"),
-                        progress=item.get("progress"),
-                        reserve_data=item.get("reserve_data"),  # Это поле точно есть?
-                        unique_id=item.get("unique_id"),
-                        article=item.get("article"),
-                        name=item.get("name"),
-                        barcode=item.get("barcode"),
-                        quantity=item.get("quantity"),
-                        place=item.get("place"),
-                        final_ship_date=datetime.now().date()  # Дата архивирования
+                    # Подготовка данных для архивирования в ArchiveShip
+                    archive_ship_data.append(
+                        ArchiveShip(
+                            unique_id_ship=item.get("unique_id_ship"),
+                            type=item.get("type"),
+                            ship_number=item.get("ship_number"),
+                            ship_date=item.get("ship_date"),
+                            counterparty=item.get("counterparty"),
+                            warehouse=item.get("warehouse"),
+                            progress=item.get("progress"),
+                            reserve_data=item.get("reserve_data"),
+                            unique_id=item.get("unique_id"),
+                            article=item.get("article"),
+                            name=item.get("name"),
+                            barcode=item.get("barcode"),
+                            quantity=item.get("quantity"),
+                            place=item.get("place"),
+                            final_ship_date=datetime.now().date()  # Дата архивирования
+                        )
                     )
-                    ship_entries.delete()  # Удаляем записи из ShipList
 
-                    # Найти и удалить записи в ReservList, переместив их в ArchiveProduct
-                    reserv_entries = ReservList.objects.filter(unique_id_ship=unique_id_ship)
-                    ArchiveProduct.objects.create(
-                        unique_id=item.get("unique_id"),
-                        add_date=item.get("add_date"),
-                        article=item.get("article"),
-                        name=item.get("name"),
-                        barcode=item.get("barcode"),
-                        quantity=item.get("quantity"),
-                        place=item.get("place"),
-                        goods_status=item.get("goods_status"),
-                        close_product_date=datetime.now().date()  # Дата архивирования
+                    # Подготовка данных для архивирования в ArchiveProduct
+                    archive_product_data.append(
+                        ArchiveProduct(
+                            unique_id=item.get("unique_id"),
+                            add_date=item.get("add_date"),
+                            article=item.get("article"),
+                            name=item.get("name"),
+                            barcode=item.get("barcode"),
+                            quantity=item.get("quantity"),
+                            place=item.get("place"),
+                            goods_status=item.get("goods_status"),
+                            close_product_date=datetime.now().date()  # Дата архивирования
+                        )
                     )
-                    reserv_entries.delete()  # Удаляем записи из ReservList
+
+                # Выполняем массовую вставку данных в архивы
+                ArchiveShip.objects.bulk_create(archive_ship_data)
+                ArchiveProduct.objects.bulk_create(archive_product_data)
+
+                # Удаляем записи в ShipList и ReservList, относящиеся к текущему unique_id_ship
+                ShipList.objects.filter(unique_id_ship=unique_id_ship).delete()
+                ReservList.objects.filter(unique_id_ship=unique_id_ship).delete()
 
             return Response({"message": "Data archived successfully"}, status=200)
 
