@@ -169,18 +169,29 @@ class ShipDataViewSet(viewsets.ModelViewSet):
             except ValueError:
                 return Response({"error": f"Неверный формат даты: {ship_date}"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Запись всех данных в ShipData
+            # Группировка данных по артикулу и баркоду
+            grouped_positions = defaultdict(lambda: {"name": "", "quantity": 0})
+
             for item in position_data:
+                article = item.get("article", "")
+                barcode = item.get("barcode", "")
+                key = (article, barcode)
+
+                grouped_positions[key]["name"] = item.get("name", "")
+                grouped_positions[key]["quantity"] += item.get("quantity", 0)
+
+            # Запись агрегированных данных в ShipData
+            for (article, barcode), data in grouped_positions.items():
                 ship_data_instances.append(
                     ShipData(
                         ship_number=ship_number,
                         ship_date=ship_date,
                         counterparty=counterparty,
                         warehouse=warehouse,
-                        article=item.get("article", ""),
-                        name=item.get("name", ""),
-                        barcode=item.get("barcode", ""),
-                        quantity=item.get("quantity", 0)
+                        article=article,
+                        name=data["name"],
+                        barcode=barcode,
+                        quantity=data["quantity"]
                     )
                 )
 
@@ -195,10 +206,10 @@ class ShipDataViewSet(viewsets.ModelViewSet):
                             counterparty=counterparty,
                             warehouse=warehouse,
                             progress="Новый",
-                            article=item.get("article", ""),
-                            name=item.get("name", ""),
-                            barcode=item.get("barcode", ""),
-                            quantity=item.get("quantity", 0)
+                            article=article,
+                            name=data["name"],
+                            barcode=barcode,
+                            quantity=data["quantity"]
                         )
                     )
 
@@ -243,18 +254,29 @@ class AddDataViewSet(viewsets.ModelViewSet):
             except ValueError:
                 return Response({"error": f"Неверный формат даты: {add_date}"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Запись всех данных в AddData
+            # Группировка данных по артикулу и баркоду
+            grouped_positions = defaultdict(lambda: {"name": "", "quantity": 0})
+
             for item in position_data:
+                article = item.get("article", "")
+                barcode = item.get("barcode", "")
+                key = (article, barcode)
+
+                grouped_positions[key]["name"] = item.get("name", "")
+                grouped_positions[key]["quantity"] += item.get("quantity", 0)
+
+            # Запись агрегированных данных в AddData
+            for (article, barcode), data in grouped_positions.items():
                 add_data_instances.append(
                     AddData(
                         add_number=add_number,
                         add_date=add_date,
                         counterparty=counterparty,
                         warehouse=warehouse,
-                        article=item.get("article", ""),
-                        name=item.get("name", ""),
-                        barcode=item.get("barcode", ""),
-                        quantity=item.get("quantity", 0)
+                        article=article,
+                        name=data["name"],
+                        barcode=barcode,
+                        quantity=data["quantity"]
                     )
                 )
 
@@ -269,10 +291,10 @@ class AddDataViewSet(viewsets.ModelViewSet):
                             counterparty=counterparty,
                             warehouse=warehouse,
                             progress="Новый",
-                            article=item.get("article", ""),
-                            name=item.get("name", ""),
-                            barcode=item.get("barcode", ""),
-                            quantity=item.get("quantity", 0),
+                            article=article,
+                            name=data["name"],
+                            barcode=barcode,
+                            quantity=data["quantity"],
                             error_barcode=False,
                             newbarcode="",
                             final_quantity=0,
@@ -288,7 +310,6 @@ class AddDataViewSet(viewsets.ModelViewSet):
             AddList.objects.bulk_create(add_list_instances)
 
         return Response({"message": "Данные успешно сохранены"}, status=status.HTTP_201_CREATED)
-
     
 # Работает get и post 
 # Обработчик для получения всех отгрузок
@@ -442,7 +463,8 @@ class PlaceProducts(APIView):
            
             for product in new_products:
                 add_date = product.get("add_date")
-    
+                uniqid = uuid.uuid4()
+
                 if add_date:
                     try:
                         add_date_fin = datetime.fromisoformat(add_date).date()
@@ -450,11 +472,11 @@ class PlaceProducts(APIView):
                         return Response({"error": f"Неверный формат даты: {add_date}"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"error": "Поле add_date обязательно"}, status=status.HTTP_400_BAD_REQUEST)
-            
+
                 # Исключаем `unique_id`, так как Django сам его создаст
                 place_product = PlaceProduct.objects.create(
                     unique_id_add = product.get("uid_add", ""),
-                    unique_id=uuid.uuid4(),
+                    unique_id=uniqid,
                     type=product.get("type", ""),
                     add_number=product.get("add_number", ""),
                     add_date=add_date_fin,
@@ -466,10 +488,24 @@ class PlaceProducts(APIView):
                     goods_status=product.get("goods_status")
                 )
 
-                # Сериализуем объект
-                serializer = PlaceProductSerializer(place_product)
-                created_products.append(serializer.data)
+                prod_list = ProductList.objects.create(
+                    unique_id=uniqid,
+                    add_date=add_date_fin,
+                    article=product.get("article"),
+                    name=product.get("name"),
+                    barcode=product.get("barcode"),
+                    place=product.get("place"),
+                    quantity=product.get("quantity"),
+                    goods_status=product.get("goods_status")
+                )
 
+                # Сериализуем объект
+
+
+                serializerPlace = PlaceProductSerializer(place_product)
+                created_products.append(serializerPlace.data)
+                serializerProd = ProductListSerializer(prod_list)
+                created_products.append(serializerProd.data)
             return Response({"message": "Данные успешно добавлены", "data": created_products}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
