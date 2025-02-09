@@ -16,7 +16,7 @@ COPY . /app/
 
 # Выполняем миграции и собираем статичные файлы
 # RUN python manage.py migrate
-RUN python manage.py collectstatic --noinput
+# RUN python manage.py collectstatic --noinput
 
 # Команда для запуска сервера Django
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
