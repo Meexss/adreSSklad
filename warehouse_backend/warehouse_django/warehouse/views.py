@@ -18,6 +18,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 import traceback
 from django.db import transaction
+from collections import defaultdict
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -31,8 +32,9 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
     serializer_class = TranzitDataSerializer
 
     def create(self, request, *args, **kwargs):
-        # Очистка таблицы
+        # Очистка таблицы перед загрузкой новых данных
         TranzitData.objects.all().delete()
+
         print(f"Получены данные: {request.data}")
         if not isinstance(request.data, list):
             return Response({"error": "Ожидался массив данных"}, status=status.HTTP_400_BAD_REQUEST)
@@ -54,23 +56,34 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
 
             tranz_date = datetime.strptime(tranz_date, "%d.%m.%Y").date()
 
-            # Создаем записи для TranzitData
+            # Группировка данных по артикулу и баркоду
+            grouped_positions = defaultdict(lambda: {"name": "", "quantity": 0})
+            
+            for position in position_data:
+                article = position.get("article", "")
+                barcode = position.get("barcode", "")
+                key = (article, barcode)
+
+                grouped_positions[key]["name"] = position.get("name", "")
+                grouped_positions[key]["quantity"] += position.get("quantity", 0)
+
+            # Формируем записи для TranzitData
             tranzit_records = [
                 TranzitData(
                     tranz_number=tranz_number,
                     tranz_date=tranz_date,
                     from_house=from_house,
                     to_house=to_house,
-                    article=position.get("article", ""),
-                    name=position.get("name", ""),
-                    barcode=position.get("barcode", ""),
-                    quantity=position.get("quantity", 0),
+                    article=article,
+                    name=data["name"],
+                    barcode=barcode,
+                    quantity=data["quantity"],
                 )
-                for position in position_data
+                for (article, barcode), data in grouped_positions.items()
             ]
             all_tranzit_records.extend(tranzit_records)
 
-            # Логика распределения в ShipList и AddList
+            # Логика добавления в ShipList и AddList
             if from_house == "Центральный новый" and not ShipList.objects.filter(ship_number=tranz_number).exists():
                 ship_records = [
                     ShipList(
@@ -81,12 +94,12 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
                         counterparty=to_house,
                         warehouse=from_house,
                         progress="Новый",
-                        article=position["article"],
-                        name=position["name"],
-                        barcode=position["barcode"],
-                        quantity=position["quantity"],
+                        article=article,
+                        name=data["name"],
+                        barcode=barcode,
+                        quantity=data["quantity"],
                     )
-                    for position in position_data
+                    for (article, barcode), data in grouped_positions.items()
                 ]
                 all_ship_records.extend(ship_records)
 
@@ -100,20 +113,20 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
                         counterparty=from_house if from_house != "Центральный новый" else to_house,
                         warehouse=to_house if to_house == "Центральный новый" else from_house,
                         progress="Новый",
-                        article=position.get("article", ""),
-                        name=position.get("name", ""),
-                        barcode=position.get("barcode", ""),
-                        quantity=position.get("quantity", 0),
+                        article=article,
+                        name=data["name"],
+                        barcode=barcode,
+                        quantity=data["quantity"],
                         error_barcode=False,
                         newbarcode="",
                         final_quantity=0,
                         goods_status="Приемка перемещения",
                     )
-                    for position in position_data
+                    for (article, barcode), data in grouped_positions.items()
                 ]
                 all_add_list_records.extend(add_list_records)
 
-        # Массовая вставка в базу
+        # Массовая вставка данных в базу
         if all_tranzit_records:
             TranzitData.objects.bulk_create(all_tranzit_records)
 
