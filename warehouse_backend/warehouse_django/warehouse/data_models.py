@@ -151,6 +151,9 @@ class ArchiveAdd(models.Model):
     type = models.CharField(max_length=100)  #Тип задания реализация/перемещение
     add_number = models.CharField(max_length=100)  #tranz_number или add_number
     add_date = models.DateField() #tranz_date или add_date
+    counterparty=models.CharField(max_length=255, default="")
+    warehouse=models.CharField(max_length=255, default="")
+    progress = models.CharField(max_length=100, default="")
     unique_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=True)
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
@@ -159,6 +162,7 @@ class ArchiveAdd(models.Model):
     quantity_start = models.IntegerField() #количество на входе
     quanity_place = models.IntegerField() #Финальное кол-во размещенного товара 
     goods_status = models.CharField(max_length=100) #статус товара
+    
     close_add_date = models.DateField() #дата закрытия приемки
 
 

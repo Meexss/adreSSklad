@@ -71,22 +71,32 @@ const AddProductDetails = () => {
 
     //плохо работает
      const handleCloseAdd = async () => {
-
+        console.log("Место товара", placeProducts)
+        console.log("Товары к приемке", addproducts)
         //СМОТРЕТЬ ПЕРЕД ИСПОЛЬЗОАНИЕМ
         try {
-            const request = placeProducts.map((item) => ({
-                type: item.type,
-                uid_add: item.uid_add,
-                add_number: item.add_number,
-                progress: 'Завершен',
-                unique_id: item.unique_id,
-                article: item.article,
-                name: item.name,
-                quantity: item.quantity,
-                place: item.place,
-                goods_status: 'Хранение',
-                barcode: item.barcode
-            }));
+            const request = placeProducts.map((item) => {
+                const foundItem = addproducts.items.find(i => i.article === item.article); // Ищем по артикулу или другому ключу
+            
+                return {
+                    unique_id_add: item.unique_id_add,
+                    type: item.type,
+                    add_number: item.add_number,
+                    add_date: item.add_date,
+                    counterparty: addproducts.counterparty,
+                    warehouse: addproducts.warehouse,
+                    progress: 'Завершен',
+                    unique_id: item.unique_id,
+                    article: item.article,
+                    name: item.name,
+                    barcode: item.barcode,
+                    place: item.place,
+                    quantity_start: foundItem ? foundItem.quantity : 0, // Если нашли, берем quantity, иначе 0
+                    quanity_place: item.quantity,
+                    goods_status: item.goods_status
+                };
+            });
+            console.log("данные на отправку ", request)
     
             // Отправка данных через API
             const reserveResponse = await api.post('/api/archiveAdd/', request);

@@ -18,6 +18,7 @@ const Layout = ({ children }) => {
                     <h1>Акватехнологии.Склад</h1>
                 </div>
                 <nav>
+
                     <button className="burger-menu" onClick={toggleMenu}>
                         <span className="burger-line"></span>
                         <span className="burger-line"></span>
@@ -33,9 +34,9 @@ const Layout = ({ children }) => {
                             <li className="dropdown">
                                 <span className="dropdown-toggle">Архив</span>
                                 <ul className="dropdown-menu">
-                                    <li><NavLink to="/archive/products">Архив товаров</NavLink></li>
-                                    <li><NavLink to="/archive/shipments">Архив отгрузок</NavLink></li>
-                                    <li><NavLink to="/archive/receipts">Архив приемок</NavLink></li>
+                                    <li><NavLink to="/archive-prod">Архив товаров</NavLink></li>
+                                    <li><NavLink to="/archive-ship">Архив отгрузок</NavLink></li>
+                                    <li><NavLink to="/archive-add">Архив приемок</NavLink></li>
                                 </ul>
                             </li>
                         </ul>

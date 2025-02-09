@@ -140,8 +140,8 @@ const ShipmentDetails = () => {
             const request = reservedData.map((item) => ({
                 unique_id_ship: shipment.unique_id_ship, 
                 type: shipment.type,
-                shipment_number: shipment.ship_number,
-                shipment_date: shipment.ship_date,
+                ship_number: shipment.ship_number,
+                ship_date: shipment.ship_date,
                 counterparty: shipment.counterparty,    
                 warehouse: shipment.warehouse,
                 progress: 'Завершен',
@@ -239,6 +239,18 @@ const ShipmentDetails = () => {
         fetchReservationData();
     }, [shipment, storageKey, api]);
 
+    const handleNewData = async () => {
+        setLoading(true)
+        try {
+            const res = await api.get(`/api/newData/?ship_number=${shipment.ship_number}`)
+        } catch (error) {
+            setError(error)
+        } finally {
+            setLoading(false)
+        }
+
+    }
+
 
     // Печать
      const contentRef = useRef(null);
@@ -292,6 +304,17 @@ const ShipmentDetails = () => {
                         Зарезервировать все товары
                     </button>
                 )}
+                {!showReservedData && (
+                    <button 
+                        className='no-print'
+                        onClick={handleNewData}
+                        style={{
+                            backgroundColor: 'blue',
+                        }}
+                    >
+                        Оновить данные
+                    </button>
+                )}
                 {showReservedData && (
                     <Link to="/operations"><button
                         onClick={handleCloseShip}
@@ -329,22 +352,22 @@ const ShipmentDetails = () => {
                 <h3>{showReservedData ? "Зарезервированные товары:" : "Товары для отгрузки:"}</h3>
                 <table >
                     <thead>
-    <tr>
-      <th>Артикул</th>
-      <th>Наименование</th>
-      <th>Количество общее</th>
-      {(showReservedData || shipment.items.some(stock => noReserv.filter(item => item.article === stock.article).length > 0)) && (
-        <>
-          <th>Место Хранение</th>
-          <th>Кол-во к отбору</th>
-          <th className="no-print">Статус</th>
-          <th> </th>
-        </>
-      )}
-    </tr>
-  </thead>
-  <tbody>
-  {shipment.items.map((stock, index) => {
+                    <tr>
+                    <th>Артикул</th>
+                    <th>Наименование</th>
+                    <th>Количество общее</th>
+                    {(showReservedData || shipment.items.some(stock => noReserv.filter(item => item.article === stock.article).length > 0)) && (
+                        <>
+                        <th>Место Хранение</th>
+                        <th>Кол-во к отбору</th>
+                        <th className="no-print">Статус</th>
+                        <th> </th>
+                        </>
+                    )}
+                    </tr>
+                </thead>
+                <tbody>
+                {shipment.items.map((stock, index) => {
                             // Фильтруем все записи из reservedData, соответствующие данному артикулу
                             const reservedItems = reservedData.filter(item => item.article === stock.article);
 

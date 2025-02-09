@@ -15,20 +15,30 @@ const Operations = () => {
     // }), []);
 
     useEffect(() => {
-        api.get('/api/shipments/')
-            .then(response => {
-                setShipments(groupShipmentsByUniqueId(response.data));  
+
+        const fetchData = async () => {
+            try{
+                const res = await api.get('/api/shipments/')
+                setShipments(groupShipmentsByUniqueId(res.data));  
                 setLoading(false);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error("Ошибка запроса:", error);
                 setErrorMessage(`Ошибка: ${error.response?.data?.error || error.message}`);
+
+            }finally {
                 setLoading(false);
-            });
+            }}
+
+            fetchData()
+            const interval = setInterval(fetchData, 60000);
+
+            // Очистка интервала при размонтировании компонента
+            return () => clearInterval(interval);     
+
     }, [api]);
 
     const groupShipmentsByUniqueId = (data) => {
-        return data.reduce((acc, shipment) => {
+        return  Object.values(data.reduce((acc, shipment) => {
             const { unique_id_ship } = shipment;
             if (!acc[unique_id_ship]) {
                 acc[unique_id_ship] = {
@@ -44,8 +54,8 @@ const Operations = () => {
             }
             acc[unique_id_ship].items.push(shipment);
             return acc;
-        }, {});
-    };
+        }, {})
+    )};
 
     return (
         <Layout>

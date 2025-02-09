@@ -17,7 +17,9 @@ import TSDSerchPlace from './components/TSDSerchPlace';
 import TSDChangePlace from './components/TSDChangePlace';
 import PrivateRoute from './components/PrivateRoute'; // Импортируем новый компонент
 import Login from './components/Login'; // Импортируем новый компонент
-
+import ArchiveShip from './components/ArchiveShip'; // Импортируем новый компонент
+import ArchiveProduct from './components/ArchiveProduct'; // Импортируем новый компонент
+import ArchiveAdd from './components/ArchiveAdd'; // Импортируем новый компонент
 
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -36,40 +38,97 @@ const App = () => {
     }, []);
 
     return (
-            <Routes>
-                <Route path="/" element={<Home />} />
+        <Routes>
+        <Route path="/" element={<Home />} />
+        
+        {/* Приватные маршруты */}
+        <Route
+          path="/operations"
+          element={<PrivateRoute element={Operations} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/shipment/:id"
+          element={<PrivateRoute element={ShipmentDetails} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/add-product-list"
+          element={<PrivateRoute element={AddProductList} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/add-product/:id"
+          element={<PrivateRoute element={AddProductDetails} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/products"
+          element={<PrivateRoute element={ProductList} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/search"
+          element={<PrivateRoute element={Search} isAuthenticated={isAuthenticated} />}
+        />
 
-                {/* <Route path="/operations" element={<PrivateRoute element={Operations} isAuthenticated={isAuthenticated} />} />  */}
-                <Route path="/operations" element={<Operations />} /> {/* информация о реализации товара  */}
-                    <Route path="/shipment/:id" element={<ShipmentDetails />} /> {/* информация о деталях реализации товара  */}             
-                
-                <Route path="/add-product-list" element={<AddProductList />} /> {/* информация о приходе товара  */}   
-                    <Route path="/add-product/:id" element={<AddProductDetails />} /> {/* информация о деталях приходе товара  */}  
- 
-                <Route path="/products" element={<ProductList />} />
-                <Route path="/search" element={<Search />} />
+        {/* Меню ТСД и его маршруты */}
+        <Route
+          path="/TSDmenu"
+          element={<PrivateRoute element={TSDMenu} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/add-product"
+          element={<PrivateRoute element={TSDReceivingComponent} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/add-product/scan"
+          element={<PrivateRoute element={TSDScanProduct} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/add-product/place"
+          element={<PrivateRoute element={TSDPlaceProduct} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/change-place-tsd"
+          element={<PrivateRoute element={TSDChangePlace} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/info-place-tsd"
+          element={<PrivateRoute element={TSDSerchPlace} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/info-product-tsd"
+          element={<PrivateRoute element={TSDSerchProduct} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/ship-info-tsd"
+          element={<PrivateRoute element={TSDMenu} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/invent-product-tsd"
+          element={<PrivateRoute element={TSDMenu} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/test-tsd"
+          element={<PrivateRoute element={TSDTest} isAuthenticated={isAuthenticated} />}
+        />
 
-                <Route path="/TSDmenu" element={<TSDMenu />} /> {/* главное меню ТСД  */}
-                    <Route path="/add-product" element={<TSDReceivingComponent />} /> {/* Оприходование  */}
-                        <Route path="/add-product/scan" element={<TSDScanProduct />} /> {/* Сверка кол-ва  */}
-                        <Route path="/add-product/place" element={<TSDPlaceProduct />} /> {/* Присваение места  */}
-                    <Route path="/change-place-tsd" element={<TSDChangePlace />} /> {/* перемещение товара (изменение ячейки)  */}
-                    <Route path="/info-place-tsd" element={<TSDSerchPlace />} /> {/* информация о товаре в ячейке  */}
-                    <Route path="/info-product-tsd" element={<TSDSerchProduct />} /> {/* информация о товаре в ячейках  */}
-                    <Route path="/ship-info-tsd" element={<TSDMenu />} /> {/* отгрузка товара  */}
-                    <Route path="/invent-product-tsd" element={<TSDMenu />} /> {/* инвентаризация товара  */}
-                    <Route path="/test-tsd" element={<TSDTest />} /> {/* инвентаризация товара  */}   
-                
-                
-                <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} /> 
+        {/* Архив */}
+        <Route
+          path="/archive-add"
+          element={<PrivateRoute element={ArchiveAdd} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/archive-prod"
+          element={<PrivateRoute element={ArchiveProduct} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/archive-ship"
+          element={<PrivateRoute element={ArchiveShip} isAuthenticated={isAuthenticated} />}
+        />
 
-
-
-
-
-                
-                
-            </Routes>
+        {/* Страница входа */}
+        <Route
+          path="/login"
+          element={<Login setIsAuthenticated={setIsAuthenticated} />}
+        />
+      </Routes>
     );
 };
 

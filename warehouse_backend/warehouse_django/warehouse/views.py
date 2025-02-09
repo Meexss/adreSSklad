@@ -107,7 +107,7 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
                         error_barcode=False,
                         newbarcode="",
                         final_quantity=0,
-                        goods_status="Приемка",
+                        goods_status="Приемка перемещения",
                     )
                     for position in position_data
                 ]
@@ -283,7 +283,7 @@ class ShipmentListView(APIView):
 
     def get(self, request):
         try:
-            shipments = ShipList.objects.all()  # Читаем данные из базы данных
+            shipments = ShipList.objects.all().order_by("ship_date")  # Читаем данные из базы данных
             serializer = ShipListSerializer(shipments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -485,7 +485,8 @@ class AddProductListView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             print("uid_add не передан! Возвращаем все записи.")  # Лог
-            products = AddList.objects.all()
+
+            products = AddList.objects.all().order_by("add_date") 
             serializer = AddListSerializer(products, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -761,8 +762,11 @@ class CancelReservation(APIView):
             reserv = ReservList.objects.filter(unique_id__in=reserve_ids)
             products = ProductList.objects.all()  # Получаем все товары
             archive = ArchiveProduct.objects.all()  # Получаем все архивные товары
-
+            print(f"фильтрованные данные : {reserv}")
             for item in reserv:
+                print(f"позиция  : {item}")
+                print(f"стутус позиции  : {item.goods_status}")
+                print(f"шв позиции  : {item.unique_id}")
                 cancel_quantity = cancel_quantities.get(str(item.unique_id), item.quantity)
 
                 if item.place == "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ":
@@ -776,8 +780,7 @@ class CancelReservation(APIView):
                         canceled_items.append(item)
                         continue
 
-                if item.unique_id in reserve_ids:
-                    if item.goods_status in ['Брак', 'Недостача']:
+                if item.goods_status in ['Брак', 'Недостача']:
                         if cancel_quantity < item.quantity:
                             canceled_item = ArchiveProduct(
                                 unique_id=uuid.uuid4(),
@@ -811,37 +814,37 @@ class CancelReservation(APIView):
                             archived_product.save()
                             item.delete()
 
-                    elif item.goods_status == 'Хранение':
-                        if cancel_quantity < item.quantity:
-                            canceled_item = ProductList(
-                                unique_id=uuid.uuid4(),
-                                article=item.article,
-                                name=item.name,
-                                quantity=cancel_quantity,
-                                place=item.place,
-                                goods_status=new_goods_status,
-                                barcode=item.barcode,
-                                add_date=item.add_date
-                            )
-                            canceled_item.save()
+                elif item.goods_status == 'В отгрузке':
+                    if cancel_quantity < item.quantity:
+                        canceled_item = ProductList(
+                            unique_id=uuid.uuid4(),
+                            article=item.article,
+                            name=item.name,
+                            quantity=cancel_quantity,
+                            place=item.place,
+                            goods_status=new_goods_status,
+                            barcode=item.barcode,
+                            add_date=item.add_date
+                        )
+                        canceled_item.save()
 
-                            item.quantity -= cancel_quantity
-                            item.goods_status = "Хранение"
-                            item.save()
-                        else:
-                            canceled_items.append(item)
-                            product_entry = ProductList(
-                                unique_id=item.unique_id,
-                                article=item.article,
-                                name=item.name,
-                                quantity=item.quantity,
-                                place=item.place,
-                                goods_status=new_goods_status,
-                                barcode=item.barcode,
-                                add_date=item.add_date
-                            )
-                            product_entry.save()
-                            item.delete()
+                        item.quantity -= cancel_quantity
+                        item.goods_status = "Хранение"
+                        item.save()
+                    else:
+                        canceled_items.append(item)
+                        product_entry = ProductList(
+                            unique_id=item.unique_id,
+                            article=item.article,
+                            name=item.name,
+                            quantity=item.quantity,
+                            place=item.place,
+                            goods_status=new_goods_status,
+                            barcode=item.barcode,
+                            add_date=item.add_date
+                        )
+                        product_entry.save()
+                        item.delete()
 
             # Сериализация отмененных товаров
             canceled_items_serializer = ReservListSerializer(canceled_items, many=True)
@@ -872,15 +875,17 @@ class ArchiveShipView(APIView):
             return Response({"error": "Invalid data format, expected a list"}, status=400)
         print(f"полученные данные : {data}")
         unique_id_ship = data[0].get("unique_id_ship")  # Берем `unique_id_ship` из первого элемента
-
+        print(f"фильтруем id : {unique_id_ship}")
         try:
             with transaction.atomic():  # Группируем операции в одну транзакцию
                 # Архивируем данные для ShipList и ReservList
+                print(f"начлаи с atomic")
                 archive_ship_data = []
                 archive_product_data = []
 
                 for item in data:
                     # Подготовка данных для архивирования в ArchiveShip
+                    print(f"получаем item: {item}")
                     archive_ship_data.append(
                         ArchiveShip(
                             unique_id_ship=item.get("unique_id_ship"),
@@ -915,7 +920,7 @@ class ArchiveShipView(APIView):
                             close_product_date=datetime.now().date()  # Дата архивирования
                         )
                     )
-
+                print(f"закончили цикол")
                 # Выполняем массовую вставку данных в архивы
                 ArchiveShip.objects.bulk_create(archive_ship_data)
                 ArchiveProduct.objects.bulk_create(archive_product_data)
@@ -931,7 +936,7 @@ class ArchiveShipView(APIView):
 
     def get(self, request):
         try:
-            archiveShip = ArchiveShip.objects.all()  # Читаем данные из базы данных
+            archiveShip = ArchiveShip.objects.all().order_by("-final_ship_date")  # Читаем данные из базы данных
             serializer = ArchiveShipSerializer(archiveShip, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -942,7 +947,7 @@ class ArchiveShipView(APIView):
 class ArchiveProductView(APIView):
     def get(self, request):
         try:
-            archiveProd = ArchiveProduct.objects.all()  # Читаем данные из базы данных
+            archiveProd = ArchiveProduct.objects.all().order_by("-close_product_date")  # Читаем данные из базы данных
             serializer = ArchiveProductSerializer(archiveProd, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -951,58 +956,64 @@ class ArchiveProductView(APIView):
 #обработчик для переноса в архив поставок НО проверить
 class ArchiveAddView(APIView):
     def post(self, request):
-        data = request.data
-        print(f"Полученные данные: {data}")
+        data = request.data  # Получаем список объектов
         if not isinstance(data, list):
-            return Response({"error": "Expected an array of objects"}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response({"error": "Invalid data format, expected a list"}, status=400)
+        print(f"полученные данные : {data}")
+        unique_id_add = data[0].get("unique_id_add")  # Берем `unique_id_ship` из первого элемента
+        print(f"фильтруем id : {unique_id_add}")
         try:
-            # Создаем набор uid_add для быстрой проверки
-            uid_add_to_remove = {item.get('uid_add') for item in data if item.get('uid_add')}
-            print(f"Проверки: {uid_add_to_remove}")
+            with transaction.atomic():  # Группируем операции в одну транзакцию
+                # Архивируем данные для ShipList и ReservList
+                print(f"начлаи с atomic")
+                archive_add_data = []
+        
 
-            # Удаляем записи, если uid_add совпадает
-            ArchiveAdd.objects.filter(unique_id_add__in=uid_add_to_remove).delete()
+                for item in data:
+                    # Подготовка данных для архивирования в ArchiveShip
+                    print(f"получаем item: {item}")
+                    archive_add_data.append(
+                        ArchiveAdd(
+                            unique_id_add=item.get("unique_id_add"),
+                            type=item.get("type"),
+                            add_number=item.get("add_number"),
+                            add_date=item.get("add_date"),
+                            counterparty=item.get("counterparty"),
+                            warehouse=item.get("warehouse"),
+                            progress=item.get("progress"),
 
-            # Добавляем новые записи в архив
-            for item in data:
-                uid_add = item.get('uid_add')
-                if not uid_add:
-                    continue  # Пропускаем элемент, если нет uid_add
-                type = item.get('type')
-                add_number = item.get('add_number')
-                add_date = item.get('add_date')
-                progress = item.get('progress')
-                unique_id = item.get('unique_id')
-                article = item.get('article')
-                name = item.get('name')
-                quantity = item.get('quantity')
-                place = item.get('place')
-                goods_status = item.get('goods_status')
-                barcode = item.get('barcode')
-                quantity_start = item.get('quantity_start')
+                            unique_id=item.get("unique_id"),
+                            article=item.get("article"),
+                            name=item.get("name"),
+                            barcode=item.get("barcode"),
+                            place=item.get("place"),
+                            quantity_start=item.get("quantity_start"),
+                            quanity_place=item.get("quanity_place"),
+                            goods_status=item.get("goods_status"),
+                            close_add_date=datetime.now().date()  # Дата архивирования
+                        )
+                    )
 
-                # Создаем запись в базе данных
-                ArchiveAdd.objects.create(
-                    type=type,
-                    add_number=add_number,
-                    add_date=add_date,
-                    unique_id=unique_id,
-                    article=article,
-                    name=name,
-                    barcode=barcode,
-                    place=place,
-                    quantity_start=quantity_start,
-                    quanity_place=quantity,  # или любое другое значение для финального количества
-                    goods_status=goods_status,
-                    close_add_date=datetime.now().date()  # Используем текущую дату
-                )
+                print(f"закончили цикол")
+                # Выполняем массовую вставку данных в архивы
+                ArchiveAdd.objects.bulk_create(archive_add_data)
 
-            return Response({"message": "Ships archived successfully"}, status=status.HTTP_200_OK)
+                # Удаляем записи в ShipList и ReservList, относящиеся к текущему unique_id_ship
+                AddList.objects.filter(unique_id_add=unique_id_add).delete()
+                PlaceProduct.objects.filter(unique_id_add=unique_id_add).delete()
+
+            return Response({"message": "Data archived successfully"}, status=200)
 
         except Exception as e:
-            # Обрабатываем ошибки
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=500)
+
+    def get(self, request):
+        try:
+            archiveAdd = ArchiveAdd.objects.all().order_by("-close_add_date")  # Читаем данные из базы данных
+            serializer = ArchiveAddSerializer(archiveAdd, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
         
 # Работает {} и post
 # загрузка карточек в базу
@@ -1107,4 +1118,79 @@ class FindPlaceViews(APIView):
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class NewDataViews(APIView):
+    def get(self, request):
+        try:
+            number = request.query_params.get('ship_number')
+            print(f"получен номер: {number}")
+            if not number:
+                return Response({"error": "Параметр ship_number обязателен"}, status=status.HTTP_400_BAD_REQUEST)
+
+            dataNumber = number[1:]  # Убираем первую букву номера
+            print(f"получен номер: {dataNumber}")
+            # Определяем, с каким типом данных работаем
+            if number.startswith("p"):
+
+                print(f"начали поиск: {number.startswith("p")}")
+                gettranz = TranzitData.objects.filter(tranz_number=number)
+                getFinal = ShipList.objects.filter(ship_number=number)
+                print(f"фильтрованный массив : {gettranz}")
+                # Удаляем старые записи
+                getFinal.delete()
+                id=str(uuid.uuid4())   
+                # Копируем данные из TranzitData в ShipList
+                new_entries = [
+                    ShipList(
+                        unique_id_ship=id,
+                        type="Перемещение",
+                        ship_number=number,
+                        ship_date=data.tranz_date,
+                        counterparty=data.to_house,
+                        warehouse=data.from_house,
+                        progress="Обновленный",
+                        article=data.article,
+                        name=data.name,
+                        barcode=data.barcode,
+                        quantity=data.quantity
+                    ) for data in gettranz
+                ]
+                print(f"записываем данные : {new_entries}")
+
+            elif number.startswith("s"):
+                gettranz = ShipData.objects.filter(ship_number=number)
+                getFinal = ShipList.objects.filter(ship_number=number)
+
+                # Удаляем старые записи
+                getFinal.delete()
+                id=str(uuid.uuid4()) 
+                # Копируем данные из ShipData в ShipList
+                new_entries = [
+                    ShipList(
+                        unique_id_ship=id,
+                        type="Реализация",
+                        ship_number=number,
+                        ship_date=data.ship_date,
+                        counterparty=data.counterparty,
+                        warehouse=data.warehouse,
+                        progress="Обновленный",
+                        article=data.article,
+                        name=data.name,
+                        barcode=data.barcode,
+                        quantity=data.quantity
+                    ) for data in gettranz
+                ]
+            else:
+                return Response({"error": "Неверный формат номера"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Записываем новые данные в базу
+            ShipList.objects.bulk_create(new_entries)
+
+            # Возвращаем обновленные данные
+            updated_data = ShipList.objects.filter(ship_number=number)
+            serializer = ShipListSerializer(updated_data, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": f"Ошибка на сервере: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                   
