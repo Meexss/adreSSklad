@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 import traceback
+from django.db import transaction
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -862,64 +863,78 @@ class CancelReservation(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+#поправил Post сделал get для полчения списка        
 #Обработчик для переноса в архив отгрузок Надо проверить 
 class ArchiveShipView(APIView):
     def post(self, request):
-        # Получаем данные из запроса (массив объектов)
-        data = request.data
+        data = request.data  # Получаем список объектов
         if not isinstance(data, list):
-            return Response({"error": "Expected an array of objects"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid data format, expected a list"}, status=400)
 
         try:
-            # Создаем набор uid_ship для быстрой проверки
-            uid_ships_to_remove = {item.get('uid_ship') for item in data if item.get('uid_ship')}
+            with transaction.atomic():  # Группируем операции в одну транзакцию
+                for item in data:
+                    unique_id_ship = item.get("unique_id_ship")
 
-            # Удаляем записи из базы данных для соответствующих uid_ship
-            ArchiveShip.objects.filter(unique_id_ship__in=uid_ships_to_remove).delete()
+                    # Найти и удалить записи в ShipList, переместив их в ArchiveShip
+                    ship_entries = ShipList.objects.filter(unique_id_ship=unique_id_ship)
+                    ArchiveShip.objects.create(
+                        unique_id_ship=item.get("unique_id_ship"),
+                        type=item.get("type"),
+                        ship_number=item.get("ship_number"),
+                        ship_date=item.get("ship_date"),
+                        counterparty=item.get("counterparty"),
+                        warehouse=item.get("warehouse"),
+                        progress=item.get("progress"),
+                        reserve_data=item.get("reserve_data"),  # Это поле точно есть?
+                        unique_id=item.get("unique_id"),
+                        article=item.get("article"),
+                        name=item.get("name"),
+                        barcode=item.get("barcode"),
+                        quantity=item.get("quantity"),
+                        place=item.get("place"),
+                        final_ship_date=datetime.now().date()  # Дата архивирования
+                    )
+                    ship_entries.delete()  # Удаляем записи из ShipList
 
-            # Проходим по каждому элементу данных
-            for item in data:
-                uid_ship = item.get('uid_ship')
-                if not uid_ship:
-                    continue  # Пропускаем элемент, если нет uid_ship
-                type = item.get('type')
-                ship_number = item.get('shipment_number')
-                ship_date = item.get('shipment_date')
-                progress = item.get('progress')
-                unique_id = item.get('unique_id')
-                article = item.get('article')
-                name = item.get('name')
-                quantity = item.get('quantity')
-                place = item.get('place')
-                goods_status = item.get('goods_status')
-                barcode = item.get('barcode')
-                counterparty=item.get('counterparty')  # Предположим, что goods_status соответствует counterparty
-                warehouse=item.get('warehouse')
-                reserve_data=item.get('reserve_data')
+                    # Найти и удалить записи в ReservList, переместив их в ArchiveProduct
+                    reserv_entries = ReservList.objects.filter(unique_id_ship=unique_id_ship)
+                    ArchiveProduct.objects.create(
+                        unique_id=item.get("unique_id"),
+                        add_date=item.get("add_date"),
+                        article=item.get("article"),
+                        name=item.get("name"),
+                        barcode=item.get("barcode"),
+                        quantity=item.get("quantity"),
+                        place=item.get("place"),
+                        goods_status=item.get("goods_status"),
+                        close_product_date=datetime.now().date()  # Дата архивирования
+                    )
+                    reserv_entries.delete()  # Удаляем записи из ReservList
 
-                # Создаем новый объект ArchiveShip для архивации
-                ArchiveShip.objects.create(
-                    type=type,
-                    ship_number=ship_number,
-                    ship_date=ship_date,
-                    counterparty=counterparty,  # Предположим, что goods_status соответствует counterparty
-                    warehouse=warehouse,     # Аналогично warehouse
-                    progress=progress,
-                    reserve_data=reserve_data,
-                    unique_id=unique_id,  # Новый уникальный ID
-                    article=article,
-                    name=name,
-                    barcode=barcode,
-                    quantity=quantity,
-                    place=place,
-                    final_ship_date=datetime.now().date(),  # Установим текущую дату как дату отгрузки
-                )
-
-            return Response({"message": "Ships archived successfully"}, status=status.HTTP_200_OK)
+            return Response({"message": "Data archived successfully"}, status=200)
 
         except Exception as e:
-            # Обрабатываем ошибки
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=500)
+
+    def get(self, request):
+        try:
+            archiveShip = ArchiveShip.objects.all()  # Читаем данные из базы данных
+            serializer = ArchiveShipSerializer(archiveShip, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Сделал get на получение 
+# Обработчик для почения списка архва продуктов 
+class ArchiveProduct(APIView):
+    def get(self, request):
+        try:
+            archiveProd = ArchiveProduct.objects.all()  # Читаем данные из базы данных
+            serializer = ArchiveProductSerializer(archiveProd, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #обработчик для переноса в архив поставок НО проверить
 class ArchiveAddView(APIView):

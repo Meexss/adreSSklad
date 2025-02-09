@@ -138,22 +138,29 @@ const ShipmentDetails = () => {
     const handleCloseShip = async () => {
         try {
             const request = reservedData.map((item) => ({
-                type: item.type,
-                shipment_number: shipment.shipment_number,
-                shipment_date: shipment.shipment_date,
-                uid_ship: item.uid_ship,
+                unique_id_ship: shipment.unique_id_ship, 
+                type: shipment.type,
+                shipment_number: shipment.ship_number,
+                shipment_date: shipment.ship_date,
+                counterparty: shipment.counterparty,    
+                warehouse: shipment.warehouse,
                 progress: 'Завершен',
-                unique_id: item.unique_id,
+
                 article: item.article,
                 name: item.name,
+                barcode: item.barcode,
                 quantity: item.quantity,
+                reserve_data: item.reserve_data,
+                unique_id: item.unique_id,
+                add_date: item.add_date,
                 place: item.place,
                 goods_status: 'Отгружен',
-                barcode: item.barcode
+                
             }));
-    
+
+            console.log("массив к отправке", request)
             // Отправка данных через API
-            const reserveResponse = await api.post('/api/archiveShip/', request);
+            const reserveResponse = await api.post('/api/archiveShi/', request);
     
             // Обработка успешного ответа
             if (reserveResponse.status === 200) {
