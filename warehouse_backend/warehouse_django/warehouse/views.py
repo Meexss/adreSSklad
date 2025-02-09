@@ -1130,8 +1130,6 @@ class NewDataViews(APIView):
             print(f"получен номер: {dataNumber}")
             # Определяем, с каким типом данных работаем
             if number.startswith("p"):
-
-                print(f"начали поиск: {number.startswith("p")}")
                 gettranz = TranzitData.objects.filter(tranz_number=number)
                 getFinal = ShipList.objects.filter(ship_number=number)
                 print(f"фильтрованный массив : {gettranz}")
