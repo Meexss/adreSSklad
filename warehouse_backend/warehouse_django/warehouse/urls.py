@@ -1,6 +1,6 @@
 from django.urls import path
 # from .oldviews import ShipmentListView, AddProductListView, ProductListView, ReserveAllView, CancelReservation, PlaceProducts, protected_view, ArchiveShip, ArchiveAdd
-from .views import TranzitDataViewSet, ShipDataViewSet, AddDataViewSet, ProductListView, ProductListCreateView, ShipmentListView, ReserveAllView, CancelReservation, AddProductListView,PlaceProducts, FindBarcodeViews, protected_view, FindPlaceViews, ArchiveProduct, ArchiveShip
+from .views import TranzitDataViewSet, ShipDataViewSet, AddDataViewSet, ProductListView, ProductListCreateView, ShipmentListView, ReserveAllView, CancelReservation, AddProductListView,PlaceProducts, FindBarcodeViews, protected_view, FindPlaceViews, ArchiveProductView, ArchiveShipView
 from rest_framework_simplejwt.views import (                                                                                            
     TokenObtainPairView,
     TokenRefreshView,
@@ -18,8 +18,8 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('protected/', protected_view, name='protected_view'),
     # path('archiveAdd/', ArchiveAdd.as_view()), #перенос в архив прихода
-    path('archiveShip/', ArchiveShip.as_view()), #перенос в архив прихода
-    path('archiveProd/', ArchiveProduct.as_view()), #перенос в архив прихода
+    path('archiveShip/', ArchiveShipView.as_view()), #перенос в архив прихода
+    path('archiveProd/', ArchiveProductView.as_view()), #перенос в архив прихода
 
     path('inTranzit/', TranzitDataViewSet.as_view({'post': 'create'})),  # Только crea
     path('inShip/', ShipDataViewSet.as_view({'post': 'create'})),  # Только crea

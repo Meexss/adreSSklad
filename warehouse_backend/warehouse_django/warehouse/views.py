@@ -927,7 +927,7 @@ class ArchiveShipView(APIView):
 
 # Сделал get на получение 
 # Обработчик для почения списка архва продуктов 
-class ArchiveProduct(APIView):
+class ArchiveProductView(APIView):
     def get(self, request):
         try:
             archiveProd = ArchiveProduct.objects.all()  # Читаем данные из базы данных
