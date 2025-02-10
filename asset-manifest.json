@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/adreSSklad/static/css/main.95820a9b.css",
-    "main.js": "/adreSSklad/static/js/main.42b6c15d.js",
+    "main.js": "/adreSSklad/static/js/main.4ae9f65d.js",
     "index.html": "/adreSSklad/index.html",
     "main.95820a9b.css.map": "/adreSSklad/static/css/main.95820a9b.css.map",
-    "main.42b6c15d.js.map": "/adreSSklad/static/js/main.42b6c15d.js.map"
+    "main.4ae9f65d.js.map": "/adreSSklad/static/js/main.4ae9f65d.js.map"
   },
   "entrypoints": [
     "static/css/main.95820a9b.css",
-    "static/js/main.42b6c15d.js"
+    "static/js/main.4ae9f65d.js"
   ]
 }
