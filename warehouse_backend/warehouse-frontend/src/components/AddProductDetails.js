@@ -116,7 +116,7 @@ const AddProductDetails = () => {
     return (
         <Layout >
             <div className='print-container' ref={contentRef} >
-                <Link to="/add-product-list" className='no-print' style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                <Link to="/add-product-list" className='no-print' style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', margin: '10px' }}>
                     <FontAwesomeIcon
                         icon={faArrowLeft}
                         style={{
@@ -129,10 +129,9 @@ const AddProductDetails = () => {
                     <span style={{ fontSize: '12px' }}>Назад</span>
                 </Link>
 
-                <button className='no-print' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
-                        <FontAwesomeIcon icon={faPrint} /> Печать
-                    </button>
+
                 <h2>Детали прихода</h2>
+                
                 <Barcode
                     className="print-only"
                     value={addproducts.add_number}
@@ -140,15 +139,23 @@ const AddProductDetails = () => {
                     width={2}         // Уменьшаем ширину штрих-кода
                     height={40}       // Уменьшаем высоту штрих-кода
                     />
-                <Link to="/add-product-list"><button
-                                        onClick={handleCloseAdd}
-                                        className='no-print'
-                                        style={{
-                                            backgroundColor: 'grey',
-                                        }}
-                                    >
-                                        Завершить отгрузку
-                </button></Link>
+                    <div className='btn-ship-wrap'>
+                        <Link to="/add-product-list"><button
+                                            onClick={handleCloseAdd}
+                                            className='no-print'
+                                            style={{
+                                                backgroundColor: 'grey',
+                                            }}
+                                        >
+                                            Завершить отгрузку
+                        </button></Link>
+                        <button className='no-print' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
+                        <FontAwesomeIcon icon={faPrint} /> Печать
+                        </button>
+
+
+                    </div>
+                
                 <div  className="data_wraper" >
                     
                     <div className="data_info"><p><strong>Номер прихода:</strong> {addproducts.add_number}</p></div>

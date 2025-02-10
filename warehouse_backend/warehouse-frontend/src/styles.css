@@ -200,11 +200,23 @@ a {
 }
 
 a button {
-  margin-right: 5vh;
+  /* margin-right: 5vh; */
+}
+
+.btn-ship-wrap {
+  align-items: flex-start;
+  display: flex;
+}
+
+.btn-ship {
+
+  height: 5vh;
+  font-size: 12px;
 }
 
 
 button {
+  margin-left: 20px;
   font-size: 10px;
   font-weight:bold;
   cursor: pointer;
@@ -405,6 +417,43 @@ main {
 .text-left {
   text-align: left;
 }
+
+
+
+.neon {
+
+}
+
+.neon-new {
+  border-color: #00ff00;
+  color: #00ff00;
+  border: 2px solid;
+  border-radius:  10px;
+
+}
+
+.neon-updated {
+  color: #0088ff;
+  border-color: #0088ff;
+  border: 2px solid;
+  border-radius:  10px;
+ 
+}
+
+.neon-work {
+  color: #ff8800;
+  border-color: #ff8800;
+  border: 2px solid;
+  border-radius:  10px;
+}
+
+.neon-draft {
+  color: #000000;
+  border-color: #000000;
+  border: 2px solid;
+  border-radius:  10px;
+}
+
 
 
 

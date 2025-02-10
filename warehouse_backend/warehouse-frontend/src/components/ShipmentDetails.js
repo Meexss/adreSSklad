@@ -272,8 +272,6 @@ const ShipmentDetails = () => {
         <Layout>
             <div ref={contentRef} style={{ padding: '20px' }}>
 
-            {error && <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
-            {message && <div className="success-message" style={{ color: 'green', margin: '10px 0' }}>{message}</div>}
                 {/* кнопка назад */}
                 <Link to="/operations" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
                     <FontAwesomeIcon
@@ -288,57 +286,61 @@ const ShipmentDetails = () => {
                     <span style={{ fontSize: '12px' }}>Назад</span>
                 </Link>
                 
-                <button className='no-print' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
-                <FontAwesomeIcon icon={faPrint} /> Печать
-                </button>
+               
                 <h2>Детали отгрузки</h2>
                 {/* <Barcode className="print-only" value={shipment.uid_ship} format="CODE128"/> */}
                 {!showReservedData && (
-                    <button 
-                        className='no-print'
-                        onClick={handleReserveAll}
-                        style={{
-                            backgroundColor: 'green',
-                        }}
-                    >
-                        Зарезервировать все товары
-                    </button>
-                )}
-                {!showReservedData && (
-                    <button 
-                        className='no-print'
-                        onClick={handleNewData}
-                        style={{
-                            backgroundColor: 'blue',
-                        }}
-                    >
-                        Оновить данные
-                    </button>
-                )}
-                {showReservedData && (
-                    <Link to="/operations"><button
-                        onClick={handleCloseShip}
-                        className='no-print'
-                        style={{
-                            backgroundColor: 'grey',
-                        }}
-                    >
-                        Завершить отгрузку
-                    </button></Link>
+                    <div className='btn-ship-wrap'>
+                        <button 
+                            className='no-print btn-ship'
+                            onClick={handleReserveAll}
+                            style={{
+                                backgroundColor: 'green',
+                            }}
+                        >
+                            Зарезервировать всё
+                        </button>
+                        <button 
+                            className='no-print btn-ship '
+                            onClick={handleNewData}
+                            style={{
+                                backgroundColor: 'blue',
+                            }}
+                        >
+                            Обновить данные
+                        </button>
+
+                        
+                    </div>             
                 )}
                 {showReservedData && (
-                    <Link to="/operations"><button
-                        onClick={handleMassCancelReservation}
-                        className='no-print'
-                        style={{
-                            backgroundColor: 'red',
-                        }}
-                    >
-                        Отменить резервирование
-                    </button></Link>
+                    <div className='btn-ship-wrap'>
+                        <Link to="/operations"><button
+                            onClick={handleCloseShip}
+                            className='no-print btn-ship '
+                            style={{
+                                backgroundColor: 'grey',
+                            }}
+                        >
+                            Завершить отгрузку
+                        </button></Link>
+                        <button
+                            onClick={handleMassCancelReservation}
+                            className='no-print btn-ship '
+                            style={{
+                                backgroundColor: 'red',
+                            }}
+                        >
+                            Отменить резервирование
+                        </button>
+
+                        <button className='no-print btn-ship' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
+                <FontAwesomeIcon icon={faPrint} /> Печать
+                </button>
+                    </div>
+                    
                 )}
                 <div className="data_wraper">
-                    {/* <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.uid_ship}</p></div> */}
                     <div className="data_info"><p><strong>Тип:</strong> {shipment.type}</p></div>
                     <div className="data_info"><p><strong>Номер отгрузки:</strong> {shipment.ship_number}</p></div>
                     <div className="data_info"><p><strong>Дата отгрузки:</strong> {shipment.ship_date}</p></div>
@@ -389,7 +391,7 @@ const ShipmentDetails = () => {
                                         <td>
                                             <div 
                                                 style={{
-                                                color: reservedItem.place === "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ" ? "white" : "inherit",
+                                                color: reservedItem.place === "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ" ? "white" : "inherit", borderRadius: "10px",
                                                 backgroundColor: reservedItem.place === "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ" ? "red" : "inherit",
                                                 }}
                                             >
@@ -398,7 +400,7 @@ const ShipmentDetails = () => {
                                             </td>
                                         <td >{reservedItem.quantity}</td>
                                         <td className='no-print'>{reservedItem.goods_status}</td>
-                                        <FontAwesomeIcon
+                                        <td><FontAwesomeIcon
                                             className='no-print'
                                             icon={faEdit}
                                             onClick={() => handleOpenModal(reservedItem)}
@@ -409,8 +411,11 @@ const ShipmentDetails = () => {
                                                 borderRadius: '50%',
                                                 backgroundColor: '#fff',
                                             }}
+                                            
                                         />
+                                        </td>
                                     </tr>
+                                    
                                 ))
                             ) : (
                                 // Если зарезервированных данных нет, создаем одну строку

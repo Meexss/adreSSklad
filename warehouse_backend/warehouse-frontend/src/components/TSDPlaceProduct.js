@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -72,6 +72,23 @@ const TSDPlaceProduct = () => {
         
     };
 
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+          console.log("Key pressed:", event.key);
+          if (event.key === "Escape") {
+            console.log("Нажата клавиша ESC");
+            setCurrentStep((prev) => prev - 1);
+          }
+        };
+      
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+          document.removeEventListener("keydown", handleKeyDown);
+        };
+      }, []);
+      
+    
     // Функия места
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
@@ -176,6 +193,7 @@ const TSDPlaceProduct = () => {
                             autoFocus
                             inputMode="none"
                         />
+                        <div>Дальше ENT</div>
                     </div>
                 )}
 
@@ -193,6 +211,7 @@ const TSDPlaceProduct = () => {
                     
                                 autoFocus 
                                 inputMode="none"/>
+                        <div>Дальше ENT</div>        
                         {error && <p style={{ color: "red" }}>{error}</p>}
                     </div>
                 )}

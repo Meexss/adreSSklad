@@ -74,6 +74,7 @@ const Operations = () => {
                     <table>
                         <thead>
                             <tr>
+                                <th>Статус</th>
                                 <th>Тип операции</th>
                                 <th>Номер отгрузки</th>
                                 <th>Дата</th>
@@ -81,7 +82,7 @@ const Operations = () => {
                                 <th>Склад отгрузки</th>
                                 <th>Кол-во позиций</th>
                                 <th>Кол-во единиц товара</th>
-                                <th>Статус</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
@@ -91,6 +92,16 @@ const Operations = () => {
                                     onClick={() => navigate(`/shipment/${shipment.unique_id_ship}`, { state: { shipment } })}
                                     style={{ cursor: 'pointer' }}
                                 >
+                                    <td ><div className={`neon ${
+                                    shipment.progress === "Новый" ? "neon-new" :
+                                    shipment.progress === "Обновленный" ? "neon-updated" :
+                                    shipment.progress === "Черновик" ? "neon-draft" : 
+                                    shipment.progress === "В работе" ? "neon-work" : ""
+                                    }`}>
+                                        {shipment.progress}
+                                    </div>
+                                    
+                                    </td>
                                     <td>{shipment.type}</td>
                                     <td>{shipment.ship_number}</td>
                                     <td>{shipment.ship_date}</td>
@@ -98,7 +109,7 @@ const Operations = () => {
                                     <td>{shipment.warehouse}</td>
                                     <td>{shipment.items.length}</td>
                                     <td>{shipment.items.reduce((total, item) => total + (item.quantity || 0), 0)}</td>
-                                    <td>{shipment.progress}</td>
+                                    
                                 </tr>
                             ))}
                         </tbody>

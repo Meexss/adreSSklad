@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -17,6 +17,21 @@ const TSDChangePlace = () => {
     const [colChange, setColChange] = useState(0) //количество тавара к изменению
     const [newPlace, setNewPlace] = useState('')
 
+
+        useEffect(() => {
+            const handleKeyDown = (event) => {
+              console.log("Key pressed:", event.key);
+              if (event.key === "Escape") {
+                console.log("Нажата клавиша ESC");
+                setCurrentStep((prev) => prev - 1);
+              }
+            };
+          
+            document.addEventListener("keydown", handleKeyDown);
+            return () => {
+              document.removeEventListener("keydown", handleKeyDown);
+            };
+          }, []);
     
 
 
@@ -146,6 +161,7 @@ const TSDChangePlace = () => {
                         
                                 autoFocus
                                 inputMode="none" />
+                        <div>Дальше ENT</div>        
                     </div>
                 )}
 
@@ -163,6 +179,7 @@ const TSDChangePlace = () => {
                         
                                 autoFocus
                                 inputMode="none" />
+                        <div>Дальше ENT</div>        
                         {error && <p style={{ color: "red" }}>{error}</p>}
                     </div>
                 )}
@@ -209,6 +226,7 @@ const TSDChangePlace = () => {
                         
                                 autoFocus
                                 inputMode="none" />
+                        <div>Дальше ENT</div>        
                         {error && <p style={{ color: "red" }}>{error}</p>}
                     </div>
                 )}

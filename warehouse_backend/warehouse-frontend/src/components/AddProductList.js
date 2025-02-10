@@ -66,6 +66,7 @@ const AddProductList = () => {
                     <table>
                         <thead>
                             <tr>
+                                <th>Статус</th>
                                 <th>Тип</th>
                                 <th>Номер прихода 1С</th>
                                 <th>Дата</th>
@@ -74,7 +75,7 @@ const AddProductList = () => {
                                 <th>Кол-во позиций по 1С</th>
                                 <th>Кол-во единиц товара по 1С</th>
                                 <th>Кол-во принятого товара</th>
-                                <th>Статус</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -84,6 +85,10 @@ const AddProductList = () => {
                                     onClick={() => navigate(`/add-product/${addproduct.unique_id_add}`, { state: { addproducts: addproduct } })}
                                     style={{ cursor: 'pointer' }}
                                 >
+                                    <td><div className={`neon ${
+                                    addproduct.progress === "Новый" ? "neon-new" :
+                                    addproduct.progress === "В работе" ? "neon-work" : ""
+                                    }`}>{addproduct.progress}</div></td>
                                     <td>{addproduct.type}</td>
                                     <td>{addproduct.add_number}</td>
                                     <td>{addproduct.add_date}</td>
@@ -96,7 +101,7 @@ const AddProductList = () => {
                                     <td>
                                         {addproduct.items.reduce((total, stock) => total + stock.final_quantity, 0)}
                                     </td>
-                                    <td>{addproduct.progress}</td>
+                                    
                                 </tr>
                             ))}
                         </tbody>

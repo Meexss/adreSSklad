@@ -1,4 +1,4 @@
-import React, {useState, useCallback  } from 'react';
+import React, {useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
 import api from './api'; // Импортируешь созданный файл
@@ -41,6 +41,20 @@ const TSDScanProduct = () => {
         setCurrentStep(-1)
       }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        console.log("Нажата клавиша ESC");
+        setCurrentStep((prev) => prev - 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
 
   // Обработка сканирования баркода
@@ -211,6 +225,7 @@ const TSDScanProduct = () => {
           }} 
       
              autoFocus inputMode="none"/>
+             <div>Дальше ENT</div>
           </div>
           )}
 
@@ -228,6 +243,7 @@ const TSDScanProduct = () => {
               autoFocus
               inputMode="none"
             /> 
+            <div>Дальше ENT</div>
             {error && <p style={{ color: "red" }}>{error}</p>}
             </div>
           )}
