@@ -94,7 +94,8 @@ nav ul {
 body {
   margin: 0;
   padding: 0;
-  background-image: linear-gradient(to right bottom, #7dc25e, #7eb763, #7fad68, #7fa26c, #7e9870);
+  background-color: #6b9071;
+  /* background-image: linear-gradient(to right bottom, #375534, #e3eed4); */
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
@@ -113,7 +114,7 @@ main > * {
     margin-top: 2vh;
     margin-bottom: 2vh; */
     padding: 0 15px 10px 15px; 
-    background-color: #f5fbf1; /* Белый фон для детей */
+    background-color: #e5e7e6; /* Белый фон для детей */
     border-radius: 10px; /* Закругленные углы у детей */
     box-shadow: 0px 5px 10px 1px rgba(34, 60, 80, 0.36) inset;
     min-height: 77vh;
@@ -126,7 +127,10 @@ main > * {
 }
 
 .table-container {
+  max-height: 80vh;
 
+  overflow-y: auto; /* Вертикальная прокрутка */
+  position: relative;
   /* overflow-y: auto; */
   position: relative;
 }
@@ -148,14 +152,24 @@ table {
 
 thead {
   /* style={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}; */
-
+  /* position: sticky;
+  top: 0; */
   border-radius: 0 0 0 10px;
+  
+  
 }
 
-th {
-
-  background-color: #a4ae9e;
+thead th {
+  position: sticky;
+  top: 0;
+  background-color: #AEC3B0; /* Цвет фона заголовков */
+  z-index: 10;
 }
+
+
+/* th {
+  background-color: #AEC3B0;
+} */
 
 th:first-child {
   border-radius: 10px 0 0 0 ;
@@ -192,7 +206,7 @@ tbody td:hover::before {
   /* top: -9999px;
   bottom: -9999px; */
   z-index: -1;
-}
+}B
 
 a {
   all: unset; /* Убирает все стили */
@@ -223,7 +237,7 @@ button {
   color: white;
   border: none;
   border-radius: 5vw;
-  background-color: #7dc25e;
+  background-color: #80ce5b;
   width: 10vw;
   height: 4vh;
 }

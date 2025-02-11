@@ -352,6 +352,7 @@ const ShipmentDetails = () => {
 
                 {message && <p style={{ marginTop: '10px', color: message.includes("Ошибка") ? 'red' : 'green' }}>{message}</p>}
                 <h3>{showReservedData ? "Зарезервированные товары:" : "Товары для отгрузки:"}</h3>
+                <div className="table-container">
                 <table >
                     <thead>
                     <tr>
@@ -433,6 +434,7 @@ const ShipmentDetails = () => {
 
                     </tbody>
                 </table>
+                </div>
                 {showModal && selectedItem && (
                     <div style={{
                         position: 'fixed', top: '0', left: '0', right: '0', bottom: '0',

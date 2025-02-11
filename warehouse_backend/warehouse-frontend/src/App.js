@@ -20,6 +20,9 @@ import Login from './components/Login'; // Импортируем новый к�
 import ArchiveShip from './components/ArchiveShip'; // Импортируем новый компонент
 import ArchiveProduct from './components/ArchiveProduct'; // Импортируем новый компонент
 import ArchiveAdd from './components/ArchiveAdd'; // Импортируем новый компонент
+import PrintLabel from './components/PrintLabel'; // Импортируем новый компонент
+
+
 
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -122,6 +125,10 @@ const App = () => {
           path="/archive-ship"
           element={<PrivateRoute element={ArchiveShip} isAuthenticated={isAuthenticated} />}
         />
+
+        <Route
+          path="/print-label"
+          element={<PrintLabel />}/>
 
         {/* Страница входа */}
         <Route

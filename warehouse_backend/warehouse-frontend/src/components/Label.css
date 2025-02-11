@@ -1,0 +1,115 @@
+.wrap-label-main {
+    padding-top: 10px;
+    min-height: 100px;
+}
+
+.allWrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.mainWrapLabel {
+    width: 227px;
+    height: 170px;
+    margin-bottom: 5px;
+    background-color: white;
+    padding: 5px;
+    border-radius: 10px;
+    border: 1px solid;
+}
+
+.wramTOP {
+    display: flex;
+    justify-content: space-between;
+    height: 40px;
+}
+
+.imgIcon {
+    height: 25px;
+    width: 25px;
+    margin-right: 1px;
+}
+
+.wrapLogo {
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+    align-items: end;
+    width: 90px;
+    height: 40px;
+}
+
+.imgIconKar {
+    width: 90px;
+    height: 25px;
+}
+
+.textLogo {
+    height: 10px;
+    margin: 0;
+    font-weight: bold;
+    font-size: 9px;
+}
+
+.wrapText {
+    display: flex;
+    justify-content: space-between;
+    font-size: bold;
+}
+
+
+
+
+.wrapSN {
+    /* width: 90px; */
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    height: 13px;
+}
+
+.textAbout {
+    height: 13px;
+    font-size: 10px;
+}
+
+.wrapBlockText {
+    display: block;
+    z-index: 3;
+}
+
+.wrapBottom {
+    margin-top: 4px;
+    height: 60px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden; /* Чтобы текст не выходил за пределы */
+
+}
+
+.labelErap input {
+    width: 50px;
+    border: 1px solid;
+}
+
+.barcodeData {
+    /* z-index: 0; */
+
+    /* max-height: 50px; */
+    /* width: 100%; */
+}
+
+.textBottom {
+    display: block;
+    min-height: 7px;
+    width: 100%;
+    font-size: 5px;
+    text-align: center;
+    overflow: hidden; /* Если текст выходит за границы */
+    white-space: nowrap; /* Чтобы не переносился */
+    font-weight: bold;
+}

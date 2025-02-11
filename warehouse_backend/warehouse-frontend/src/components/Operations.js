@@ -71,6 +71,7 @@ const Operations = () => {
                         <p style={{ color: 'red' }}>{errorMessage}</p>
                     </div>
                 ) : (
+                    <div className="table-container">
                     <table>
                         <thead>
                             <tr>
@@ -114,6 +115,7 @@ const Operations = () => {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 )}
             </div>
         </Layout>

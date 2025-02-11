@@ -175,7 +175,8 @@ const AddProductDetails = () => {
                     <   p style={{ color: 'red' }}>{errorMessage}</p>
                     </div>
                 ) : (
-                    <table>
+                    <div className="table-container">
+                    <table >
                         <thead>
                             <tr>
                                 <th>Артикул</th>
@@ -237,6 +238,7 @@ const AddProductDetails = () => {
                         })}
                         </tbody>
                     </table>
+                    </div>
                 )}
             </div>
         </Layout>

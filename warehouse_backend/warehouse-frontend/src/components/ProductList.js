@@ -43,8 +43,8 @@ const ProductList = () => {
                     </div>
                 ) : (
                     <div className="table-container">
-                        <table>
-                            <thead>
+                        <table >
+                            <thead >
                                 <tr>
                                     <th>Артикул</th>
                                     <th>Наименование</th>
