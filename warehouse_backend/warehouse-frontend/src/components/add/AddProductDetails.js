@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef} from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../Layout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useReactToPrint } from 'react-to-print';
 import Barcode from "react-barcode";
-import api from './api'; // Импортируешь созданный файл
+import api from '../api'; // Импортируешь созданный файл
 
 const AddProductDetails = () => {
     const location = useLocation();

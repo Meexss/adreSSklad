@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TSDLayout from './TSDLayout';
-import api from './api'; // Импортируешь созданный файл
+import api from '../api'; // Импортируешь созданный файл
 
 // Компонент для поиска товара
 const TSDSerchPlace = () => {

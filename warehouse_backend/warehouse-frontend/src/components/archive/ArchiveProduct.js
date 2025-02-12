@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Layout from "./Layout";
-import api from './api'; // Импортируешь созданный файл
+import Layout from "../Layout";
+import api from '../api'; // Импортируешь созданный файл
 
 
 const ArchiveProduct = () => {

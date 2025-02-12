@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Layout from './Layout';
+import Layout from '../Layout';
 import { useNavigate } from 'react-router-dom';
-import api from './api'; // Импортируешь созданный файл
+import api from '../api'; // Импортируешь созданный файл
 
 const ArchiveShip = () => {
     const [addproducts, setAddproducts] = useState([]);

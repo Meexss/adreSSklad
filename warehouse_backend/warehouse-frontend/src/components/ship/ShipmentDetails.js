@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../Layout';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons';
 // import Barcode from "react-barcode";
 import { useReactToPrint } from 'react-to-print';
 
-import api from './api'; // Импортируешь созданный файл
+import api from '../api'; // Импортируешь созданный файл
 
 
 const ShipmentDetails = () => {
