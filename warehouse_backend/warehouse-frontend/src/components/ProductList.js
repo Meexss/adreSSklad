@@ -51,6 +51,7 @@ const ProductList = () => {
                                     <th>Количество</th>
                                     <th>Место хранения</th>
                                     <th>Статус товара</th>
+                                    <th>Дата прихода</th>
                                     <th>Штрихкод</th>
                                 </tr>
                             </thead>
@@ -62,6 +63,7 @@ const ProductList = () => {
                                         <td>{product.quantity}</td>
                                         <td>{product.place}</td>
                                         <td>{product.goods_status}</td>
+                                        <td>{product.add_date}</td>
                                         <td>{product.barcode}</td>
                                     </tr>
                                 ))}

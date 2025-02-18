@@ -65,6 +65,7 @@ const Search = () => {
                                 <th>Количество</th>
                                 <th>Место товара</th>
                                 <th>Статус</th>
+                                <th>Дата прихода</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,6 +76,8 @@ const Search = () => {
                                     <td>{item.quantity}</td>
                                     <td>{item.place}</td>
                                     <td>{item.goods_status}</td>
+                                    <td>{item.add_date}</td>
+
                                 </tr>
                             ))}
                         </tbody>

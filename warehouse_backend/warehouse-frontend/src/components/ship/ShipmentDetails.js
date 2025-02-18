@@ -31,79 +31,70 @@ const ShipmentDetails = () => {
 
     // перерезервирование резерва
     const handleChangeReserve = async (item) => {
-        setLoading(true)
-        setError(null);
-        setSelectedItem(item);
-        setSelectedQuantity(item.quantity);
-        console.log(item)    
+
+        setLoading(true);
+            setError(null);
+        const totalReservedQuantity = reservedData
+            .filter((res) => res.article === item.article && res.place !== "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ")
+            .reduce((sum, res) => sum + res.quantity, 0);
+
+            console.log(`Суммарное зарезервированное количество: ${totalReservedQuantity}`);    
+            const finalQuantity = shipment.items
+            .filter((res) => res.article === item.article)
+            .reduce((sum, res) => sum + res.quantity, 0);
+
+            console.log(`Стоковое количество: ${finalQuantity}`); 
+
+        const sentQuanity = finalQuantity - totalReservedQuantity 
+        if (sentQuanity == 0) {
+            setLoading(false)
+            setMessage('не нужно резервировать')
+        }
+
         try {
-            const cancelRequest = {
-                reserve_ids: [selectedItem.unique_id],
-                goods_status: "Хранение",
-                cancel_quantities: {
-                    [selectedItem.unique_id]: selectedQuantity,
-                },
+
+            const reserveRequest = {
+                uid_ship: shipment.unique_id_ship, // Убедитесь, что поле соответствует API
+                type: shipment.type,
+                ship_number: shipment.ship_number,
+                ship_date: shipment.ship_date,
+                counterparty: shipment.counterparty,
+                warehouse: shipment.warehouse,
+                progress: shipment.progress,
+                stocks: [{
+                    article: item.article,
+                    quantity: sentQuanity,
+                }],
             };
 
-            const cancelResponse = await api.post('/api/reserve/cancel/', cancelRequest);
-
-            if (cancelResponse.status === 200) {
-                console.log("отменили успешно")
-                const reserveRequest = {
-                    uid_ship: selectedItem.unique_id_ship, // Убедитесь, что поле соответствует API
-                    type: selectedItem.type,
-                    ship_number: selectedItem.ship_number,
-                    ship_date: selectedItem.ship_date,
-                    counterparty: selectedItem.counterparty,
-                    warehouse: selectedItem.warehouse,
-                    progress: "В работе",
-                    stocks: [{
-                        article: selectedItem.article,
-                        quantity: selectedQuantity,
-                    }],
-                };
-                console.log("отправляемое резервирование",reserveRequest)
-        
-                const reserveResponse = await api.post('/api/reserve/', reserveRequest);
-
-                if (reserveResponse.status === 200) {
-                        console.log("Резервирование успешно завершено.");
-                        setMessage("Резервирование успешно завершено.");
-            
-                        const uid_ship = shipment.unique_id_ship; // Используем корректное поле
-                        const getResponse = await api.get(`/api/reserve/?uid_ship=${uid_ship}`);
-            
-                        if (getResponse.status === 200) {
-                            console.log(getResponse);
-                            setLoading(false)
-                            setReservedData(getResponse.data);
-                            setShowReservedData(true);
-                            localStorage.setItem(storageKey, JSON.stringify(getResponse.data));
-                        }
-                        else {
-                            setError("Ошибка в обновлении данных", getResponse)
-                            setLoading(false)    
-                        }
-
-                } else {
-                    setError("Ошибка в резервировании данных", reserveResponse)
-                    setLoading(false)   
-                }       
-            } else {
-                setError("оишбка в отмене", cancelResponse)
-                setLoading(false)
-            }
-
+            console.log("общее резервирование", reserveRequest)
+    
+            const reserveResponse = await api.post('/api/reserv/', reserveRequest);
         } catch (error) {
             setLoading(false)
-            setError(error.status)
-            // Обработка ошибки запроса
-            console.error('Error in API request:', error);
 
         }
 
+        }
 
-    }
+    // частичная отмена работает но подумать над ошибкой 500
+    const handleSubmitPartialCancel = async () => {
+        try {
+            await api.post("/api/changeReserveStatus/", {
+                reserve_id: selectedItem.unique_id,
+                new_status: selectedStatus,
+                quantity_to_cancel: selectedQuantity,
+            });
+
+            console.log(selectedItem.unique_id, selectedStatus, selectedQuantity)
+    
+            handleCloseModal()
+        } catch (error) {
+            console.error("Ошибка при изменении резервации:", error);
+        }
+
+       
+    };
 
     
     // модалка
@@ -120,10 +111,6 @@ const ShipmentDetails = () => {
 
     const statusOptions = ["Хранение", "Брак", "Недостача"];
     const storageKey = `reservedData_${shipment?.uid_ship}`;
-
-    // const api = useMemo(() => axios.create({
-    //     baseURL: 'http://127.0.0.1:8000',
-    // }), []);
 
     const updateShipmentStatus = (newStatus) => {
         setShipment(prev => ({ ...prev, progress: newStatus }));
@@ -184,35 +171,6 @@ const ShipmentDetails = () => {
         }
     }, [api, shipment, storageKey, updateShipmentStatus]);
 
-    // частичная отмена работает но подумать над ошибкой 500
-    const handleSubmitPartialCancel = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            setShowModal(false);
-
-            const cancelRequest = {
-                reserve_ids: [selectedItem.unique_id],
-                goods_status: selectedStatus,
-                cancel_quantities: {
-                    [selectedItem.unique_id]: selectedQuantity,
-                },
-            };
-
-            const cancelResponse = await api.post('/api/reserve/cancel/', cancelRequest);
-
-            if (cancelResponse.status === 200) {
-                setMessage("Частичная отмена выполнена успешно.");
-                await api.get(`/api/reserve/?uid_ship=${shipment.unique_id_ship}`);
-            } else if (cancelResponse.status === 500) {
-                setMessage("Ошибка на сервере. Пожалуйста, попробуйте позже.");
-                await api.get(`/api/reserve/?uid_ship=${shipment.unique_id_ship}`);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
     //Закрыть отгрузку
     const handleCloseShip = async () => {
         try {
@@ -264,6 +222,7 @@ const ShipmentDetails = () => {
 
             const cancelResponse = await api.post('/api/reserve/cancel/', {
                 reserve_ids: reservedData.map(item => item.unique_id),
+                goods_status: "Хранение",
             });
 
             console.log(reservedData.map(item => item.unique_id))
@@ -315,9 +274,17 @@ const ShipmentDetails = () => {
             } finally {
                 setLoading(false);
             }
+
+            console.log(reservedData)
         };
 
         fetchReservationData();
+        const interval = setInterval(fetchReservationData, 60000);
+
+        // Очистка интервала при размонтировании компонента
+        return () => clearInterval(interval);     
+
+
     }, [shipment, storageKey, api]);
 
     const handleNewData = async () => {
@@ -455,7 +422,11 @@ const ShipmentDetails = () => {
                 {shipment.items.map((stock, index) => {
                             // Фильтруем все записи из reservedData, соответствующие данному артикулу
                             const reservedItems = reservedData.filter(item => item.article === stock.article);
-
+                           
+                            const totalReservedQuantity = reservedItems.reduce((sum, res) => sum + res.quantity, 0);
+            
+                            
+                            const sentQuanity = stock.quantity - totalReservedQuantity       
                             return reservedItems.length > 0 ? (
                                 // Если есть зарезервированные данные, создаем строку для каждого элемента из reservedItems
                                 reservedItems.map((reservedItem, subIndex) => (
@@ -465,8 +436,9 @@ const ShipmentDetails = () => {
                                             <>
                                                 <td rowSpan={reservedItems.length} >{stock.article}</td>
                                                 <td className='text-left' rowSpan={reservedItems.length} >{stock.name}</td>
-                                                <td rowSpan={reservedItems.length} >{stock.quantity}</td>
-                                                
+                                                <td 
+                                                style={{backgroundColor: sentQuanity === 0 ? "inherit": "red", borderRadius: "10px",}}
+                                                rowSpan={reservedItems.length} >{stock.quantity}</td>
                                                 
                             
                                             </>
@@ -497,6 +469,7 @@ const ShipmentDetails = () => {
                                             
                                         />
                                         </td>
+                                        
                                         <td><FontAwesomeIcon 
                                             className='no-print'
                                             icon={faRotate} 
@@ -520,9 +493,26 @@ const ShipmentDetails = () => {
                                 <tr key={index}>
                                     <td >{stock.article}</td>
                                     <td className='text-left'>{stock.name}</td>
-                                    <td >{stock.quantity}</td>
+                                    <td style={{backgroundColor: sentQuanity === 0 ? "inherit": "red", borderRadius: "10px",}}>{stock.quantity}</td>
                                     <td >—</td>
                                     <td >—</td>
+                                    <td ></td>
+                                    <td ></td>
+                                    <td><FontAwesomeIcon 
+                                            className='no-print'
+                                            icon={faRotate} 
+                                            style={{
+                                                cursor: 'pointer',
+                                                fontSize: '18px',
+                                                padding: '5px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#fff',
+                                                color: 'green'
+                                            }}
+                                            onClick={() => handleChangeReserve(stock)}
+
+                                        />
+                                        </td>
                                 </tr>
                             );
                         })}

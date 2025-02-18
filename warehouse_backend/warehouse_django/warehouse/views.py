@@ -479,10 +479,13 @@ class PlaceProducts(APIView):
 
                 if difference < product.get("quantity"):
                     return Response(
-                        {"error": f"Досутпно к размещению: {difference}"},
+                        {"error": f"Недостаточное количество товара: {difference} доступно, {product.get('quantity')} требуется"},
                         status=status.HTTP_400_BAD_REQUEST
                     )
-                
+
+
+
+
                 if add_date:
                     try:
                         add_date_fin = datetime.fromisoformat(add_date).date()
@@ -784,26 +787,26 @@ class ReserveAllView(APIView):
 
             # Если не удалось зарезервировать всю требуемую партию, создаем запись о нехватке
             no_reserv = quantity > reserved_quantity
-            if no_reserv:
-                ReservList.objects.create(
-                    unique_id_ship=uid_ship,
-                    reserve_data=datetime.now().date(),
-                    unique_id=uuid.uuid4(),
-                    article=article,
-                    name="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
-                    barcode="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
-                    quantity=quantity - reserved_quantity,
-                    place="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
-                    goods_status="В отгрузке",
-                    add_date=datetime.now().date(),
+            # if no_reserv:
+            #     ReservList.objects.create(
+            #         unique_id_ship=uid_ship,
+            #         reserve_data=datetime.now().date(),
+            #         unique_id=uuid.uuid4(),
+            #         article=article,
+            #         name="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
+            #         barcode="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
+            #         quantity=quantity - reserved_quantity,
+            #         place="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
+            #         goods_status="В отгрузке",
+            #         add_date=datetime.now().date(),
 
-                    type = type,
-                    ship_number = ship_number,
-                    ship_date = ship_date,
-                    counterparty = counterparty,
-                    warehouse = warehouse,
-                    progress = progress,
-                )
+            #         type = type,
+            #         ship_number = ship_number,
+            #         ship_date = ship_date,
+            #         counterparty = counterparty,
+            #         warehouse = warehouse,
+            #         progress = progress,
+            #     )
 
             return reserved_quantity, reserved_places, no_reserv
 
@@ -818,115 +821,46 @@ class CancelReservation(APIView):
     def post(self, request):
         try:
             reserve_ids = request.data.get('reserve_ids', [])
-            cancel_quantities = request.data.get('cancel_quantities', {})  # Словарь {unique_id: количество для отмены}
             new_goods_status = request.data.get('goods_status', 'Хранение')
-
-            print(f"полученные данные : {reserve_ids}")
-            print(f"статус данных : {new_goods_status}")
-
-            canceled_items = []  # Для сериализации
-            archive_items = []
-            update_items = []
-            delete_items = []  # Для удаления
-
-            reserv = ReservList.objects.filter(unique_id__in=reserve_ids)
-            print(f"фильтрованные данные : {reserv}")
-
-            for item in reserv:
-                print(f"позиция  : {item}")
-                print(f"статус позиции  : {item.goods_status}")
-                print(f"UID позиции  : {item.unique_id}")
-
-                cancel_quantity = cancel_quantities.get(str(item.unique_id), item.quantity)
-
-                if item.goods_status in ['Брак', 'Недостача']:
-                    if cancel_quantity < item.quantity:
-                        # Добавляем в архив
-                        archive_items.append(ArchiveProduct(
-                            unique_id=uuid.uuid4(),
-                            add_date=item.add_date,
-                            article=item.article,
-                            name=item.name,
-                            quantity=cancel_quantity,
-                            place=item.place,
-                            goods_status=new_goods_status,
-                            barcode=item.barcode,
-                            close_product_date=datetime.now().date()
-                        ))
-                        # Обновляем объект
-                        item.quantity -= cancel_quantity
-                        item.goods_status = "Хранение"
-                        update_items.append(item)
-                    else:
-                        # Полностью переносим в архив и удаляем
-                        archive_items.append(ArchiveProduct(
-                            unique_id=item.unique_id,
-                            add_date=item.add_date,
-                            article=item.article,
-                            name=item.name,
-                            quantity=item.quantity,
-                            place=item.place,
-                            goods_status=new_goods_status,
-                            barcode=item.barcode,
-                            close_product_date=datetime.now().date()
-                        ))
-                        delete_items.append(item)
-
-                elif item.goods_status == 'В отгрузке':
+            
+            print(f"Полученные данные: {reserve_ids}")
+            print(f"Новый статус товаров: {new_goods_status}")
+            
+            canceled_items = []  # Список отмененных товаров
+            
+            reserv_items = ReservList.objects.filter(unique_id__in=reserve_ids)
+            print(f"Найденные резервированные позиции: {reserv_items}")
+            
+            with transaction.atomic():  # Оборачиваем в транзакцию для целостности данных
+                for item in reserv_items:
                     if item.place == "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ":
-                        if cancel_quantity >= item.quantity:
-                            delete_items.append(item)
-                        else:
-                            item.quantity -= cancel_quantity
-                            update_items.append(item)
                         canceled_items.append(item)
-                    else:     
-                        if cancel_quantity < item.quantity:
-                            # Создаем новый объект в ProductList
-                            archive_items.append(ProductList(
-                                unique_id=uuid.uuid4(),
-                                article=item.article,
-                                name=item.name,
-                                quantity=cancel_quantity,
-                                place=item.place,
-                                goods_status=new_goods_status,
-                                barcode=item.barcode,
-                                add_date=item.add_date
-                            ))
-                            # Обновляем резерв
-                            item.quantity -= cancel_quantity
-                            item.goods_status = "Хранение"
-                            update_items.append(item)
-                        else:
-                            # Переносим в ProductList и удаляем из резерва
-                            archive_items.append(ProductList(
-                                unique_id=item.unique_id,
-                                article=item.article,
-                                name=item.name,
-                                quantity=item.quantity,
-                                place=item.place,
-                                goods_status=new_goods_status,
-                                barcode=item.barcode,
-                                add_date=item.add_date
-                            ))
-                            delete_items.append(item)
-
-            # Выполняем массовые операции
-            if archive_items:
-                ArchiveProduct.objects.bulk_create(archive_items)
-                print(f"Сохранено {len(archive_items)} записей в ArchiveProduct")
-
-            if update_items:
-                ReservList.objects.bulk_update(update_items, ['quantity', 'goods_status'])
-                print(f"Обновлено {len(update_items)} записей в ReservList")
-
-            if delete_items:
-                ReservList.objects.filter(unique_id__in=[obj.unique_id for obj in delete_items]).delete()
-                print(f"Удалено {len(delete_items)} записей из ReservList")
-
+                        item.delete()
+                        continue
+                            
+                    product = ProductList.objects.filter(article=item.article, place=item.place, add_date=item.add_date).first()
+                    
+                    if product:
+                        product.quantity += item.quantity  # Добавляем количество к существующему товару
+                        product.save()
+                    else:
+                        product = ProductList.objects.create(
+                            unique_id=item.unique_id,  # Присваиваем UUID от резерва
+                            add_date=item.add_date,
+                            article=item.article,
+                            name=item.name,
+                            barcode=item.barcode,
+                            place=item.place,
+                            quantity=item.quantity,
+                            goods_status=new_goods_status,
+                        )
+                    
+                    canceled_items.append(item)
+                    item.delete()  # Удаляем запись из резерва
+            
             # Сериализация отмененных товаров
             canceled_items_serializer = ReservListSerializer(canceled_items, many=True)
-
+            
             return Response(
                 {
                     "status": "success",
@@ -935,7 +869,6 @@ class CancelReservation(APIView):
                 },
                 status=status.HTTP_200_OK,
             )
-
         except Exception as e:
             print(f"Ошибка: {str(e)}")  # Для отладки
             return Response(
@@ -1268,4 +1201,71 @@ class NewDataViews(APIView):
 
         except Exception as e:
             return Response({"error": f"Ошибка на сервере: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                  
+
+# частичная отмена товара
+class ChangeReserveStatus(APIView):
+    def post(self, request):
+        try:
+            reserve_id = request.data.get("reserve_id")
+            new_status = request.data.get("new_status")
+            quantity_to_cancel = int(request.data.get("quantity_to_cancel", 0))
+
+            if not reserve_id or not new_status or quantity_to_cancel <= 0:
+                return Response({"error": "reserve_id, new_status и количество обязательны"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Найти запись в ReservList
+            reserved_item = ReservList.objects.filter(unique_id=reserve_id).first()
+
+            if not reserved_item:
+                return Response({"error": "Запись не найдена"}, status=status.HTTP_404_NOT_FOUND)
+
+            if reserved_item.quantity < quantity_to_cancel:
+                return Response({"error": "Недостаточное количество для отмены"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Создаем запись в нужном списке
+            if new_status in ["Брак", "Недостача"]:
+                ArchiveProduct.objects.create(
+                    unique_id=reserved_item.unique_id,
+                    add_date=reserved_item.add_date,
+                    article=reserved_item.article,
+                    name=reserved_item.name,
+                    barcode=reserved_item.barcode,
+                    quantity=quantity_to_cancel,
+                    place=reserved_item.place,
+                    goods_status=new_status,
+                    close_product_date=datetime.now().date()
+                
+                )
+            elif new_status == "Хранение":
+                existing_products = ProductList.objects.filter(article=reserved_item.article, place=reserved_item.place, add_date=reserved_item.add_date)
+
+                if existing_products.exists():
+                    # Если записи есть, обновляем первую найденную (можно улучшить логику)
+                    product = existing_products.first()
+                    product.quantity += quantity_to_cancel
+                    product.save()
+                else:
+                    # Если записи нет, создаем новую
+                    ProductList.objects.create(
+                        unique_id=reserved_item.unique_id,  # Добавляем, если уникальность важна
+                        add_date=reserved_item.add_date,
+                        article=reserved_item.article,
+                        name=reserved_item.name,
+                        barcode=reserved_item.barcode,
+                        quantity=quantity_to_cancel,
+                        place=reserved_item.place,
+                        goods_status=new_status,
+                    )
+
+            # Если после списания остается товар — обновляем количество, иначе удаляем запись
+            if reserved_item.quantity > quantity_to_cancel:
+                reserved_item.quantity -= quantity_to_cancel
+                reserved_item.save()
+            else:
+                reserved_item.delete()
+
+            return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Ошибка: {str(e)}")
+            return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

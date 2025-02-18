@@ -1,6 +1,6 @@
 from django.urls import path
 # from .oldviews import ShipmentListView, AddProductListView, ProductListView, ReserveAllView, CancelReservation, PlaceProducts, protected_view, ArchiveShip, ArchiveAdd
-from .views import TranzitDataViewSet, ShipDataViewSet, AddDataViewSet, ProductListView, ProductListCreateView, ShipmentListView, ReserveAllView, CancelReservation, AddProductListView,PlaceProducts, FindBarcodeViews, protected_view, FindPlaceViews, ArchiveProductView, ArchiveShipView, ArchiveAddView, NewDataViews
+from .views import TranzitDataViewSet, ShipDataViewSet, AddDataViewSet, ProductListView, ProductListCreateView, ShipmentListView, ReserveAllView, CancelReservation, AddProductListView,PlaceProducts, FindBarcodeViews, protected_view, FindPlaceViews, ArchiveProductView, ArchiveShipView, ArchiveAddView, NewDataViews, ChangeReserveStatus
 from rest_framework_simplejwt.views import (                                                                                            
     TokenObtainPairView,
     TokenRefreshView,
@@ -27,7 +27,7 @@ urlpatterns = [
     path('inShip/', ShipDataViewSet.as_view({'post': 'create'})),  # Только crea
     path('inAdd/', AddDataViewSet.as_view({'post': 'create'})),  # Только crea 
     path('send_product/', ProductListCreateView.as_view()), 
-   
+    path('changeReserveStatus/', ChangeReserveStatus.as_view()), 
    
     path('newData/', NewDataViews.as_view()),
     path('serch_product/', FindBarcodeViews.as_view()), 
