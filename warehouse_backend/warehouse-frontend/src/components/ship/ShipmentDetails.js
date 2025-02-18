@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Layout from '../Layout';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faArrowLeft, faPrint, faRotate } from '@fortawesome/free-solid-svg-icons';
 // import Barcode from "react-barcode";
 import { useReactToPrint } from 'react-to-print';
 
@@ -29,6 +29,83 @@ const ShipmentDetails = () => {
     const [noReserv, setNoReserv] = useState([])
 
 
+    // перерезервирование резерва
+    const handleChangeReserve = async (item) => {
+        setLoading(true)
+        setError(null);
+        setSelectedItem(item);
+        setSelectedQuantity(item.quantity);
+        console.log(item)    
+        try {
+            const cancelRequest = {
+                reserve_ids: [selectedItem.unique_id],
+                goods_status: "Хранение",
+                cancel_quantities: {
+                    [selectedItem.unique_id]: selectedQuantity,
+                },
+            };
+
+            const cancelResponse = await api.post('/api/reserve/cancel/', cancelRequest);
+
+            if (cancelResponse.status === 200) {
+                console.log("отменили успешно")
+                const reserveRequest = {
+                    uid_ship: selectedItem.unique_id_ship, // Убедитесь, что поле соответствует API
+                    type: selectedItem.type,
+                    ship_number: selectedItem.ship_number,
+                    ship_date: selectedItem.ship_date,
+                    counterparty: selectedItem.counterparty,
+                    warehouse: selectedItem.warehouse,
+                    progress: "В работе",
+                    stocks: [{
+                        article: selectedItem.article,
+                        quantity: selectedQuantity,
+                    }],
+                };
+                console.log("отправляемое резервирование",reserveRequest)
+        
+                const reserveResponse = await api.post('/api/reserve/', reserveRequest);
+
+                if (reserveResponse.status === 200) {
+                        console.log("Резервирование успешно завершено.");
+                        setMessage("Резервирование успешно завершено.");
+            
+                        const uid_ship = shipment.unique_id_ship; // Используем корректное поле
+                        const getResponse = await api.get(`/api/reserve/?uid_ship=${uid_ship}`);
+            
+                        if (getResponse.status === 200) {
+                            console.log(getResponse);
+                            setLoading(false)
+                            setReservedData(getResponse.data);
+                            setShowReservedData(true);
+                            localStorage.setItem(storageKey, JSON.stringify(getResponse.data));
+                        }
+                        else {
+                            setError("Ошибка в обновлении данных", getResponse)
+                            setLoading(false)    
+                        }
+
+                } else {
+                    setError("Ошибка в резервировании данных", reserveResponse)
+                    setLoading(false)   
+                }       
+            } else {
+                setError("оишбка в отмене", cancelResponse)
+                setLoading(false)
+            }
+
+        } catch (error) {
+            setLoading(false)
+            setError(error.status)
+            // Обработка ошибки запроса
+            console.error('Error in API request:', error);
+
+        }
+
+
+    }
+
+    
     // модалка
     const handleOpenModal = (item) => {
         console.log(item)
@@ -73,6 +150,8 @@ const ShipmentDetails = () => {
                     quantity: stock.quantity,
                 })),
             };
+
+            console.log("общее резервирование", reserveRequest)
     
             const reserveResponse = await api.post('/api/reserve/', reserveRequest);
     
@@ -365,6 +444,7 @@ const ShipmentDetails = () => {
                         <th>Кол-во к отбору</th>
                         <th className="no-print">Статус</th>
                         <th> </th>
+                        <th> </th>
                         </>
                     )}
                     </tr>
@@ -415,6 +495,21 @@ const ShipmentDetails = () => {
                                             
                                         />
                                         </td>
+                                        <td><FontAwesomeIcon 
+                                            className='no-print'
+                                            icon={faRotate} 
+                                            style={{
+                                                cursor: 'pointer',
+                                                fontSize: '18px',
+                                                padding: '5px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#fff',
+                                                color: 'green'
+                                            }}
+                                            onClick={() => handleChangeReserve(reservedItem)}
+
+                                        />
+                                        </td>
                                     </tr>
                                     
                                 ))
@@ -438,7 +533,7 @@ const ShipmentDetails = () => {
                 {showModal && selectedItem && (
                     <div style={{
                         position: 'fixed', top: '0', left: '0', right: '0', bottom: '0',
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: '2'
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: '20'
                     }}>
                         <div style={{
                             backgroundColor: 'white', padding: '20px', borderRadius: '8px', width: '400px',

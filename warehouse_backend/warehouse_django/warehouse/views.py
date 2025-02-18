@@ -19,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 import traceback
 from django.db import transaction
 from collections import defaultdict
+from django.db.models import Sum
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -465,6 +466,23 @@ class PlaceProducts(APIView):
                 add_date = product.get("add_date")
                 uniqid = uuid.uuid4()
 
+                # Фильтруем данные
+                filtered_add = AddList.objects.filter(unique_id_add=product.get("uid_add"), article=product.get("article"))
+                filtered_place = PlaceProduct.objects.filter(unique_id_add=product.get("uid_add"), article=product.get("article"))
+
+                # Считаем сумму полей
+                sum_add = filtered_add.aggregate(total=Sum("final_quantity"))["total"] or 0
+                sum_place = filtered_place.aggregate(total=Sum("quantity"))["total"] or 0
+
+                # Вычисляем разницу
+                difference = sum_add - sum_place
+
+                if difference < product.get("quantity"):
+                    return Response(
+                        {"error": f"Досутпно к размещению: {difference}"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
                 if add_date:
                     try:
                         add_date_fin = datetime.fromisoformat(add_date).date()
@@ -472,6 +490,7 @@ class PlaceProducts(APIView):
                         return Response({"error": f"Неверный формат даты: {add_date}"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"error": "Поле add_date обязательно"}, status=status.HTTP_400_BAD_REQUEST)
+                
 
                 # Исключаем `unique_id`, так как Django сам его создаст
                 place_product = PlaceProduct.objects.create(
@@ -818,16 +837,7 @@ class CancelReservation(APIView):
                 print(f"шв позиции  : {item.unique_id}")
                 cancel_quantity = cancel_quantities.get(str(item.unique_id), item.quantity)
 
-                if item.place == "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ":
-                    if cancel_quantity >= item.quantity:
-                        item.delete()
-                        canceled_items.append(item)
-                        continue
-                    else:
-                        item.quantity -= cancel_quantity
-                        item.save()
-                        canceled_items.append(item)
-                        continue
+                
 
                 if item.goods_status in ['Брак', 'Недостача']:
                         if cancel_quantity < item.quantity:
@@ -864,36 +874,48 @@ class CancelReservation(APIView):
                             item.delete()
 
                 elif item.goods_status == 'В отгрузке':
-                    if cancel_quantity < item.quantity:
-                        canceled_item = ProductList(
-                            unique_id=uuid.uuid4(),
-                            article=item.article,
-                            name=item.name,
-                            quantity=cancel_quantity,
-                            place=item.place,
-                            goods_status=new_goods_status,
-                            barcode=item.barcode,
-                            add_date=item.add_date
-                        )
-                        canceled_item.save()
+                    if item.place == "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ":
+                        if cancel_quantity >= item.quantity:
+                            item.delete()
+                            canceled_items.append(item)
+                            continue
+                        else:
+                            item.quantity -= cancel_quantity
+                            item.save()
+                            canceled_items.append(item)
+                            continue
+                    else:     
 
-                        item.quantity -= cancel_quantity
-                        item.goods_status = "Хранение"
-                        item.save()
-                    else:
-                        canceled_items.append(item)
-                        product_entry = ProductList(
-                            unique_id=item.unique_id,
-                            article=item.article,
-                            name=item.name,
-                            quantity=item.quantity,
-                            place=item.place,
-                            goods_status=new_goods_status,
-                            barcode=item.barcode,
-                            add_date=item.add_date
-                        )
-                        product_entry.save()
-                        item.delete()
+                        if cancel_quantity < item.quantity:
+                            canceled_item = ProductList(
+                                unique_id=uuid.uuid4(),
+                                article=item.article,
+                                name=item.name,
+                                quantity=cancel_quantity,
+                                place=item.place,
+                                goods_status=new_goods_status,
+                                barcode=item.barcode,
+                                add_date=item.add_date
+                            )
+                            canceled_item.save()
+
+                            item.quantity -= cancel_quantity
+                            item.goods_status = "Хранение"
+                            item.save()
+                        else:
+                            canceled_items.append(item)
+                            product_entry = ProductList(
+                                unique_id=item.unique_id,
+                                article=item.article,
+                                name=item.name,
+                                quantity=item.quantity,
+                                place=item.place,
+                                goods_status=new_goods_status,
+                                barcode=item.barcode,
+                                add_date=item.add_date
+                            )
+                            product_entry.save()
+                            item.delete()
 
             # Сериализация отмененных товаров
             canceled_items_serializer = ReservListSerializer(canceled_items, many=True)

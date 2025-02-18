@@ -147,7 +147,7 @@ const AddProductDetails = () => {
                                                 backgroundColor: 'grey',
                                             }}
                                         >
-                                            Завершить отгрузку
+                                            Завершить приёмку
                         </button></Link>
                         <button className='no-print' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
                         <FontAwesomeIcon icon={faPrint} /> Печать
