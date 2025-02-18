@@ -203,10 +203,10 @@ const ShipmentDetails = () => {
 
             if (cancelResponse.status === 200) {
                 setMessage("Частичная отмена выполнена успешно.");
-                await api.get(`/api/reserve/?uid_ship=${shipment.uid_ship}`);
+                await api.get(`/api/reserve/?uid_ship=${shipment.unique_id_ship}`);
             } else if (cancelResponse.status === 500) {
                 setMessage("Ошибка на сервере. Пожалуйста, попробуйте позже.");
-                await api.get(`/api/reserve/?uid_ship=${shipment.uid_ship}`);
+                await api.get(`/api/reserve/?uid_ship=${shipment.unique_id_ship}`);
             }
         } finally {
             setLoading(false);
@@ -265,6 +265,8 @@ const ShipmentDetails = () => {
             const cancelResponse = await api.post('/api/reserve/cancel/', {
                 reserve_ids: reservedData.map(item => item.unique_id),
             });
+
+            console.log(reservedData.map(item => item.unique_id))
 
             if (cancelResponse.status === 200) {
                 setReservedData([]);

@@ -824,70 +824,66 @@ class CancelReservation(APIView):
             print(f"полученные данные : {reserve_ids}")
             print(f"статус данных : {new_goods_status}")
 
-            canceled_items = []  # Список отмененных товаров
-            updated_reserv = []  # Обновленные записи резервирования
+            canceled_items = []  # Для сериализации
+            archive_items = []
+            update_items = []
+            delete_items = []  # Для удаления
 
             reserv = ReservList.objects.filter(unique_id__in=reserve_ids)
-            products = ProductList.objects.all()  # Получаем все товары
-            archive = ArchiveProduct.objects.all()  # Получаем все архивные товары
             print(f"фильтрованные данные : {reserv}")
+
             for item in reserv:
                 print(f"позиция  : {item}")
-                print(f"стутус позиции  : {item.goods_status}")
-                print(f"шв позиции  : {item.unique_id}")
+                print(f"статус позиции  : {item.goods_status}")
+                print(f"UID позиции  : {item.unique_id}")
+
                 cancel_quantity = cancel_quantities.get(str(item.unique_id), item.quantity)
 
-                
-
                 if item.goods_status in ['Брак', 'Недостача']:
-                        if cancel_quantity < item.quantity:
-                            canceled_item = ArchiveProduct(
-                                unique_id=uuid.uuid4(),
-                                add_date=item.add_date,
-                                article=item.article,
-                                name=item.name,
-                                quantity=cancel_quantity,
-                                place=item.place,
-                                goods_status=new_goods_status,
-                                barcode=item.barcode,
-                                close_product_date=datetime.now().date()
-                            )
-                            canceled_item.save()
-
-                            item.quantity -= cancel_quantity
-                            item.goods_status = "Хранение"
-                            item.save()
-                        else:
-                            canceled_items.append(item)
-                            archived_product = ArchiveProduct(
-                                unique_id=item.unique_id,
-                                add_date=item.add_date,
-                                article=item.article,
-                                name=item.name,
-                                quantity=item.quantity,
-                                place=item.place,
-                                goods_status=new_goods_status,
-                                barcode=item.barcode,
-                                close_product_date=datetime.now().date()
-                            )
-                            archived_product.save()
-                            item.delete()
+                    if cancel_quantity < item.quantity:
+                        # Добавляем в архив
+                        archive_items.append(ArchiveProduct(
+                            unique_id=uuid.uuid4(),
+                            add_date=item.add_date,
+                            article=item.article,
+                            name=item.name,
+                            quantity=cancel_quantity,
+                            place=item.place,
+                            goods_status=new_goods_status,
+                            barcode=item.barcode,
+                            close_product_date=datetime.now().date()
+                        ))
+                        # Обновляем объект
+                        item.quantity -= cancel_quantity
+                        item.goods_status = "Хранение"
+                        update_items.append(item)
+                    else:
+                        # Полностью переносим в архив и удаляем
+                        archive_items.append(ArchiveProduct(
+                            unique_id=item.unique_id,
+                            add_date=item.add_date,
+                            article=item.article,
+                            name=item.name,
+                            quantity=item.quantity,
+                            place=item.place,
+                            goods_status=new_goods_status,
+                            barcode=item.barcode,
+                            close_product_date=datetime.now().date()
+                        ))
+                        delete_items.append(item)
 
                 elif item.goods_status == 'В отгрузке':
                     if item.place == "НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ":
                         if cancel_quantity >= item.quantity:
-                            item.delete()
-                            canceled_items.append(item)
-                            continue
+                            delete_items.append(item)
                         else:
                             item.quantity -= cancel_quantity
-                            item.save()
-                            canceled_items.append(item)
-                            continue
+                            update_items.append(item)
+                        canceled_items.append(item)
                     else:     
-
                         if cancel_quantity < item.quantity:
-                            canceled_item = ProductList(
+                            # Создаем новый объект в ProductList
+                            archive_items.append(ProductList(
                                 unique_id=uuid.uuid4(),
                                 article=item.article,
                                 name=item.name,
@@ -896,15 +892,14 @@ class CancelReservation(APIView):
                                 goods_status=new_goods_status,
                                 barcode=item.barcode,
                                 add_date=item.add_date
-                            )
-                            canceled_item.save()
-
+                            ))
+                            # Обновляем резерв
                             item.quantity -= cancel_quantity
                             item.goods_status = "Хранение"
-                            item.save()
+                            update_items.append(item)
                         else:
-                            canceled_items.append(item)
-                            product_entry = ProductList(
+                            # Переносим в ProductList и удаляем из резерва
+                            archive_items.append(ProductList(
                                 unique_id=item.unique_id,
                                 article=item.article,
                                 name=item.name,
@@ -913,14 +908,25 @@ class CancelReservation(APIView):
                                 goods_status=new_goods_status,
                                 barcode=item.barcode,
                                 add_date=item.add_date
-                            )
-                            product_entry.save()
-                            item.delete()
+                            ))
+                            delete_items.append(item)
+
+            # Выполняем массовые операции
+            if archive_items:
+                ArchiveProduct.objects.bulk_create(archive_items)
+                print(f"Сохранено {len(archive_items)} записей в ArchiveProduct")
+
+            if update_items:
+                ReservList.objects.bulk_update(update_items, ['quantity', 'goods_status'])
+                print(f"Обновлено {len(update_items)} записей в ReservList")
+
+            if delete_items:
+                ReservList.objects.filter(unique_id__in=[obj.unique_id for obj in delete_items]).delete()
+                print(f"Удалено {len(delete_items)} записей из ReservList")
 
             # Сериализация отмененных товаров
             canceled_items_serializer = ReservListSerializer(canceled_items, many=True)
 
-            # Ответ с сериализованными данными
             return Response(
                 {
                     "status": "success",
@@ -933,7 +939,7 @@ class CancelReservation(APIView):
         except Exception as e:
             print(f"Ошибка: {str(e)}")  # Для отладки
             return Response(
-                {"error": "Ошибка на сервере"}, 
+                {"error": "Ошибка на сервере", "details": str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
