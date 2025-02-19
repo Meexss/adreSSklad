@@ -177,3 +177,16 @@ class ArchiveProduct(models.Model):
     place = models.CharField(max_length=100)
     goods_status = models.CharField(max_length=100) #при удалении из резерва устанавливаетя Брак или Недостача
     close_product_date = models.DateField() #дата переноса в эту таблицу
+
+
+class MoveList(models.Model):
+    moveNumber = models.CharField(max_length=255) #номер задания на перемещение/размещение 
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=True) #уникальный id товара
+    add_date = models.DateField() #дата поступления
+    article = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    barcode = models.CharField(max_length=100) #если ошибка error_barcode === true то новый баркод если false то шк 1С
+    place = models.CharField(max_length=100) #место хранения на складе
+    quantity = models.IntegerField() #размещенное кол-во в ячейке
+    goods_status = models.CharField(max_length=100) #в этом списке только Хранение
+    newPlace = models.CharField(max_length=100) #новое место

@@ -27,12 +27,14 @@ const Layout = ({ children }) => {
                     <div className="nav-container">
                         <ul className={`nav-links ${isMenuOpen ? "open" : ""}`}>
                             <li><NavLink to="/operations" className={({ isActive }) => isActive ? "active" : ""}>Расходные операции</NavLink></li>
-                            <li><NavLink to="/products" className={({ isActive }) => isActive ? "active" : ""}>Список товаров</NavLink></li>
-                            <li><NavLink to="/add-product-list" className={({ isActive }) => isActive ? "active" : ""}>Список приходов</NavLink></li>
-                            <li><NavLink to="/TSDmenu" className={({ isActive }) => isActive ? "active" : ""}>Меню ТСД</NavLink></li>
+                            
+                            <li><NavLink to="/add-product-list" className={({ isActive }) => isActive ? "active" : ""}>Приходные операции</NavLink></li>
+                            
                             <li><NavLink to="/search" className={({ isActive }) => isActive ? "active" : ""}>Поиск</NavLink></li>
+                            <li><NavLink to="/move" className={({ isActive }) => isActive ? "active" : ""}>Перемещение/Распределение</NavLink></li>
 
-                            <li><NavLink to="/print-label" className={({ isActive }) => isActive ? "active" : ""}>Печать стикеров</NavLink></li>
+                            {/* <li><NavLink to="/print-label" className={({ isActive }) => isActive ? "active" : ""}>Печать стикеров</NavLink></li> */}
+                            <li><NavLink to="/products" className={({ isActive }) => isActive ? "active" : ""}>Список товаров</NavLink></li>
                             <li className="dropdown">
                                 <span className="dropdown-toggle">Архив</span>
                                 <ul className="dropdown-menu">
@@ -41,6 +43,7 @@ const Layout = ({ children }) => {
                                     <li><NavLink to="/archive-add">Архив приемок</NavLink></li>
                                 </ul>
                             </li>
+                            <li><NavLink to="/TSDmenu" className={({ isActive }) => isActive ? "active" : ""}>Меню ТСД</NavLink></li>
                         </ul>
                     </div>
                 </nav>

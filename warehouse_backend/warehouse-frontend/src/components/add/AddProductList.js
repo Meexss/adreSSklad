@@ -52,7 +52,7 @@ const AddProductList = () => {
     return (
         <Layout>
             <div>
-                <h2>Список приходов с 1С (перемещение/ приход товара)</h2>
+                <h2>Приходные операции с 1С (перемещение/ приход товара)</h2>
                 
                 {loading ? (
                         <div className='loaderWrap'>

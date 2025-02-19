@@ -60,7 +60,7 @@ const Operations = () => {
     return (
         <Layout>
             <div>
-                <h2>Расходные операции</h2>
+                <h2>Расходные операции с 1С (реализация/перемещение)</h2>
 
                 {loading ? (
                     <div className='loaderWrap'>

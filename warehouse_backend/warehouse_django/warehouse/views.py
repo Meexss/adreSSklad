@@ -2,14 +2,14 @@ from .serializers import (
     TranzitDataSerializer, ShipDataSerializer, AddDataSerializer,
     ShipListSerializer, AddListSerializer, ProductListSerializer,
     ReservListSerializer, PlaceProductSerializer, ArchiveShipSerializer,
-    ArchiveAddSerializer, ArchiveProductSerializer, ProductListSerializer
+    ArchiveAddSerializer, ArchiveProductSerializer, ProductListSerializer, MoveListSerializer
 )
 from rest_framework import serializers, viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .data_models import (
     TranzitData, ShipData, AddData, ShipList, AddList, ProductList,
-    ReservList, PlaceProduct, ArchiveShip, ArchiveAdd, ArchiveProduct
+    ReservList, PlaceProduct, ArchiveShip, ArchiveAdd, ArchiveProduct, MoveList
 )
 import uuid
 from datetime import datetime
@@ -108,7 +108,7 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
                 add_list_records = [
                     AddList(
                         unique_id_add=unique_id,
-                        type="Приемка",
+                        type="Перемещение",
                         add_number=tranz_number,
                         add_date=tranz_date,
                         counterparty=from_house if from_house != "Центральный новый" else to_house,
@@ -201,7 +201,7 @@ class ShipDataViewSet(viewsets.ModelViewSet):
                     ship_list_instances.append(
                         ShipList(
                             unique_id_ship=unique_id,
-                            type="реализация",
+                            type="Реализация",
                             ship_number=ship_number,
                             ship_date=ship_date,
                             counterparty=counterparty,
@@ -286,7 +286,7 @@ class AddDataViewSet(viewsets.ModelViewSet):
                     add_list_instances.append(
                         AddList(
                             unique_id_add=unique_id,
-                            type="оприходование",
+                            type="Оприходование",
                             add_number=add_number,
                             add_date=add_date,
                             counterparty=counterparty,
@@ -616,7 +616,7 @@ class ReserveAllView(APIView):
         uid_ship = request.data.get("uid_ship", "RESERVED")
         type = request.data.get("type", "RESERVED")
         ship_number = request.data.get("ship_number", "RESERVED")
-        ship_date = request.data.get("ship_date", "RESERVED")
+        ship_date = request.data.get("ship_date")
         counterparty = request.data.get("counterparty", "RESERVED")
         warehouse = request.data.get("warehouse", "RESERVED")
         progress = request.data.get("progress", "RESERVED")
@@ -725,7 +725,7 @@ class ReserveAllView(APIView):
                     reserved_places.append(product.place)
 
                     # Создаем запись в резерве
-                    reserved_product = ReservList.objects.create(
+                    reserved_product = ReservList(
                         unique_id_ship=uid_ship,
                         reserve_data=datetime.now().date(),
                         unique_id=uuid.uuid4(),
@@ -746,6 +746,12 @@ class ReserveAllView(APIView):
 
                     )
 
+                    try:
+                        reserved_product.save()
+                    except Exception as e:
+                        print(f"Ошибка сохранения ReservList: {e}")
+                        raise
+
                     # Уменьшаем количество товара
                     product.quantity -= remaining_needed
                     product.save(update_fields=["quantity"])
@@ -762,7 +768,7 @@ class ReserveAllView(APIView):
                     remaining_needed -= available_quantity
 
                     # Создаем запись в резерве
-                    reserved_product = ReservList.objects.create(
+                    reserved_product = ReservList(
                         unique_id_ship=uid_ship,
                         reserve_data=datetime.now().date(),
                         unique_id=uuid.uuid4(),
@@ -781,32 +787,17 @@ class ReserveAllView(APIView):
                         warehouse = warehouse,
                         progress = progress,
                     )
+                    try:
+                        reserved_product.save()
+                    except Exception as e:
+                        print(f"Ошибка сохранения ReservList: {e}")
+                        raise
 
                     # Удаляем товар
                     product.delete()
 
             # Если не удалось зарезервировать всю требуемую партию, создаем запись о нехватке
             no_reserv = quantity > reserved_quantity
-            # if no_reserv:
-            #     ReservList.objects.create(
-            #         unique_id_ship=uid_ship,
-            #         reserve_data=datetime.now().date(),
-            #         unique_id=uuid.uuid4(),
-            #         article=article,
-            #         name="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
-            #         barcode="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
-            #         quantity=quantity - reserved_quantity,
-            #         place="НЕУДАЛОСЬ ЗАРЕЗЕРВИРОВАТЬ",
-            #         goods_status="В отгрузке",
-            #         add_date=datetime.now().date(),
-
-            #         type = type,
-            #         ship_number = ship_number,
-            #         ship_date = ship_date,
-            #         counterparty = counterparty,
-            #         warehouse = warehouse,
-            #         progress = progress,
-            #     )
 
             return reserved_quantity, reserved_places, no_reserv
 
@@ -840,6 +831,7 @@ class CancelReservation(APIView):
                             
                     product = ProductList.objects.filter(article=item.article, place=item.place, add_date=item.add_date).first()
                     
+
                     if product:
                         product.quantity += item.quantity  # Добавляем количество к существующему товару
                         product.save()
@@ -1269,3 +1261,68 @@ class ChangeReserveStatus(APIView):
         except Exception as e:
             print(f"Ошибка: {str(e)}")
             return Response({"error": "Ошибка на сервере", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class ChangeStatusAndPlace(APIView):
+    def post(self, request):
+        try:
+            ship_id = request.data.get("ship_id")
+            stock = request.data.get("stock", [])  # Список уникальных ID товаров  
+
+            # Получаем все записи с этим ship_id
+            ship_items = ReservList.objects.filter(unique_id_ship=ship_id)
+
+            # Проходим по stock и обновляем записи, если они есть в ship_items
+            updated_count = 0
+            for item_id in stock:
+                item = ship_items.filter(unique_id=item_id).first()  # Проверяем, есть ли товар  
+                if item:
+                    item.place = "Сборка"
+                    item.goods_status = "Собран"
+                    item.progress = "Собран"
+                    item.save()
+                    updated_count += 1  # Подсчитываем количество обновлённых записей  
+
+            if updated_count > 0:
+                return Response({"message": "Данные обновлены", "updated": updated_count}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Нет подходящих товаров"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class MoveProducts(APIView):
+    def post(self, request):
+        try:
+            move_id = request.data.get("moveNumber")
+            stock = request.data.get("stock", [])  # Список уникальных ID товаров  
+
+            for item in stock:
+                # Удаляем товар из списка резервов
+                ReservList.objects.filter(unique_id=item["unique_id"]).delete()
+
+                # Перемещаем в MoveList
+                MoveList.objects.create(
+                    moveNumber=move_id,
+                    unique_id=item["unique_id"],
+                    add_date=item["add_date"],
+                    article=item["article"],
+                    name=item["name"],
+                    barcode=item["barcode"],
+                    place=item["place"],
+                    quantity=item["quantity"],
+                    goods_status="В работе",
+                    newPlace="",
+                )
+            return Response({"message": "Товары перемещены"}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get(self, request):
+        try:
+            moveData = MoveList.objects.all()
+            serializer = MoveListSerializer(moveData, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

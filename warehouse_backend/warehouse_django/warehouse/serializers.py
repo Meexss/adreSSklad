@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .data_models import (
     TranzitData, ShipData, AddData, ShipList, AddList, ProductList,
-    ReservList, PlaceProduct, ArchiveShip, ArchiveAdd, ArchiveProduct
+    ReservList, PlaceProduct, ArchiveShip, ArchiveAdd, ArchiveProduct, MoveList
 )
 
 class TranzitDataSerializer(serializers.ModelSerializer):
@@ -63,3 +63,9 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductList
         fields = '__all__'       
+
+  
+class MoveListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MoveList
+        fields = '__all__'         

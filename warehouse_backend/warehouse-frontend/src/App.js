@@ -21,6 +21,9 @@ import ArchiveShip from './components/archive/ArchiveShip'; // Импортир�
 import ArchiveProduct from './components/archive/ArchiveProduct'; // Импортируем новый компонент
 import ArchiveAdd from './components/archive/ArchiveAdd'; // Импортируем новый компонент
 import PrintLabel from './components/PrintLabel'; // Импортируем новый компонент
+import Move from './components/Move'; // Импортируем новый компонент
+
+
 
 
 
@@ -125,6 +128,12 @@ const App = () => {
           path="/archive-ship"
           element={<PrivateRoute element={ArchiveShip} isAuthenticated={isAuthenticated} />}
         />
+          <Route
+          path="/move"
+          element={<PrivateRoute element={Move} isAuthenticated={isAuthenticated} />}
+        />
+
+
 
         <Route
           path="/print-label"
