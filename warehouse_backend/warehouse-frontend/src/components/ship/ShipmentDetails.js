@@ -72,14 +72,17 @@ const ShipmentDetails = () => {
                 setReservedData(getResponse.data);
                 setShowReservedData(true);
                 localStorage.setItem(storageKey, JSON.stringify(getResponse.data));
+                await api.post('/api/shipments/', {
+                    uid_ship,
+                    progress: newStatus
+                });
+                updateShipmentStatus(newStatus);
+            
             }
 
-            await api.post('/api/shipments/', {
-                uid_ship,
-                progress: newStatus
-            });
+           
 
-            updateShipmentStatus(newStatus);
+            
 
     } catch (error) {
         console.log(error)

@@ -6,6 +6,8 @@ import { faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useReactToPrint } from 'react-to-print';
 import Barcode from "react-barcode";
 import api from '../api'; // Импортируешь созданный файл
+import { faEdit} from '@fortawesome/free-solid-svg-icons';
+
 
 const AddProductDetails = () => {
     const location = useLocation();
@@ -15,9 +17,66 @@ const AddProductDetails = () => {
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
 
-    // const api = useMemo(() => axios.create({
-    //     baseURL: 'http://127.0.0.1:8000',
-    // }), []);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedQuantity, setSelectedQuantity] = useState(0);
+    const [selectedStatus, setSelectedStatus] = useState("Хранение");
+    const [showModal, setShowModal] = useState(false);
+    const [selectedBarcode, setSelectedBarcode] = useState('');
+
+    
+
+
+    const handleChange = async() => {
+        console.log(dataProducts)
+
+        handleCloseModal()
+        try {
+
+            const scanRequest = {
+                type: selectedItem.type,
+                uid_add: selectedItem.unique_id_add,
+                add_number: selectedItem.add_number,
+                add_date: selectedItem.add_date,
+                counterparty: selectedItem.counterparty,
+                warehouse: selectedItem.warehouse,
+                progress: "В работе",
+                positionData: [{
+                    article: selectedItem.article,
+                    name: selectedItem.name,
+                    barcode: selectedItem.barcode,
+                    quantity: selectedItem.quantity,
+                    error_barcode: selectedItem.error_barcode,
+                    newbarcode: selectedBarcode,
+                    final_quantity: selectedQuantity,
+                    goods_status: selectedItem.goods_status,
+                     }] // Используем обновленное значение для запроса
+              };
+              console.log("параметры запроса:",scanRequest);
+
+              const scanResponse = await api.post('/api/addproducts/', scanRequest);
+              if(scanResponse.status === 200) {
+                console.log(scanResponse)
+              }
+
+        } catch (error){
+            console.log(error)
+        }
+    }
+
+
+
+        // модалка
+        const handleOpenModal = (item) => {
+            console.log(item)
+            setSelectedItem(item);
+            setSelectedQuantity(item.final_quantity);
+            setShowModal(true);
+        };
+        // модалка
+        const handleCloseModal = () => {
+            setShowModal(false);
+        };
+    
 
     useEffect(() => {
         if (!addproducts?.unique_id_add) return;
@@ -188,6 +247,7 @@ const AddProductDetails = () => {
                                 <th>Размещено товара</th>
                                 <th>Места товара</th>
                                 <th>Количество на месте</th>
+                                <th></th>
                             
                                 {/* <th>Статус товара</th> */}
                                 
@@ -199,6 +259,7 @@ const AddProductDetails = () => {
                             const finalQuantity = Array.isArray(dataProducts) 
                             ? dataProducts.find(item => item.article === stock.article)?.final_quantity || '0' 
                             : '0';
+                            const curentData = Array.isArray(dataProducts) && dataProducts.find(item => item.article === stock.article)
                             console.log(dataProducts)
                             const filteredProducts = placeProducts.filter(item => item.article === stock.article) || [];
 
@@ -233,11 +294,90 @@ const AddProductDetails = () => {
                                     ? filteredProducts.map((p, i) => <div key={i}>{p.goods_status || '—'}</div>)
                                     : '—'}
                                 </td> */}
+                                <td><FontAwesomeIcon
+                                    className='no-print'
+                                    icon={faEdit}
+                                    onClick={() => handleOpenModal(curentData)}
+                                    style={{
+                                    cursor: 'pointer',
+                                    fontSize: '18px',
+                                    padding: '5px',
+                                    borderRadius: '50%',
+                                    backgroundColor: '#fff',
+                                    }}
+                                             
+                                    />
+                                </td>                               
                             </tr>
                             );
                         })}
                         </tbody>
                     </table>
+                    </div>
+                )}
+                 {showModal && selectedItem && (
+                    <div style={{
+                        position: 'fixed', top: '0', left: '0', right: '0', bottom: '0',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: '20'
+                    }}>
+                        <div style={{
+                            backgroundColor: 'white', padding: '20px', borderRadius: '8px', width: '400px',
+                            display: 'flex', flexDirection: 'column', gap: '15px'
+                        }}>
+                            <h3>Изменить данные приёмки</h3>
+                            <p><strong>Артикул:</strong> {selectedItem.article}</p>
+                            <p ><strong>Наименование:</strong> {selectedItem.name}</p>
+
+                            <label><strong>Количество принятого товара:</strong></label>
+                            <input
+                                type="number"
+                                value={selectedQuantity}
+                                onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    
+                                        setSelectedQuantity(value);  // Обновляем состояние, если значение корректное
+                                    
+                                }}
+                                min="1"
+                                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                            />
+                            <label><strong>Сосканированный Штрихкод товара:</strong></label>
+                            <input
+                                type="text"
+                                value={selectedItem.barcode}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value.length > 8) {
+                                        setSelectedBarcode(value);  // Обновляем состояние, если значение корректное
+                                    }
+                                }}
+                                min="8"
+                                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                            />
+
+
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <button
+                                    onClick={handleCloseModal}
+                                    style={{
+                                        backgroundColor: 'gray', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Закрыть
+                                </button>
+                                <button
+                                    onClick={handleChange}
+                                    style={{
+                                        backgroundColor: 'orange', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Сохранить изменения
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

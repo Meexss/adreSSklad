@@ -52,10 +52,8 @@ class TranzitDataViewSet(viewsets.ModelViewSet):
             to_house = tranzit.get("to_house", "")
             position_data = tranzit.get("positionData", [])
 
-            if not tranz_date:
-                continue  # Пропускаем записи без даты
-
-            tranz_date = datetime.strptime(tranz_date, "%d.%m.%Y").date()
+            
+            tranz_date = datetime.strptime(tranz_date, "%Y-%m-%dT%H:%M:%SZ")
 
             # Группировка данных по артикулу и баркоду
             grouped_positions = defaultdict(lambda: {"name": "", "quantity": 0})
@@ -166,7 +164,7 @@ class ShipDataViewSet(viewsets.ModelViewSet):
             position_data = data.get("positionData", [])
 
             try:
-                ship_date = datetime.strptime(ship_date, "%d.%m.%Y").date()
+                ship_date = datetime.strptime(ship_date, "%Y-%m-%dT%H:%M:%SZ")
             except ValueError:
                 return Response({"error": f"Неверный формат даты: {ship_date}"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -251,7 +249,7 @@ class AddDataViewSet(viewsets.ModelViewSet):
             position_data = data.get("positionData", [])
 
             try:
-                add_date = datetime.strptime(add_date, "%d.%m.%Y").date()
+                add_date = datetime.strptime(add_date, "%Y-%m-%dT%H:%M:%SZ")
             except ValueError:
                 return Response({"error": f"Неверный формат даты: {add_date}"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -457,6 +455,8 @@ class PlaceProducts(APIView):
             new_products = request.data
             print("Полученные данные:", new_products)  # Лог запроса
 
+            print("Тип полученных данных:", type(new_products))
+
             if not isinstance(new_products, list):
                 return Response({"error": "Ожидается список объектов"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -483,12 +483,9 @@ class PlaceProducts(APIView):
                         status=status.HTTP_400_BAD_REQUEST
                     )
 
-
-
-
                 if add_date:
                     try:
-                        add_date_fin = datetime.fromisoformat(add_date).date()
+                        add_date_fin = datetime.strptime(add_date, "%Y-%m-%dT%H:%M:%SZ")
                     except ValueError:
                         return Response({"error": f"Неверный формат даты: {add_date}"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
@@ -627,7 +624,7 @@ class ReserveAllView(APIView):
 
         if isinstance(ship_date, str) and ship_date != "RESERVED":
             try:
-                ship_date = datetime.fromisoformat(ship_date).date()
+                ship_date = datetime.fromisoformat(ship_date)
             except ValueError:
                 print(f"Ошибка конвертации ship_date: {ship_date}")
             
@@ -727,7 +724,7 @@ class ReserveAllView(APIView):
                     # Создаем запись в резерве
                     reserved_product = ReservList(
                         unique_id_ship=uid_ship,
-                        reserve_data=datetime.now().date(),
+                        reserve_data=datetime.now(),
                         unique_id=uuid.uuid4(),
                         article=product.article,
                         name=product.name,
@@ -770,7 +767,7 @@ class ReserveAllView(APIView):
                     # Создаем запись в резерве
                     reserved_product = ReservList(
                         unique_id_ship=uid_ship,
-                        reserve_data=datetime.now().date(),
+                        reserve_data=datetime.now(),
                         unique_id=uuid.uuid4(),
                         article=product.article,
                         name=product.name,
@@ -828,6 +825,9 @@ class CancelReservation(APIView):
                         canceled_items.append(item)
                         item.delete()
                         continue
+
+                    if item.place == "Сборка":
+                        continue  
                             
                     product = ProductList.objects.filter(article=item.article, place=item.place, add_date=item.add_date).first()
                     
@@ -904,7 +904,7 @@ class ArchiveShipView(APIView):
                             barcode=item.get("barcode"),
                             quantity=item.get("quantity"),
                             place=item.get("place"),
-                            final_ship_date=datetime.now().date()  # Дата архивирования
+                            final_ship_date=datetime.now()  # Дата архивирования
                         )
                     )
 
@@ -919,7 +919,7 @@ class ArchiveShipView(APIView):
                             quantity=item.get("quantity"),
                             place=item.get("place"),
                             goods_status=item.get("goods_status"),
-                            close_product_date=datetime.now().date()  # Дата архивирования
+                            close_product_date=datetime.now()  # Дата архивирования
                         )
                     )
                 print(f"закончили цикол")
@@ -992,7 +992,7 @@ class ArchiveAddView(APIView):
                             quantity_start=item.get("quantity_start"),
                             quanity_place=item.get("quanity_place"),
                             goods_status=item.get("goods_status"),
-                            close_add_date=datetime.now().date()  # Дата архивирования
+                            close_add_date=datetime.now()  # Дата архивирования
                         )
                     )
 
@@ -1040,7 +1040,7 @@ class ProductListCreateView(APIView):
                     return Response({"error": "Не все поля заполнены для одного из товаров"}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Переводим дату в нужный формат
-                add_date = datetime.strptime(item['add_date'], "%d.%m.%Y").date()
+                add_date = datetime.strptime(item['add_date'], "%Y-%m-%dT%H:%M:%SZ")
 
                 # Создаем объект товара, добавляем его в список
                 product = ProductList(
@@ -1225,7 +1225,7 @@ class ChangeReserveStatus(APIView):
                     quantity=quantity_to_cancel,
                     place=reserved_item.place,
                     goods_status=new_status,
-                    close_product_date=datetime.now().date()
+                    close_product_date=datetime.now()
                 
                 )
             elif new_status == "Хранение":
@@ -1326,3 +1326,90 @@ class MoveProducts(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class MoviFinalData(APIView):
+    def post(self, request):
+        try:
+            barcode = request.data.get("barcode")
+            quantity = int(request.data.get("colChange"))  # Количество для перемещения
+            updatedNewPlace = request.data.get("newPlace")  # Новое место хранения
+
+            if not barcode or quantity <= 0:
+                return Response({"error": "Неверные данные"}, status=status.HTTP_400_BAD_REQUEST)
+
+            with transaction.atomic():
+                move_items = MoveList.objects.filter(barcode=barcode)  # Берем записи в порядке добавления
+                remaining_quantity = quantity
+
+                for item in move_items:
+                    if remaining_quantity <= 0:
+                        break  # Если уже всё перенесли, выходим
+
+                    if item.quantity > remaining_quantity:
+                        # Если текущая запись содержит больше, чем нужно переместить
+                        ProductList.objects.create(
+                            unique_id=uuid.uuid4(),
+                            add_date=item.add_date,
+                            article=item.article,
+                            name=item.name,
+                            barcode=item.barcode,
+                            place=updatedNewPlace,  # Новое место хранения
+                            quantity=remaining_quantity,
+                            goods_status='Хранение',
+                        )
+                        item.quantity -= remaining_quantity  # Уменьшаем количество в MoveList
+                        item.save()
+                        remaining_quantity = 0
+                    else:
+                        # Если количество в item меньше или равно запрошенному
+                        ProductList.objects.create(
+                            unique_id=item.unique_id,
+                            add_date=item.add_date,
+                            article=item.article,
+                            name=item.name,
+                            barcode=item.barcode,
+                            place=updatedNewPlace,  # Новое место хранения
+                            quantity=remaining_quantity,
+                            goods_status='Хранение',
+                        )
+                        remaining_quantity -= item.quantity  # Вычитаем перемещенное количество
+                        item.delete()  # Полностью перемещенная позиция удаляется из MoveList
+
+                if remaining_quantity > 0:
+                    return Response({"error": "Недостаточно товара для перемещения"}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"success": "Товары перемещены"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ReserfIndo(APIView):
+    def get(self, request):
+        try:
+            uid_ship = request.query_params.get("uid_ship")
+            print(f"получили данные : {uid_ship}")   
+            if not uid_ship:
+                return Response(
+                    {"error": "Параметр uid_ship обязателен"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Получаем все записи из базы данных для указанного uid_ship
+            reserv = ReservList.objects.filter(ship_number=uid_ship).order_by('place')
+
+            if not reserv.exists():
+                return Response(
+                    {"error": f"Отгрузка с uid_ship={uid_ship} не найдена"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            serializer = ReservListSerializer(reserv, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Ошибка в get: {str(e)}")
+            return Response(
+                {"error": "Ошибка на сервере"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

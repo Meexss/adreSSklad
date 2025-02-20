@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (TranzitDataViewSet, ShipDataViewSet, AddDataViewSet, ProductListView, 
 ProductListCreateView, ShipmentListView, ReserveAllView, CancelReservation, AddProductListView, 
 PlaceProducts, FindBarcodeViews, protected_view, FindPlaceViews, ArchiveProductView, ArchiveShipView, 
-ArchiveAddView, NewDataViews, ChangeReserveStatus, ChangeStatusAndPlace, MoveProducts)
+ArchiveAddView, NewDataViews, ChangeReserveStatus, ChangeStatusAndPlace, MoveProducts, MoviFinalData, ReserfIndo)
 
 from rest_framework_simplejwt.views import (                                                                                            
     TokenObtainPairView,
@@ -34,7 +34,10 @@ urlpatterns = [
     path('changeReserveStatus/', ChangeReserveStatus.as_view()), 
     path('changePlaceAndStatus/', ChangeStatusAndPlace.as_view()),
     path('moveData/', MoveProducts.as_view()),
-
+    path('moveChangePlace/', MoviFinalData.as_view()),
+    path('reserfInfo/', ReserfIndo.as_view()),
+    
+    
     
    
     path('newData/', NewDataViews.as_view()),

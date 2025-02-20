@@ -22,6 +22,9 @@ import ArchiveProduct from './components/archive/ArchiveProduct'; // Импор�
 import ArchiveAdd from './components/archive/ArchiveAdd'; // Импортируем новый компонент
 import PrintLabel from './components/PrintLabel'; // Импортируем новый компонент
 import Move from './components/Move'; // Импортируем новый компонент
+import TSDWrapeMove from './components/tsd/TSDWrapeMove';
+import TSDMove from './components/tsd/TSDMove';
+import TSDAssembly from './components/tsd/TSDAssembly';
 
 
 
@@ -114,6 +117,21 @@ const App = () => {
           path="/test-tsd"
           element={<PrivateRoute element={TSDTest} isAuthenticated={isAuthenticated} />}
         />
+        <Route
+          path="/moveWrap"
+          element={<PrivateRoute element={TSDWrapeMove} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/moveMain"
+          element={<PrivateRoute element={TSDMove} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/assembly"
+          element={<PrivateRoute element={TSDAssembly} isAuthenticated={isAuthenticated} />}
+        />
+
+
+
 
         {/* Архив */}
         <Route
@@ -132,6 +150,9 @@ const App = () => {
           path="/move"
           element={<PrivateRoute element={Move} isAuthenticated={isAuthenticated} />}
         />
+
+
+
 
 
 

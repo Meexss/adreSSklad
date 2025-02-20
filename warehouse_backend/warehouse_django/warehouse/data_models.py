@@ -6,7 +6,7 @@ from django.db import migrations, models
 # Гтово прием данных о перемещении 1С
 class TranzitData(models.Model):
     tranz_number =  models.CharField(max_length=100) #Номер перемещения 1С
-    tranz_date = models.DateField() #Дата перемещения 1С
+    tranz_date = models.DateTimeField() #Дата перемещения 1С
     from_house = models.CharField(max_length=100) #Отправиьель 1С
     to_house = models.CharField(max_length=100) #Получатель 1С
 
@@ -19,7 +19,7 @@ class TranzitData(models.Model):
 # Готово прием данных о релизации 1С
 class ShipData(models.Model):
     ship_number = models.CharField(max_length=100) #Номер реализации 1С
-    ship_date = models.DateField() #Дата реализации 1С
+    ship_date = models.DateTimeField() #Дата реализации 1С
     counterparty = models.CharField(max_length=100) #Контрагент 1С
     warehouse = models.CharField(max_length=100) #Склад отгрузки 1С
 
@@ -32,7 +32,7 @@ class ShipData(models.Model):
 # Готово прием данных о поступлении 1С
 class AddData(models.Model):
     add_number = models.CharField(max_length=100) #Номер поступления 1С
-    add_date = models.DateField() #Дата поступления 1С
+    add_date = models.DateTimeField() #Дата поступления 1С
     counterparty = models.CharField(max_length=100) #Контрагент 1С
     warehouse = models.CharField(max_length=100) #Склад поступления 1С
 
@@ -47,7 +47,7 @@ class ShipList(models.Model):
     unique_id_ship = models.CharField(max_length=255, default=uuid.uuid4) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     ship_number = models.CharField(max_length=100) #tranz_number или ship_number
-    ship_date = models.DateField() #tranz_date или ship_date
+    ship_date = models.DateTimeField() #tranz_date или ship_date
     counterparty = models.CharField(max_length=100) #Из ShipData counterparty или to_house != Центральный новый
     warehouse = models.CharField(max_length=100) #Из ShipData warehouse или  from_house === Центральный новый
     progress = models.CharField(max_length=100) #На входе устанавливаем статус отгрузки на Новый
@@ -63,7 +63,7 @@ class AddList(models.Model):
     unique_id_add = models.CharField(max_length=255, default=uuid.uuid4) #при перемещении с AddData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     add_number = models.CharField(max_length=100) #tranz_number или add_number
-    add_date = models.DateField() #tranz_date или add_date
+    add_date = models.DateTimeField() #tranz_date или add_date
     counterparty = models.CharField(max_length=100) #Из AddData counterparty или from_house != Центральный новый
     warehouse = models.CharField(max_length=100) #Из AddData warehouse или  to_house === Центральный новый
     progress = models.CharField(max_length=100) #На входе устанавливаем статус прихода на Новый
@@ -81,7 +81,7 @@ class AddList(models.Model):
 # Готово хранение данных о товарах на ЦС
 class ProductList(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=True) #уникальный id товара
-    add_date = models.DateField() #дата поступления
+    add_date = models.DateTimeField() #дата поступления
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100) #если ошибка error_barcode === true то новый баркод если false то шк 1С
@@ -95,13 +95,13 @@ class ReservList(models.Model):
     unique_id_ship = models.UUIDField( default=uuid.uuid4, editable=True)  #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     ship_number = models.CharField(max_length=100)  #tranz_number или ship_number
-    ship_date = models.DateField()  #tranz_date или ship_date
+    ship_date = models.DateTimeField()  #tranz_date или ship_date
     counterparty = models.CharField(max_length=100) #Из ShipData counterparty или to_house != Центральный новый
     warehouse = models.CharField(max_length=100)  #Из ShipData warehouse или  from_house === Центральный новый
     progress = models.CharField(max_length=100) #при переходе в эту базу ставим В работе 
-    reserve_data = models.DateField() #дата установки в резерв
+    reserve_data = models.DateTimeField() #дата установки в резерв
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False) #уникальный id товара
-    add_date = models.DateField()  #tranz_date или add_date
+    add_date = models.DateTimeField()  #tranz_date или add_date
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100) 
@@ -117,7 +117,7 @@ class PlaceProduct(models.Model):
     add_number = models.CharField(max_length=100) #tranz_number или add_number
 
     unique_id = models.UUIDField(default=uuid.uuid4, editable=True) #На этом этапе присваивается уникальный id
-    add_date = models.DateField() #tranz_date или add_date
+    add_date = models.DateTimeField() #tranz_date или add_date
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100)
@@ -131,18 +131,18 @@ class ArchiveShip(models.Model):
     unique_id_ship = models.UUIDField(default=uuid.uuid4, editable=True) #при перемещении с ShipData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100) #Тип задания реализация/перемещение
     ship_number = models.CharField(max_length=100) #tranz_number или ship_number
-    ship_date = models.DateField() #tranz_date или ship_date
+    ship_date = models.DateTimeField() #tranz_date или ship_date
     counterparty = models.CharField(max_length=100)  #Из ShipData counterparty или to_house != Центральный новый
     warehouse = models.CharField(max_length=100)  #Из ShipData warehouse или  from_house === Центральный новый
     progress = models.CharField(max_length=100) #На этом этапе устанавливается завершенный
-    reserve_data = models.DateField() #дата установки в резерв
+    reserve_data = models.DateTimeField() #дата установки в резерв
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False)
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100)
     quantity = models.IntegerField()
     place = models.CharField(max_length=100) 
-    final_ship_date = models.DateField() #дата отгрузки устанавливается при переносе в эту базу
+    final_ship_date = models.DateTimeField() #дата отгрузки устанавливается при переносе в эту базу
 
 
 # Готово хранения данных о приходе товара 
@@ -150,7 +150,7 @@ class ArchiveAdd(models.Model):
     unique_id_add = models.UUIDField(default=uuid.uuid4, editable=True)  #при перемещении с AddData и TranzitData присваиваем номер отгрузки
     type = models.CharField(max_length=100)  #Тип задания реализация/перемещение
     add_number = models.CharField(max_length=100)  #tranz_number или add_number
-    add_date = models.DateField() #tranz_date или add_date
+    add_date = models.DateTimeField() #tranz_date или add_date
     counterparty=models.CharField(max_length=255, default="")
     warehouse=models.CharField(max_length=255, default="")
     progress = models.CharField(max_length=100, default="")
@@ -163,26 +163,26 @@ class ArchiveAdd(models.Model):
     quanity_place = models.IntegerField() #Финальное кол-во размещенного товара 
     goods_status = models.CharField(max_length=100) #статус товара
     
-    close_add_date = models.DateField() #дата закрытия приемки
+    close_add_date = models.DateTimeField() #дата закрытия приемки
 
 
 # Готво хранение данных о товарах перенесенных на брак или недостачу
 class ArchiveProduct(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    add_date = models.DateField()
+    add_date = models.DateTimeField()
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100)
     quantity = models.IntegerField()
     place = models.CharField(max_length=100)
     goods_status = models.CharField(max_length=100) #при удалении из резерва устанавливаетя Брак или Недостача
-    close_product_date = models.DateField() #дата переноса в эту таблицу
+    close_product_date = models.DateTimeField() #дата переноса в эту таблицу
 
 
 class MoveList(models.Model):
     moveNumber = models.CharField(max_length=255) #номер задания на перемещение/размещение 
     unique_id = models.UUIDField(default=uuid.uuid4, editable=True) #уникальный id товара
-    add_date = models.DateField() #дата поступления
+    add_date = models.DateTimeField() #дата поступления
     article = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100) #если ошибка error_barcode === true то новый баркод если false то шк 1С

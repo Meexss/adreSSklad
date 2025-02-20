@@ -15,6 +15,9 @@ const TSDPlaceProduct = () => {
     const [quantity, setQuantity] = useState("");
     const [error, setError] = useState("");
 
+    const [placeQuanity, setPlaceQuanity] = useState()
+    const [foundPlace, setFoundPlace] = useState()
+
     // const api = useMemo(() => axios.create({
     //     // baseURL: 'https://adressklad.onrender.com',
     //     baseURL: 'http://127.0.0.1:8000',
@@ -23,8 +26,29 @@ const TSDPlaceProduct = () => {
     const loadData = async (uid) => {
         try {
             const response = await api.get(`/api/addproducts/?uid_add=${uid}`);
-            setProducts(response.data);
-            setCurrentStep(2);
+            console.log(response)
+            if (response.status === 200) {
+               const res = await api.get(`/api/placeship/?uid_add=${response.data[0].unique_id_add}`)
+               const sumData = res.data.reduce((acc, item) => {
+                if (!acc[item.article]) {
+                    acc[item.article] = 0;
+                }
+                acc[item.article] += item.quantity;
+                return acc;
+            }, {});
+            const formattedData = Object.entries(sumData).map(([article, quantity]) => ({
+                article,
+                quantity
+            }));
+        
+            console.log("Сумированное кол-во",sumData)
+            setPlaceQuanity(formattedData)
+               console.log(res)
+               setProducts(response.data);
+               setCurrentStep(2);
+
+            }
+
         } catch (error) {
             setCurrentStep(-1);
             setError(`Ошибка загрузки приемки: ${error.message || error}`);
@@ -54,6 +78,9 @@ const TSDPlaceProduct = () => {
             const foundProduct = products.find(position => position.barcode === code);
     
         if (foundProduct) {
+            console.log(placeQuanity)
+            const foundPlaceQuanity = placeQuanity.find(item => item.article === foundProduct.article)
+            setFoundPlace(foundPlaceQuanity)
             console.log("Товар найден:", foundProduct);
             setCurrentProduct(foundProduct);
             setCurrentStep(3); // Переход к сканированию места
@@ -99,11 +126,11 @@ const TSDPlaceProduct = () => {
     // Функция обработки ввода количества
     const handleQuantityChange = (e) => {
         const enteredQuantity = parseInt(e.target.value, 10);
-        if (currentProduct && enteredQuantity <= currentProduct.final_quantity) {
+        if (currentProduct && enteredQuantity <= currentProduct.final_quantity - foundPlace.quantity) {
             setQuantity(enteredQuantity);
             setError('')
         } else {
-            setError(`Количество не может превышать допустимое значение! ${currentProduct.final_quantity}`)
+            setError(`Количество не может превышать допустимое значение! ${currentProduct.final_quantity - foundPlace.quantity}`)
         }
     };
 
@@ -238,7 +265,7 @@ const TSDPlaceProduct = () => {
                         <div className="position-info">
                             <div className='blockInfo'>
                                 <p className='supText'>Доступное количество: </p>
-                                <p className='mainText'>{currentProduct.final_quantity} шт.</p>
+                                <p className='mainText'>{currentProduct.final_quantity - foundPlace.quantity} шт.</p>
                             </div>
                             <div className="quantity-input">   
                                 <label className='mainText'>Введите кол-во:</label>    
