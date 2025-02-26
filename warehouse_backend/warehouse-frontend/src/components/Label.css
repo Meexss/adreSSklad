@@ -16,13 +16,13 @@
     background-color: white;
     padding: 5px;
     border-radius: 10px;
-    border: 1px solid;
+    /* border: 1px solid; */
 }
 
 .wramTOP {
     display: flex;
     justify-content: space-between;
-    height: 40px;
+    height: 35px;
 }
 
 .imgIcon {
@@ -46,17 +46,40 @@
 }
 
 .textLogo {
-    height: 10px;
-    margin: 0;
+    font-family: 'Arial';
+    height: 8px;
+    /* margin: ; */
     font-weight: bold;
-    font-size: 9px;
+    font-size: 7px;
+    margin-top: -5px;
+    margin-right: 2px;
 }
 
 .wrapText {
     display: flex;
     justify-content: space-between;
     font-size: bold;
+    
 }
+
+.mainTextBody {
+    font-family: 'Arial';
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.textSN {
+    font-family: 'Arial';
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.textYear{
+    font-family: 'Arial';
+    font-weight: bold;
+    font-size: 11px;
+}
+
 
 
 
@@ -67,20 +90,24 @@
     justify-content: space-between;
     font-size: 9px;
     height: 13px;
+    margin-bottom: 4px;
 }
 
 .textAbout {
-    height: 13px;
-    font-size: 10px;
+    font-family: 'Arial';
+    height: 12px;
+    font-size: 9px;
+    /* font-weight: bold; */
 }
 
 .wrapBlockText {
     display: block;
     z-index: 3;
+    
 }
 
 .wrapBottom {
-    margin-top: 4px;
+    margin-top: 6px;
     height: 60px;
     width: 100%;
     display: flex;
@@ -98,12 +125,99 @@
 
 
 .textBottom {
+    font-family: 'Arial';
     display: block;
     min-height: 7px;
     width: 100%;
-    font-size: 5px;
+    font-size: 6.5px;
     text-align: center;
     overflow: hidden; /* Если текст выходит за границы */
     white-space: nowrap; /* Чтобы не переносился */
     font-weight: bold;
+}
+
+.mainWrapLabelTwo {
+    width: 661px;
+    height: 189px;
+    margin-bottom: 5px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    /* border: 1px solid; */
+    display: flex;
+    flex-direction: column;
+}
+.WrapLabelTwo{
+    height: 89.5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.textManu {
+    font-family: "Arial";
+    font-size: 11px;
+    text-align: center;
+}
+
+.mainTextBodyTWO{
+    margin-top: 5px;
+    font-family: "Arial";
+    font-weight: 200;
+    font-size: 14px;
+}
+
+.mainTextCountryTWO {
+    font-family: "Arial";
+    font-weight: 200;
+    font-size: 12px;
+    margin-top: 3px;
+}
+.gtinText {
+    font-family: "Arial";
+    font-weight: 200;
+    font-size: 12px;
+    text-align: end;
+    left: -10;
+
+}
+
+.bottomBlock {
+    /* flex-grow: 1; */
+    flex-basis: 10%;
+    /* margin-right: -5px; */
+    
+}
+
+.labelBottom {
+    display: flex;
+    justify-content: end;
+    flex-direction: row;
+    align-items: end;
+    height: 70px;
+
+}
+
+.imgIconTwo {
+    width: 38px;
+}
+
+.imgBottom {
+    margin-left: 270px;
+    margin-top: 18px;
+    width: 400px;
+    height: 90px;
+}
+
+@media print {
+    .mainWrapLabel,
+    .mainWrapLabelTwo {
+      page-break-before: always; /* Каждая этикетка начинается с новой страницы */
+
+    }
+
+}
+
+.mainBodyTextTwo {
+    margin-left: 5px;
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,  useRef} from "react";
 import Layout from './Layout';
 import "./Label.css"
 import squre from './img/squre.png'
@@ -6,10 +6,17 @@ import CE from './img/CE.png'
 import EAC from './img/EAC.png'
 import karcher_mini from './img/karcher-mini.png'
 import karcher_big from './img/karcher-big.png'
+import WAR from './img/001.png'
 import trush from './img/Trush.png'
 import ukr from './img/Ukr.png'
 import water from './img/water.png'
 import Barcode from "react-barcode";
+import bootom from './img/bottom.png'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faArrowLeft, faPrint, faRotate } from '@fortawesome/free-solid-svg-icons';
+// import Barcode from "react-barcode";
+import { useReactToPrint } from 'react-to-print';
+
 
 
 const PrintLabel = () => {
@@ -64,15 +71,22 @@ const PrintLabel = () => {
         setCurrentStep(2)
     }
 
+
     const generator = () => {
         const labelsCount = Number(formData["Количество этикеток"]);
         const newSerials = Array.from({ length: labelsCount }, () => 
-            Math.floor(230000 + Math.random() *300000)
+            Math.floor(230000 + Math.random() * (300000 - 230000 + 1))
         );
         setSerialNumbers(newSerials);
+    };
 
-    }
-
+       // Печать
+         const contentRef = useRef();
+        // Печать
+            const handlePrint = useReactToPrint({
+                // documentTitle: 'Title',
+                contentRef: contentRef,
+             })
     
 
     return (
@@ -105,15 +119,20 @@ const PrintLabel = () => {
 
                 </div>
                 <button onClick={generator}>Сгенерировать </button>
+                <button className='no-print btn-ship' onClick={handlePrint} style={{ cursor: 'pointer', padding: '5px 10px', fontSize: '14px' }}>
+                                <FontAwesomeIcon icon={faPrint} /> Печать
+                                </button>
                 {serialNumbers.length > 0 && <button onClick={handleLabel}>Этикетки на товар</button>}
                 {serialNumbers.length > 0 && <button onClick={handleLabelPartTwo}>Этикетки на коробку</button>}
             </div>
-            <div className="allWrap">
+            
+            <div className="allWrap" ref={contentRef} >
+                
                 {currentStep === 1 && (
                 // Общий контейнер этикеток 
 
                 serialNumbers.map((sn, index) => (
-                            <div className="mainWrapLabel" key={index}>
+                            <div   className="mainWrapLabel" key={index}>
                                 {/* Верхний блок  */}
                                 <div>
                                     <div className="wramTOP">
@@ -128,13 +147,13 @@ const PrintLabel = () => {
                                         {/* Правый хедер  */}
                                         <div className="wrapLogo">
                                             <img className="imgIconKar" src={karcher_big}/>
-                                            <p className="textLogo">{formData["Страна производства"]}</p>
+                                            <div className="textLogo">{formData["Страна производства"]}</div>
                                             
                                         </div>
                                     </div>
                                     <div className="wrapText">
-                                        <p>{formData["Наименование товара"]}</p>
-                                        <p>{formData["Артикул товара"]}</p>
+                                        <p className="mainTextBody">{formData["Наименование товара"]}</p>
+                                        <p className="mainTextBody">{formData["Артикул товара"]}</p>
                                     </div>
                                 </div>
                                 {/* Центральный блок   */}
@@ -142,8 +161,8 @@ const PrintLabel = () => {
                                     <div className="wrapBlockText">
                                         {/* Верх цетра слева серийник справа код производства  */}
                                         <div className="wrapSN">      
-                                            <div>S/N:  {sn}</div>
-                                            <div>{formData["номер год производства"]}</div>
+                                            <div className="textSN">S/N:  {sn}</div>
+                                            <div className="textYear">{formData["номер год производства"]}</div>
                                         </div>
                                         <div className="textAbout">{formData["Напряжение"]}</div>
                                         <div className="textAbout">{formData["Строчка 2"]}</div>
@@ -157,13 +176,14 @@ const PrintLabel = () => {
                                         className="barcodeData"
                                         value={formData["Штрихкод товара"]}
                                         format="CODE128"
-                                        width={2}         // Уменьшаем ширину штрих-кода
+                                        width={1.8}         // Уменьшаем ширину штрих-кода
                                         height={30}       // Уменьшаем высоту штрих-кода
                                         // displayValue={false}
                                         textMargin={0}
-                                        fontSize={13}
+                                        fontSize={11}
                                         margin={0}
                                         marginTop={0}
+                                        marginBottom={1}
                                     />
                                     {/* Название бренда  */}
                                     <p className="textBottom">Alfred Kärcher SE & Co. KG, P.O.Box 160, 71349 Winnenden, Germany</p>
@@ -172,48 +192,65 @@ const PrintLabel = () => {
                 )))
                 }
                 {currentStep === 2 &&
-                <div>
+
+                serialNumbers.map((sn, index) => (
+                <div className="mainWrapLabelTwo" key={index}>
                     {/* верхний блок  */}
+                    <div className="WrapLabelTwo">
+
+                        <div>
+                            <p className="textManu">MANUFACTURERS USE ONLY</p>
+                            <Barcode
+                                        className="barcodeData"
+                                        value={"9014470500406207"}
+                                        format="CODE128"
+                                        width={1.8}         // Уменьшаем ширину штрих-кода
+                                        height={60}       // Уменьшаем высоту штрих-кода
+                                        textMargin={0}
+                                        fontSize={13}
+                                        margin={0}
+                                        marginTop={0}
+                                    />
+                        </div>
+                        <div className="mainBodyTextTwo">
+                            <p className="mainTextBodyTWO">{formData["Наименование товара"]}</p>
+                            <p className="mainTextBodyTWO">{formData["Артикул товара"]}{" Serial  "}{sn}</p>
+                            <p className="mainTextBodyTWO">{formData["Напряжение"]}</p>
+                            <p className="mainTextCountryTWO">{formData["Страна производства"]}</p>        
+                        </div>
+                        <div className="bottomBlock">
+                            <p className="gtinText">GTIN</p>
+                            <div className="labelBottom">
+                            <img className="imgIconTwo" src={WAR} alt={WAR} />
+                            <img className="imgIconTwo" src={EAC} alt={EAC} />
+                            <img className="imgIconTwo" src={ukr} alt={ukr} />
+                            </div>
+                        </div>
+                        <div>
+                        <Barcode
+                                        className="EAN13"
+                                        value={formData["Штрихкод товара"]}
+                                        format="EAN13"
+                                        width={1.4}         // Уменьшаем ширину штрих-кода
+                                        height={85}       // Уменьшаем высоту штрих-кода
+                                        textMargin={0}
+                                        fontSize={15}
+                                        margin={0}
+                                        marginTop={0}
+                                    />
+                        </div>
+
+
+                    </div >
+                        
                     <div>
-                        <div>
-                            <p>TYPE</p>
-                            <p></p>
-                        </div>
-                        <div>
-                            <p>PART-NO</p>
-                            <p></p>
-                        </div>
-                        <div>
-                            <p>SERIAL-NO</p>
-                            <p></p>
-                        </div>
-                        <div>
-                            <img/>
-                            <img/>
-                        </div>
+                    <img className="imgBottom" src={bootom} alt={bootom}/>
 
-
-                    </div>
-                    {/* Нижний блок  */}
-                    <div>
-                        <div>
-                            <p>MANUFACTURERS USE ONLY</p>
-                            <div>Генерируем баркод</div>
-                            <p></p>
-                        </div>
-                        <div>
-                            <p></p>
-                        </div>
-                        <div>
-                            <p>GTIN</p>
-                            <div>Баркод товара</div>
-                        </div>
-
-                    </div>
-
+                    
+                       </div>  
 
                 </div>  
-                }
+                ))}
             </div>
 
         </Layout>

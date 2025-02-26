@@ -33,7 +33,7 @@ const Layout = ({ children }) => {
                             <li><NavLink to="/search" className={({ isActive }) => isActive ? "active" : ""}>Поиск</NavLink></li>
                             <li><NavLink to="/move" className={({ isActive }) => isActive ? "active" : ""}>Перемещение/Распределение</NavLink></li>
 
-                            {/* <li><NavLink to="/print-label" className={({ isActive }) => isActive ? "active" : ""}>Печать стикеров</NavLink></li> */}
+                            <li><NavLink to="/print-label" className={({ isActive }) => isActive ? "active" : ""}>Печать стикеров</NavLink></li>
                             <li><NavLink to="/products" className={({ isActive }) => isActive ? "active" : ""}>Список товаров</NavLink></li>
                             <li className="dropdown">
                                 <span className="dropdown-toggle">Архив</span>
