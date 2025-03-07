@@ -1,15 +1,18 @@
 import { useState, useEffect,  useRef} from "react";
 import Layout from './Layout';
 import "./Label.css"
-import squre from './img/squre.png'
-import CE from './img/CE.png'
-import EAC from './img/EAC.png'
-import karcher_mini from './img/karcher-mini.png'
-import karcher_big from './img/karcher-big.png'
-import WAR from './img/001.png'
-import trush from './img/Trush.png'
-import ukr from './img/Ukr.png'
-import water from './img/water.png'
+import squre from './img/5.png'
+import CE from './img/2.png'
+import EAC from './img/1.png'
+import karcher_mini from './img/7.png'
+import karcher_big from './img/9.png'
+import WAR from './img/8.png'
+import WARwhite from './img/001.png'
+import EACwhite from './img/EAC.png'
+import ukrwhite from './img/Ukr.png'
+import trush from './img/3.png'
+import ukr from './img/6.png'
+import water from './img/4.png'
 import Barcode from "react-barcode";
 import bootom from './img/bottom.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -184,6 +187,7 @@ const PrintLabel = () => {
                                         margin={0}
                                         marginTop={0}
                                         marginBottom={1}
+                                        background={'#666666'}
                                     />
                                     {/* Название бренда  */}
                                     <p className="textBottom">Alfred Kärcher SE & Co. KG, P.O.Box 160, 71349 Winnenden, Germany</p>
@@ -221,9 +225,9 @@ const PrintLabel = () => {
                         <div className="bottomBlock">
                             <p className="gtinText">GTIN</p>
                             <div className="labelBottom">
-                            <img className="imgIconTwo" src={WAR} alt={WAR} />
-                            <img className="imgIconTwo" src={EAC} alt={EAC} />
-                            <img className="imgIconTwo" src={ukr} alt={ukr} />
+                            <img className="imgIconTwo" src={WARwhite} alt={WARwhite} />
+                            <img className="imgIconTwo" src={EACwhite} alt={EACwhite} />
+                            <img className="imgIconTwo" src={ukrwhite} alt={ukrwhite} />
                             </div>
                         </div>
                         <div>

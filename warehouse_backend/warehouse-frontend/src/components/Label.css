@@ -13,7 +13,7 @@
     width: 227px;
     height: 170px;
     margin-bottom: 5px;
-    background-color: white;
+    background-color: #666666;
     padding: 5px;
     border-radius: 10px;
     /* border: 1px solid; */
@@ -53,6 +53,7 @@
     font-size: 7px;
     margin-top: -5px;
     margin-right: 2px;
+    background-color: transparent;
 }
 
 .wrapText {
@@ -164,7 +165,7 @@
     margin-top: 5px;
     font-family: "Arial";
     font-weight: 200;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .mainTextCountryTWO {
@@ -215,6 +216,13 @@
       page-break-before: always; /* Каждая этикетка начинается с новой страницы */
 
     }
+    /* * {
+        background-color: #666666; 
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+
+    } */
+
 
 }
 
